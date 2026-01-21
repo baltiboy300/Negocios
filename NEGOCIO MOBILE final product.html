@@ -1,0 +1,919 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NEGOCIO Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #f5f2e9;
+            --bg-white: #ffffff;
+            --accent-secondary: #e879f9;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --sectionPadding: clamp(4rem, 10vh, 6rem);
+            --containerGap: clamp(2rem, 5vw, 4rem);
+            --gridGap: 1rem;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        .font-script { font-family: 'Satisfy', cursive; }
+
+        button, a, input, select {
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+
+        section {
+            padding: var(--sectionPadding) 1rem;
+            padding-bottom: calc(7.5rem + var(--safe-bottom));
+            width: 100%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 80rem;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--containerGap);
+        }
+
+        .card-grid {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--gridGap);
+        }
+
+        @media (min-width: 48rem) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 64rem) { .card-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(4.5rem + var(--safe-top));
+            padding-top: var(--safe-top);
+            background: rgba(245, 242, 233, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding-bottom: var(--safe-bottom);
+            background: var(--bg-white);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+        }
+
+        .version-bar {
+            width: 100%;
+            text-align: center;
+            font-size: 8px;
+            font-weight: 900;
+            color: #cbd5e1;
+            padding: 10px 0 6px 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            user-select: none;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .nav-items-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 3.5rem;
+            width: 100%;
+        }
+
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            color: var(--text-light);
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: none;
+            border: none;
+        }
+
+        .nav-btn.active { color: var(--accent-secondary); }
+
+        .fab {
+            position: fixed;
+            right: 1.25rem;
+            bottom: calc(7rem + var(--safe-bottom));
+            width: 3.75rem;
+            height: 3.75rem;
+            background: var(--accent-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(232, 121, 249, 0.4);
+            z-index: 90;
+            border: none;
+        }
+
+        .listing-card {
+            background: var(--bg-white);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.1s;
+        }
+
+        .category-bar {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .category-bar::-webkit-scrollbar { display: none; }
+
+        .cat-pill {
+            padding: 0.5rem 1rem;
+            background: var(--bg-white);
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-light);
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .cat-pill.active {
+            background: var(--accent-secondary);
+            color: white;
+            border-color: var(--accent-secondary);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 42rem;
+            border-radius: 2rem 2rem 0 0;
+            padding: 1.5rem;
+            padding-bottom: calc(2.5rem + var(--safe-bottom));
+            max-height: 92vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            font-size: 16px; 
+            margin-bottom: 0.75rem;
+            background: #f8fafc;
+        }
+
+        .gender-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .gender-btn:hover {
+            border-color: var(--accent-secondary);
+            background: #fff;
+            transform: scale(1.02);
+        }
+
+        .gender-btn.selected {
+            background: var(--accent-secondary);
+            color: white;
+            border-color: var(--accent-secondary);
+            box-shadow: 0 4px 15px rgba(232, 121, 249, 0.3);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: calc(7.5rem + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(10rem);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        #adminPanel {
+            position: fixed;
+            inset: 0;
+            background: #0f172a;
+            color: white;
+            z-index: 300;
+            padding: calc(2rem + var(--safe-top)) 1.5rem calc(2rem + var(--safe-bottom));
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <h1 class="text-2xl font-script text-fuchsia-500 italic">Negocio</h1>
+        <div id="authWrapper">
+            <div id="verifiedStatus" class="hidden">
+                <div class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-100 flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    VERIFIED
+                </div>
+            </div>
+            <div id="verificationContainer">
+                <div class="pe_verify_email" data-client-id="13401266232106403409">
+                    <script src="https://www.phone.email/verify_email_v1.js" async></script>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="marketplace">
+        <div class="container">
+            <div class="w-full space-y-4">
+                <div class="category-bar">
+                    <button onclick="setFilter('ALL')" class="cat-pill active">All Assets</button>
+                    <button onclick="setFilter('Electronics')" class="cat-pill">Electronics</button>
+                    <button onclick="setFilter('Clothing')" class="cat-pill">Clothing</button>
+                    <button onclick="setFilter('Accessories')" class="cat-pill">Accessories</button>
+                    <button onclick="setFilter('Decorations')" class="cat-pill">Decorations</button>
+                    <button onclick="setFilter('Beauty')" class="cat-pill">Beauty</button>
+                    <button onclick="setFilter('Books')" class="cat-pill">Books</button>
+                    <button onclick="setFilter('Daily needs')" class="cat-pill">Needs</button>
+                </div>
+
+                <div class="flex justify-between items-center px-4">
+                    <h2 id="viewTitle" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Global Feed</h2>
+                    <span id="itemCount" class="text-[10px] font-black text-fuchsia-500">0 ITEMS</span>
+                </div>
+            </div>
+
+            <ul id="itemsContainer" class="card-grid px-4"></ul>
+
+            <div id="emptyState" class="hidden py-20 text-center space-y-4">
+                <div class="text-5xl opacity-20">📡</div>
+                <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Searching for signals...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Modal after OTP/Verification -->
+    <div id="linkIdentityModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-black uppercase mb-2">Verification Done</h3>
+            <p class="text-xs text-slate-500 mb-6 font-bold leading-relaxed">
+                Security check complete. Please link your confirmed email below to start broadcasting.
+            </p>
+            <input type="email" id="identityEmailInput" placeholder="your@email.com" class="font-bold">
+            <button onclick="window.confirmIdentity()" class="w-full py-4 bg-fuchsia-500 text-white rounded-xl text-md font-black shadow-lg uppercase tracking-wider">Unlock Marketplace</button>
+        </div>
+    </div>
+
+    <!-- Gender Selection Modal -->
+    <div id="genderSelectionModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-black uppercase mb-2">Final Step</h3>
+            <p class="text-xs text-slate-500 mb-8 font-bold leading-relaxed">
+                Select your preference to personalize your marketplace experience.
+            </p>
+            
+            <div class="space-y-3">
+                <button onclick="window.setGender('MALE')" class="gender-btn" id="btn-male">
+                    <span>Male</span>
+                </button>
+                <button onclick="window.setGender('FEMALE')" class="gender-btn" id="btn-female">
+                    <span>Female</span>
+                </button>
+                <button onclick="window.setGender('OTHERS')" class="gender-btn" id="btn-others">
+                    <span>Others</span>
+                </button>
+            </div>
+            
+            <button onclick="window.finalizeProfile()" id="finalizeBtn" class="hidden mt-8 w-full py-4 bg-slate-900 text-white rounded-xl text-md font-black shadow-lg uppercase tracking-wider">Complete Setup</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="searchModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black uppercase tracking-tight">Search Feed</h3>
+                <button onclick="toggleModal('searchModal', false)" class="text-3xl text-slate-300">&times;</button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Looking for something?" class="font-bold" oninput="handleSearch()">
+        </div>
+    </div>
+
+    <div id="sellingModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black uppercase tracking-tight">Register Asset</h3>
+                <button onclick="toggleModal('sellingModal', false)" class="text-3xl text-slate-300">&times;</button>
+            </div>
+            <form id="itemForm" class="space-y-1">
+                <input type="text" id="itemName" required placeholder="Asset Title">
+                <input type="number" id="itemPrice" required placeholder="Value (₹)">
+                <select id="itemCategory">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Decorations">Decorations</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Books">Books</option>
+                    <option value="Daily needs">Daily needs</option>
+                </select>
+                <div class="flex gap-6 py-2">
+                    <label class="flex items-center gap-2 font-black text-xs uppercase"><input type="radio" name="itemCondition" value="unused" checked> Unused</label>
+                    <label class="flex items-center gap-2 font-black text-xs uppercase"><input type="radio" name="itemCondition" value="used"> Used</label>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="img-preview-container" id="imgPreview"></div>
+                    <input type="file" id="itemImage" accept="image/*" multiple class="text-xs border-none p-0 bg-transparent">
+                </div>
+                <input type="email" id="sellerEmail" required placeholder="Authenticated Email" readonly class="bg-slate-100 opacity-60">
+                <input type="tel" id="sellerPhone" placeholder="Secure Line (Optional)">
+                <textarea id="itemDesc" rows="3" placeholder="Intelligence Report (Item details)"></textarea>
+                <button type="submit" class="w-full py-4 bg-fuchsia-500 text-white rounded-xl text-md font-black shadow-lg uppercase tracking-wider">Broadcast Listing</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="itemDetailsModal" class="modal-overlay hidden">
+        <div class="modal-content !p-0 overflow-hidden">
+            <div class="relative h-72 bg-slate-100 flex items-center justify-center">
+                <button onclick="toggleModal('itemDetailsModal', false)" class="absolute top-4 right-4 z-20 bg-black/30 text-white w-10 h-10 rounded-full text-2xl backdrop-blur-md">&times;</button>
+                <div id="detailsGallery" class="w-full h-full relative">
+                    <button onclick="prevImage()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-3 rounded-full shadow-md z-10 text-xs">◀</button>
+                    <button onclick="nextImage()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-3 rounded-full shadow-md z-10 text-xs">▶</button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="detCat" class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[9px] font-black uppercase tracking-tighter"></span>
+                    <span id="detCond" class="text-[9px] font-black text-slate-400 uppercase"></span>
+                </div>
+                <h2 id="detName" class="text-xl font-black text-slate-800 uppercase tracking-tight mb-1"></h2>
+                <div id="detPrice" class="text-2xl font-black text-fuchsia-600 mb-4"></div>
+                <p id="detDesc" class="text-slate-500 text-xs leading-relaxed mb-6 font-medium"></p>
+                <button id="connectBtn" class="w-full py-4 bg-fuchsia-500 text-white rounded-xl text-md font-black shadow-lg uppercase tracking-wide">Request Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="requestsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black uppercase tracking-tight">Connections</h3>
+                <button onclick="toggleModal('requestsModal', false)" class="text-3xl text-slate-300">&times;</button>
+            </div>
+            <div id="reqList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div onclick="window.adminClickCounter()" class="version-bar">Version 2.2.6</div>
+        <div class="nav-items-container">
+            <button onclick="setFilter('ALL')" class="nav-btn active"><span>HOME</span></button>
+            <button onclick="toggleModal('searchModal', true)" class="nav-btn"><span>SEARCH</span></button>
+            <button onclick="toggleModal('requestsModal', true)" class="nav-btn"><span>INBOX</span></button>
+        </div>
+    </nav>
+
+    <button onclick="handleNewListingClick()" class="fab">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M12 6v12m6-6H6"></path></svg>
+    </button>
+
+    <div id="adminPanel" class="hidden">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-xl font-black text-amber-500 uppercase tracking-tighter">System Console</h1>
+            <button onclick="window.toggleAdminView(false)" class="bg-slate-800 px-6 py-2 rounded-xl font-bold text-[10px] uppercase">Close</button>
+        </div>
+        
+        <div class="space-y-8">
+            <div>
+                <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Moderate Assets</h2>
+                <div id="adminList" class="space-y-3"></div>
+            </div>
+            
+            <div>
+                <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Access Logs (Blocked)</h2>
+                <div id="blockedUsersList" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="bg-slate-900 text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl border border-slate-700">
+        <span id="toastMsg">Updated</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        // Initialize state
+        let clickCount = 0;
+        let items = [];
+        let connectionRequests = [];
+        let blockedUsers = [];
+        let user = null;
+        let isAdminActive = false;
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+        let currentImagesData = [];
+        let activeDetailsIndex = null;
+        let activeImageIndex = 0;
+        const ADMIN_EMAIL = "km0334109@gmail.com";
+
+        // Assign global handlers IMMEDIATELY to window
+        window.isUserVerified = false;
+        window.verifiedEmail = null;
+        window.userGender = null;
+
+        window.showToast = (m) => { 
+            const msg = document.getElementById('toastMsg'); 
+            if (msg) msg.textContent = m;
+            const t = document.getElementById('toast');
+            if (t) {
+                t.style.transform = "translateX(-50%) translateY(0)";
+                setTimeout(() => t.style.transform = "translateX(-50%) translateY(10rem)", 2500);
+            }
+        };
+
+        window.toggleModal = (id, show) => {
+            const m = document.getElementById(id);
+            if(m) m.classList.toggle('hidden', !show);
+        };
+
+        window.adminClickCounter = () => { 
+            clickCount++;
+            if (clickCount >= 5) { 
+                clickCount = 0;
+                const currentEmail = (window.verifiedEmail || "").toLowerCase().trim();
+                const targetAdmin = ADMIN_EMAIL.toLowerCase().trim();
+
+                if (currentEmail === targetAdmin) {
+                    window.toggleAdminView(true);
+                    window.showToast('Welcome, Administrator');
+                } else {
+                    const displayEmail = window.verifiedEmail ? window.verifiedEmail : "NONE DETECTED";
+                    window.showToast(`Access Denied: ${displayEmail}`);
+                }
+            } else {
+                window.showToast(`${clickCount}/5 Tap Sequence`);
+            }
+        };
+
+        window.toggleAdminView = (show) => {
+            isAdminActive = show;
+            const panel = document.getElementById('adminPanel');
+            if (panel) panel.classList.toggle('hidden', !show);
+            if(show) renderAdmin();
+        };
+
+        // UI Update Functions
+        const updateUI = () => {
+            let filtered = items.filter(i => i.approved === true);
+            
+            // --- PRIVACY FILTER ---
+            // Hide clothing items listed by Females from Male or Other users
+            filtered = filtered.filter(item => {
+                const isClothing = item.category === 'Clothing';
+                const isFemaleListing = item.sellerGender === 'FEMALE';
+                
+                if (isClothing && isFemaleListing) {
+                    // Only allow user identified as Female to see these
+                    return window.userGender === 'FEMALE';
+                }
+                return true;
+            });
+
+            if (currentFilter !== 'ALL') filtered = filtered.filter(i => i.category.toUpperCase().includes(currentFilter.toUpperCase()));
+            if (searchQuery) filtered = filtered.filter(i => i.name.toLowerCase().includes(searchQuery));
+            
+            const container = document.getElementById('itemsContainer');
+            const empty = document.getElementById('emptyState');
+            const badge = document.getElementById('itemCount');
+
+            if (!container) return;
+
+            if (!filtered.length) {
+                empty.classList.remove('hidden');
+                container.innerHTML = '';
+            } else {
+                empty.classList.add('hidden');
+                container.innerHTML = '';
+                filtered.forEach((item) => {
+                    const li = document.createElement('li');
+                    li.onclick = () => window.openItemDetails(item.id);
+                    li.innerHTML = `
+                        <div class="listing-card">
+                            <div class="aspect-square bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                                ${item.images?.[0] ? `<img src="${item.images[0]}" class="w-full h-full object-cover">` : '<div class="text-[8px] font-black opacity-20 uppercase">No Signal</div>'}
+                                ${item.images?.length > 1 ? `<div class="absolute bottom-2 right-2 bg-black/60 text-white text-[8px] px-2 py-0.5 rounded-full font-black">+${item.images.length-1}</div>` : ''}
+                            </div>
+                            <div class="p-3">
+                                <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest">${item.category}</span>
+                                <h3 class="text-[11px] font-black text-slate-800 uppercase truncate mb-1">${item.name}</h3>
+                                <span class="text-sm font-black text-fuchsia-600">₹${parseInt(item.price).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(li);
+                });
+            }
+            if (badge) badge.textContent = `${filtered.length} ITEMS`;
+        };
+
+        const renderAdmin = () => {
+            const list = document.getElementById('adminList');
+            const blockedList = document.getElementById('blockedUsersList');
+            if (!list || !blockedList) return;
+            
+            list.innerHTML = items.length ? '' : '<p class="text-[9px] font-black text-slate-600 uppercase">Database Empty</p>';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-900/50 p-4 rounded-xl flex items-center justify-between border border-slate-800';
+                div.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <p class="font-black text-[11px] uppercase text-white truncate">${item.name}</p>
+                        <p class="text-[8px] text-slate-500 font-bold">${item.email}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="purgeItem('${item.id}')" class="bg-red-500/20 text-red-500 px-3 py-1.5 rounded-lg font-black text-[8px] uppercase border border-red-500/20">Purge</button>
+                        <button onclick="blockUser('${item.sellerId}', '${item.email}')" class="bg-amber-500/20 text-amber-500 px-3 py-1.5 rounded-lg font-black text-[8px] uppercase border border-amber-500/20">Block</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            blockedList.innerHTML = blockedUsers.length ? '' : '<p class="text-[8px] font-bold text-slate-700 uppercase">No Restrictions Active</p>';
+            blockedUsers.forEach(block => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-2 bg-slate-900/30 rounded border border-slate-800';
+                div.innerHTML = `
+                    <span class="text-[8px] font-black text-slate-400 uppercase">${block.email}</span>
+                    <button onclick="unblockUser('${block.id}')" class="text-fuchsia-400 text-[8px] font-black uppercase">Unblock</button>
+                `;
+                blockedList.appendChild(div);
+            });
+        };
+
+        const renderRequests = () => {
+            const list = document.getElementById('reqList');
+            const badge = document.getElementById('reqBadge');
+            if(!user || !list) return;
+            const myIncoming = connectionRequests.filter(r => r.ownerId === user.uid && r.status === 'pending');
+            if (badge) badge.classList.toggle('hidden', myIncoming.length === 0);
+            list.innerHTML = myIncoming.length ? '' : '<p class="text-center text-slate-400 py-10 font-bold uppercase text-[9px]">Inbox Clear</p>';
+            myIncoming.forEach(req => {
+                const item = items.find(i => i.id === req.listingId);
+                const div = document.createElement('div');
+                div.className = 'p-3 bg-slate-50 border rounded-xl flex items-center justify-between gap-3';
+                div.innerHTML = `
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-[8px] font-black uppercase text-slate-400">Incoming for:</p>
+                        <p class="text-[11px] font-black truncate text-slate-900">${item ? item.name : 'Asset'}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="respond('${req.id}', 'approved')" class="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">Grant</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        // Firebase Initialization
+        let db, auth, appId;
+        try {
+            const firebaseConfig = JSON.parse(__firebase_config);
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'negocio-v5';
+        } catch (e) {
+            console.error("Firebase config error:", e);
+        }
+
+        const setupDataSync = () => {
+            if (!db) return;
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), (snap) => {
+                items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateUI();
+                if(isAdminActive) renderAdmin();
+            }, (err) => console.log("Listings Sync Error"));
+
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), (snap) => {
+                connectionRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderRequests();
+            }, (err) => console.log("Requests Sync Error"));
+
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users'), (snap) => {
+                blockedUsers = snap.docs.map(d => d.id);
+                if(isAdminActive) renderAdmin();
+            }, (err) => console.log("Blocked Sync Error"));
+        };
+
+        // More global assignments
+        window.respond = async (id, status) => {
+            if (!db) return;
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'connection_requests', id), { status });
+            window.showToast(`Status: ${status}`);
+        };
+
+        window.sendReq = async (lid, oid) => {
+            if(!user) return window.showToast('Auth Required');
+            if (!db) return;
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), {
+                listingId: lid, ownerId: oid, requesterId: user.uid, status: 'pending', createdAt: Date.now()
+            });
+            window.showToast('Signal Sent');
+        };
+
+        window.setFilter = (cat) => {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-pill, .nav-btn').forEach(el => {
+                const text = el.textContent.toUpperCase();
+                el.classList.toggle('active', text.includes(cat.toUpperCase()) || (cat === 'ALL' && (text === 'HOME' || text === 'ALL ASSETS')));
+            });
+            const titleEl = document.getElementById('viewTitle');
+            if (titleEl) titleEl.textContent = cat;
+            updateUI();
+        };
+
+        window.handleSearch = () => { searchQuery = document.getElementById('searchInput').value.toLowerCase(); updateUI(); };
+
+        window.openItemDetails = (id) => {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            activeDetailsIndex = items.indexOf(item);
+            activeImageIndex = 0;
+            document.getElementById('detName').textContent = item.name;
+            document.getElementById('detCat').textContent = item.category;
+            document.getElementById('detCond').textContent = item.condition || 'used';
+            document.getElementById('detPrice').textContent = `₹${parseInt(item.price).toLocaleString()}`;
+            document.getElementById('detDesc').textContent = item.description || 'Details restricted.';
+            
+            const btn = document.getElementById('connectBtn');
+            const req = connectionRequests.find(r => r.listingId === item.id && r.requesterId === user?.uid);
+            
+            if (user?.uid === item.sellerId) { btn.textContent = "Your Listing"; btn.disabled = true; }
+            else if (req) {
+                btn.textContent = req.status === 'approved' ? "Comms Open" : "Pending...";
+                btn.disabled = req.status !== 'approved';
+                if(req.status === 'approved') btn.onclick = () => window.showToast(`Email: ${item.email}`);
+            } else { btn.textContent = "Connect"; btn.disabled = false; btn.onclick = () => window.sendReq(item.id, item.sellerId); }
+            
+            window.updateGallery();
+            window.toggleModal('itemDetailsModal', true);
+        };
+
+        window.updateGallery = () => {
+            const item = items[activeDetailsIndex];
+            const container = document.getElementById('detailsGallery');
+            if (!container) return;
+            container.querySelectorAll('img').forEach(i => i.remove());
+            if(item?.images?.length) {
+                const img = document.createElement('img');
+                img.src = item.images[activeImageIndex];
+                img.className = 'w-full h-full object-contain';
+                container.prepend(img);
+            }
+        };
+
+        window.nextImage = () => { const total = items[activeDetailsIndex]?.images?.length; if(total) { activeImageIndex = (activeImageIndex + 1) % total; window.updateGallery(); } };
+        window.prevImage = () => { const total = items[activeDetailsIndex]?.images?.length; if(total) { activeImageIndex = (activeImageIndex - 1 + total) % total; window.updateGallery(); } };
+
+        window.purgeItem = async (id) => {
+            if (!db) return;
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
+            window.showToast('Asset Purged');
+        };
+
+        window.blockUser = async (uid, email) => {
+            if (!db) return;
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', uid), {
+                email, blockedAt: Date.now()
+            });
+            window.showToast(`User Restricted: ${email}`);
+        };
+
+        window.unblockUser = async (uid) => {
+            if (!db) return;
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', uid));
+            window.showToast('Restriction Lifted');
+        };
+
+        window.phoneEmailReceiver = async (userObj) => {
+            if (userObj && userObj.user_json_url) {
+                window.isUserVerified = true;
+                const container = document.getElementById('verificationContainer');
+                const status = document.getElementById('verifiedStatus');
+                if (container) container.classList.add('hidden');
+                if (status) status.classList.remove('hidden');
+                
+                window.toggleModal('linkIdentityModal', true);
+                
+                try {
+                    const res = await fetch(userObj.user_json_url);
+                    const data = await res.json();
+                    if(data.user_email_id) {
+                        const input = document.getElementById('identityEmailInput');
+                        if(input) input.value = data.user_email_id;
+                    }
+                } catch(e) {}
+            }
+        };
+
+        window.confirmIdentity = () => {
+            const emailInput = document.getElementById('identityEmailInput');
+            const email = emailInput?.value?.trim();
+            if(!email || !email.includes('@')) {
+                window.showToast('Invalid Email');
+                return;
+            }
+            window.verifiedEmail = email.toLowerCase();
+            window.toggleModal('linkIdentityModal', false);
+            window.toggleModal('genderSelectionModal', true);
+        };
+
+        window.setGender = (gender) => {
+            window.userGender = gender;
+            document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('selected'));
+            const activeBtn = document.getElementById(`btn-${gender.toLowerCase()}`);
+            if(activeBtn) activeBtn.classList.add('selected');
+            const finalize = document.getElementById('finalizeBtn');
+            if(finalize) finalize.classList.remove('hidden');
+        };
+
+        window.finalizeProfile = () => {
+            if(!window.userGender) return;
+            window.toggleModal('genderSelectionModal', false);
+            updateUI(); // Immediate refresh to apply filters
+            window.showToast(`Profile Ready: ${window.userGender}`);
+        };
+
+        window.handleNewListingClick = () => { 
+            if(!window.isUserVerified) return window.showToast('Auth Required'); 
+            window.toggleModal('sellingModal', true); 
+        };
+
+        // Form Listeners
+        const imageInput = document.getElementById('itemImage');
+        if (imageInput) {
+            imageInput.addEventListener('change', function() {
+                const files = Array.from(this.files);
+                const preview = document.getElementById('imgPreview');
+                if (preview) preview.innerHTML = '';
+                currentImagesData = [];
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        currentImagesData.push(e.target.result);
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-preview-item';
+                        if (preview) preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+        }
+
+        const itemForm = document.getElementById('itemForm');
+        if (itemForm) {
+            itemForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!user || !db) return;
+
+                const blockRef = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', user.uid));
+                if (blockRef.exists()) {
+                    window.showToast('Broadcast Failed: Account Blocked');
+                    return;
+                }
+
+                const newItem = {
+                    name: document.getElementById('itemName').value,
+                    price: parseFloat(document.getElementById('itemPrice').value),
+                    category: document.getElementById('itemCategory').value,
+                    condition: document.querySelector('input[name="itemCondition"]:checked').value,
+                    description: document.getElementById('itemDesc').value,
+                    email: window.verifiedEmail || document.getElementById('sellerEmail').value,
+                    phone: document.getElementById('sellerPhone').value,
+                    images: [...currentImagesData],
+                    approved: true,
+                    sellerId: user.uid,
+                    sellerGender: window.userGender, // Save seller gender for privacy filtering
+                    createdAt: Date.now()
+                };
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), newItem);
+                    window.toggleModal('sellingModal', false);
+                    window.showToast('Signal Broadcasted');
+                } catch (err) {
+                    window.showToast('Broadcast Failed');
+                }
+            });
+        }
+
+        // Authentication Init
+        const initAuth = async () => {
+            if (!auth) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth error:", e);
+            }
+        };
+
+        if (auth) {
+            onAuthStateChanged(auth, (u) => { 
+                user = u; 
+                if (user) setupDataSync(); 
+            });
+            initAuth();
+        }
+
+    </script>
+</body>
+</html>

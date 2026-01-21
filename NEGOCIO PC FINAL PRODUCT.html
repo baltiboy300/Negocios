@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEGOCIO Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #f5f2e9;
+            --bg-accent: #ede6d3;
+            --accent-primary: #0891b2;
+            --accent-secondary: #e879f9;
+            --accent-highlight: #b45309;
+            --text-main: #1e293b;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --border-glow: rgba(232, 121, 249, 0.3);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-accent) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .font-script { font-family: 'Satisfy', cursive; letter-spacing: 1px; }
+        .subtle-glow { text-shadow: 0 0 12px rgba(232, 121, 249, 0.3); }
+
+        .pixel-card {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pixel-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent-secondary);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.3);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-retro {
+            background: var(--accent-secondary);
+            color: #fff;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+
+        .btn-retro:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.3);
+        }
+
+        .category-pill {
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #64748b;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .category-pill:hover {
+            background: rgba(232, 121, 249, 0.05);
+            color: var(--accent-secondary);
+        }
+
+        .category-pill.active {
+            background: var(--accent-secondary);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(232, 121, 249, 0.2);
+        }
+
+        input, textarea, select {
+            background: #fff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: var(--text-main) !important;
+            font-size: 0.95rem !important;
+            padding: 12px 16px !important;
+            border-radius: 8px !important;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .img-preview-container {
+            width: 100%;
+            height: 160px;
+            border: 2px dashed #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: auto;
+            background: #f8fafc;
+            padding: 12px;
+            gap: 12px;
+            border-radius: 12px;
+        }
+
+        .img-preview-item {
+            height: 100%;
+            aspect-ratio: 1;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .search-bar {
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            padding: 16px 20px;
+            width: 100%;
+            font-size: 1rem;
+            color: var(--text-main);
+            border-radius: 12px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .gallery-main {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .btn-view-info {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+        }
+        
+        .btn-view-info:hover { background: var(--accent-secondary); color: white; }
+
+        .admin-nav-item {
+            padding: 1rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .admin-nav-item.active {
+            opacity: 1;
+            border-bottom: 2px solid #f59e0b;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Marketplace View Wrapper -->
+    <div id="marketplaceView" class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- Identity Verification Widget -->
+        <div class="fixed top-0 right-0 z-[100] p-0 m-0">
+            <div id="verificationContainer" class="transform scale-75 origin-top-right">
+                <div class="pe_verify_email" data-client-id="13401266232106403409">
+                    <script src="https://www.phone.email/verify_email_v1.js" async></script>
+                </div>
+            </div>
+            <div id="verifiedStatus" class="hidden transform scale-90 origin-top-right mt-1 mr-1 flex items-center gap-2">
+                <div id="userGenderBadge" class="bg-slate-800 text-white px-3 py-2 rounded-full text-[0.65rem] font-bold uppercase hidden"></div>
+                <div class="verified-badge">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    VERIFIED
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-72 sidebar p-8 flex flex-col shrink-0">
+            <header class="mb-12 text-center md:text-left">
+                <h1 class="text-5xl font-script subtle-glow italic text-fuchsia-500 mb-2">Negocio</h1>
+                <p class="font-script text-xl text-slate-500 lowercase opacity-80">para estudiantes</p>
+            </header>
+
+            <div class="mb-8 space-y-4">
+                <button onclick="handleNewListingClick()" class="w-full btn-retro py-4 rounded-xl text-lg shadow-lg mb-6">
+                    + New Listing
+                </button>
+
+                <button onclick="toggleModal('requestsModal', true)" class="w-full relative px-6 py-4 bg-white border border-slate-200 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                    <span>Connect Requests</span>
+                    <div id="requestBadge" class="hidden bg-red-500 text-white text-[0.6rem] px-2 py-1 rounded-full">0</div>
+                </button>
+
+                <div>
+                    <h3 class="text-xs font-bold text-slate-400 mt-10 mb-4 tracking-[0.2em] uppercase px-4">Categories</h3>
+                    <nav id="categoryFilter" class="flex flex-col gap-1">
+                        <div class="category-pill active" onclick="setFilter('ALL')">All Assets</div>
+                        <div class="category-pill" onclick="setFilter('Electronics')">Electronics</div>
+                        <div class="category-pill" onclick="setFilter('Clothing')">Clothing</div>
+                        <div class="category-pill" onclick="setFilter('Accessories')">Accessories</div>
+                        <div class="category-pill" onclick="setFilter('Decorations')">Decorations</div>
+                        <div class="category-pill" onclick="setFilter('Beauty')">Beauty</div>
+                        <div class="category-pill" onclick="setFilter('Books')">Books</div>
+                        <div class="category-pill" onclick="setFilter('Daily needs')">Daily Needs</div>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-8">
+                <div id="adminTrigger" onclick="handleAdminAccess()" class="text-[0.65rem] text-slate-400 uppercase font-medium tracking-widest cursor-pointer select-none hover:text-slate-600 transition-colors">
+                    System Active v5.7
+                </div>
+            </div>
+        </aside>
+
+        <!-- Product Content Area -->
+        <main class="flex-1 p-6 md:p-12 overflow-y-auto relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-12">
+                    <div class="flex flex-col lg:flex-row gap-6 items-center">
+                        <div class="relative flex-1 w-full">
+                            <input type="text" id="searchInput" placeholder="Search for items..." class="search-bar" oninput="handleSearch()">
+                        </div>
+                        
+                        <div class="relative w-full lg:w-auto">
+                            <button onclick="toggleFilterMenu()" class="w-full lg:w-auto px-8 py-4 bg-white border border-slate-200 rounded-xl font-semibold flex items-center justify-center gap-3 hover:bg-slate-50 transition-colors">
+                                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                                Filter
+                            </button>
+                            <div id="filterMenu" class="pixel-card absolute right-0 top-full mt-3 w-64 p-6 rounded-2xl hidden z-50">
+                                <div class="space-y-6">
+                                    <div>
+                                        <h4 class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-3">Price Sort</h4>
+                                        <div class="grid grid-cols-1 gap-2">
+                                            <button onclick="setSort('none')" id="sortNone" class="text-left text-sm py-2 px-3 rounded-lg hover:bg-slate-50 font-medium">Default</button>
+                                            <button onclick="setSort('high-to-low')" id="sortHighLow" class="text-left text-sm py-2 px-3 rounded-lg hover:bg-slate-50 font-medium">High to Low</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-3">Condition</h4>
+                                        <div class="grid grid-cols-1 gap-2">
+                                            <button onclick="setCondition('all')" id="condAll" class="text-left text-sm py-2 px-3 rounded-lg hover:bg-slate-50 font-medium">Any</button>
+                                            <button onclick="setCondition('unused')" id="condUnused" class="text-left text-sm py-2 px-3 rounded-lg hover:bg-slate-50 font-medium">Unused</button>
+                                            <button onclick="setCondition('used')" id="condUsed" class="text-left text-sm py-2 px-3 rounded-lg hover:bg-slate-50 font-medium">Used</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-8 px-2">
+                        <h2 id="currentViewTitle" class="text-sm font-bold text-fuchsia-600 tracking-wide uppercase">All Assets</h2>
+                        <span id="itemCount" class="text-xs font-semibold text-slate-400 uppercase">0 Records Found</span>
+                    </div>
+                </div>
+
+                <div id="emptyState" class="text-center py-32 pixel-card rounded-3xl border-2 border-dashed border-slate-200">
+                    <p class="text-lg font-semibold text-slate-400 uppercase">No items found</p>
+                </div>
+
+                <div id="itemsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Gender Selection Modal -->
+    <div id="genderModal" class="fixed inset-0 modal-overlay z-[500] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md p-10 relative rounded-3xl shadow-2xl text-center">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 uppercase tracking-tight">Identity Preference</h2>
+            <p class="text-slate-500 text-sm mb-8">Choose your gender to filter clothing listings. This preference is private.</p>
+            <div class="grid grid-cols-1 gap-3">
+                <button onclick="setIdentity('Male')" class="w-full py-4 border-2 border-slate-100 rounded-2xl hover:border-fuchsia-500 hover:text-fuchsia-600 font-bold transition-all uppercase text-sm">Male</button>
+                <button onclick="setIdentity('Female')" class="w-full py-4 border-2 border-slate-100 rounded-2xl hover:border-fuchsia-500 hover:text-fuchsia-600 font-bold transition-all uppercase text-sm">Female</button>
+                <button onclick="setIdentity('Other')" class="w-full py-4 border-2 border-slate-100 rounded-2xl hover:border-fuchsia-500 hover:text-fuchsia-600 font-bold transition-all uppercase text-sm">Other</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Moderation View -->
+    <div id="adminView" class="hidden flex flex-col min-h-screen bg-slate-900 text-white p-8 md:p-16">
+        <header class="flex justify-between items-center mb-12 border-b border-slate-800 pb-8">
+            <h1 class="text-3xl font-bold text-amber-500 uppercase tracking-tight">Admin Console</h1>
+            <button onclick="toggleView('market')" class="px-6 py-3 bg-slate-800 rounded-xl font-bold text-xs uppercase tracking-widest">Exit</button>
+        </header>
+
+        <div class="flex gap-12 mb-10 border-b border-slate-800">
+            <button onclick="setAdminTab('listings')" id="tab-listings" class="admin-nav-item active font-bold uppercase tracking-widest">Listings</button>
+            <button onclick="setAdminTab('users')" id="tab-users" class="admin-nav-item font-bold uppercase tracking-widest">Users</button>
+        </div>
+
+        <div id="adminContent" class="flex-1 overflow-y-auto">
+            <div id="admin-tab-listings" class="space-y-4">
+                <div id="adminListingsList" class="grid grid-cols-1 gap-4"></div>
+            </div>
+            <div id="admin-tab-users" class="hidden">
+                <div class="overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-800 text-slate-400 uppercase text-[0.7rem] font-bold">
+                            <tr><th class="p-6">User ID</th><th class="p-6">Email</th><th class="p-6 text-center">Status</th><th class="p-6 text-right">Action</th></tr>
+                        </thead>
+                        <tbody id="adminUsersList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests Modal -->
+    <div id="requestsModal" class="fixed inset-0 modal-overlay z-[300] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-xl p-10 relative rounded-3xl shadow-2xl overflow-y-auto max-h-[80vh]">
+            <button onclick="toggleModal('requestsModal', false)" class="absolute top-6 right-6 text-slate-400 text-2xl font-bold">&times;</button>
+            <h2 class="text-2xl font-bold text-slate-800 mb-8">Connection Requests</h2>
+            <div id="incomingRequestsList" class="space-y-4">
+                <p class="text-slate-400 text-center py-10">No incoming requests yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selling Modal -->
+    <div id="sellingModal" class="fixed inset-0 modal-overlay z-[150] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-2xl p-10 relative max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl">
+            <button onclick="toggleModal('sellingModal', false)" class="absolute top-6 right-6 text-slate-400 text-2xl font-bold hover:text-slate-800 transition-colors">&times;</button>
+            <h2 class="text-2xl font-bold text-slate-800 mb-10">Register Asset</h2>
+            <form id="itemForm" class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <input type="text" id="itemName" required placeholder="Asset Name" class="w-full">
+                        <input type="number" id="itemPrice" required placeholder="Price (₹)" class="w-full">
+                        <select id="itemCategory" class="w-full" onchange="toggleGenderSelect(this.value)">
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Decorations">Decorations</option>
+                            <option value="Beauty">Beauty</option>
+                            <option value="Books">Books</option>
+                            <option value="Daily needs">Daily needs</option>
+                        </select>
+                        <div id="clothingGenderGroup" class="hidden animate-pulse">
+                            <label class="text-[0.65rem] text-fuchsia-600 font-black uppercase mb-2 block">Item Target Gender</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Male" class="accent-fuchsia-500"> Male</label>
+                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Female" checked class="accent-fuchsia-500"> Female</label>
+                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Other" class="accent-fuchsia-500"> Other</label>
+                            </div>
+                        </div>
+                        <div class="flex gap-6"><label class="flex items-center gap-2"><input type="radio" name="itemCondition" value="unused" checked class="accent-fuchsia-500"> Unused</label><label class="flex items-center gap-2"><input type="radio" name="itemCondition" value="used" class="accent-fuchsia-500"> Used</label></div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="img-preview-container" id="imgPreview"><span class="text-sm text-slate-400 mx-auto">No images selected</span></div>
+                        <input type="file" id="itemImage" accept="image/*" multiple class="text-xs">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[0.65rem] text-fuchsia-600 font-bold uppercase ml-1">Email Address</label>
+                        <input type="email" id="sellerEmail" required placeholder="name@email.com">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[0.65rem] text-slate-400 font-bold uppercase ml-1">Phone Number (Optional)</label>
+                        <input type="tel" id="sellerPhone" placeholder="Phone Number">
+                    </div>
+                </div>
+                <textarea id="itemDesc" rows="4" placeholder="Detailed Information..." class="w-full"></textarea>
+                <button type="submit" class="w-full py-5 btn-retro rounded-2xl text-lg font-bold">Submit Listing</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Item Details -->
+    <div id="itemDetailsModal" class="fixed inset-0 modal-overlay z-[140] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-5xl p-0 relative max-h-[95vh] overflow-y-auto rounded-[2rem] overflow-hidden shadow-2xl">
+            <button onclick="toggleModal('itemDetailsModal', false)" class="absolute top-6 right-6 z-20 bg-black/50 text-white w-12 h-12 flex items-center justify-center rounded-full text-2xl transition-all">&times;</button>
+            <div class="flex flex-col lg:flex-row">
+                <div class="w-full lg:w-1/2 bg-slate-50">
+                    <div class="gallery-main h-full" id="detailsGallery">
+                        <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-4 rounded-full shadow z-10">◀</button>
+                        <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-4 rounded-full shadow z-10">▶</button>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 p-12 bg-white flex flex-col justify-center">
+                    <div class="mb-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex gap-2">
+                                <span id="detailsCategory" class="px-3 py-1 bg-amber-100 text-amber-800 rounded-lg text-xs font-bold uppercase tracking-widest"></span>
+                                <span id="detailsGenderTag" class="hidden px-3 py-1 bg-fuchsia-100 text-fuchsia-800 rounded-lg text-xs font-bold uppercase tracking-widest"></span>
+                            </div>
+                            <span id="detailsCondition" class="text-xs font-bold text-slate-400 uppercase tracking-widest"></span>
+                        </div>
+                        <h2 id="detailsName" class="text-3xl font-extrabold text-slate-800 uppercase mb-4 leading-tight"></h2>
+                        <div class="text-4xl font-black text-fuchsia-600 mb-10" id="detailsPrice"></div>
+                        <p id="detailsDesc" class="text-slate-600 text-lg leading-relaxed font-medium"></p>
+                    </div>
+                    <button id="connectBtn" class="w-full py-5 bg-fuchsia-500 text-white rounded-2xl text-lg font-bold shadow-lg hover:bg-fuchsia-600 transition-all uppercase tracking-wide">Connect with Owner</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md p-12 relative text-center rounded-[2rem] shadow-2xl">
+            <button onclick="toggleModal('contactModal', false)" class="absolute top-6 right-6 text-slate-300 text-2xl font-bold">&times;</button>
+            <div class="mb-8 inline-block p-6 bg-fuchsia-50 rounded-3xl">
+                <svg class="w-12 h-12 text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-8 tracking-tight uppercase">Connection Authorized</h2>
+            <div id="contactDetails" class="space-y-6"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold text-sm shadow-2xl transform translate-y-40 transition-transform duration-300 z-[1000]">
+        <span id="toastMsg">System Updated</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'negocio-v4';
+
+        // --- GLOBAL STATE ---
+        let items = [];
+        let filteredItems = [];
+        let blockedUsers = [];
+        let connectionRequests = [];
+        let user = null;
+        let isAdminView = false;
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+        let sortMode = 'none';
+        let conditionFilter = 'all';
+        let currentImagesData = [];
+        let activeDetailsIndex = null;
+        let activeImageIndex = 0;
+        window.isUserVerified = false;
+        window.verifiedUserEmail = null;
+        window.currentUserGender = null;
+
+        // --- UI FUNCTIONS ---
+        window.toggleModal = (id, show) => {
+            const m = document.getElementById(id);
+            if(m) {
+                m.classList.toggle('hidden', !show);
+                if (!show && id === 'sellingModal') { 
+                    document.getElementById('itemForm').reset(); 
+                    document.getElementById('imgPreview').innerHTML = 'No images selected'; 
+                    document.getElementById('clothingGenderGroup').classList.add('hidden');
+                    currentImagesData = []; 
+                }
+            }
+        };
+
+        window.toggleGenderSelect = (val) => {
+            const group = document.getElementById('clothingGenderGroup');
+            if(val === 'Clothing') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+            }
+        };
+
+        const updateUI = () => {
+            filteredItems = items.filter(i => {
+                if(!i.approved) return false;
+                if (i.category === 'Clothing' && i.targetGender && window.currentUserGender) {
+                    if (i.targetGender !== window.currentUserGender) return false;
+                }
+                return true;
+            });
+            
+            if (currentFilter !== 'ALL') {
+                filteredItems = filteredItems.filter(i => i.category.toUpperCase().includes(currentFilter.toUpperCase()));
+            }
+            if (searchQuery) {
+                filteredItems = filteredItems.filter(i => i.name.toLowerCase().includes(searchQuery));
+            }
+            if (conditionFilter !== 'all') {
+                filteredItems = filteredItems.filter(i => i.condition === conditionFilter);
+            }
+            if (sortMode === 'high-to-low') {
+                filteredItems.sort((a, b) => b.price - a.price);
+            }
+
+            const itemsContainer = document.getElementById('itemsContainer');
+            const emptyState = document.getElementById('emptyState');
+            const itemCountBadge = document.getElementById('itemCount');
+
+            if (!filteredItems.length) { 
+                emptyState.classList.remove('hidden'); 
+                itemsContainer.classList.add('hidden'); 
+            } else {
+                emptyState.classList.add('hidden'); 
+                itemsContainer.classList.remove('hidden'); 
+                itemsContainer.innerHTML = '';
+                filteredItems.forEach((item) => {
+                    const card = document.createElement('div');
+                    card.className = 'pixel-card flex flex-col overflow-hidden rounded-[2rem] cursor-pointer group bg-white';
+                    card.onclick = () => window.openItemDetails(item.id);
+                    
+                    const cardContent = document.createElement('div');
+                    cardContent.innerHTML = `
+                        <div class="w-full aspect-square bg-slate-50 border-b border-slate-100 flex items-center justify-center overflow-hidden relative">
+                            <div class="img-wrapper w-full h-full"></div>
+                            ${item.images?.length > 1 ? `<div class="absolute bottom-4 right-4 bg-black/60 text-white text-[0.6rem] px-3 py-1.5 rounded-full font-bold">+${item.images.length - 1}</div>` : ''}
+                            ${item.targetGender ? `<div class="absolute top-4 right-4 bg-fuchsia-500 text-white text-[0.55rem] px-2.5 py-1 rounded-md font-black uppercase tracking-tighter">${item.targetGender}</div>` : ''}
+                        </div>
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="category-text text-[0.7rem] font-bold text-amber-700 uppercase"></span>
+                                <span class="condition-text text-[0.65rem] text-slate-400 uppercase font-black bg-slate-50 px-3 py-1.5 rounded-lg"></span>
+                            </div>
+                            <h3 class="name-text text-xl font-bold text-slate-800 mb-8 uppercase leading-tight truncate"></h3>
+                            <div class="flex items-center justify-between">
+                                <span class="price-text text-2xl font-black text-fuchsia-600"></span>
+                                <div class="btn-view-info">View Info</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    cardContent.querySelector('.category-text').textContent = item.category;
+                    cardContent.querySelector('.condition-text').textContent = item.condition;
+                    cardContent.querySelector('.name-text').textContent = item.name;
+                    cardContent.querySelector('.price-text').textContent = `₹${parseInt(item.price).toLocaleString()}`;
+                    
+                    const imgWrapper = cardContent.querySelector('.img-wrapper');
+                    if (item.images?.[0]) {
+                        const img = document.createElement('img');
+                        img.src = item.images[0];
+                        img.className = 'w-full h-full object-contain group-hover:scale-105 transition-all';
+                        imgWrapper.appendChild(img);
+                    } else {
+                        imgWrapper.innerHTML = `<div class="text-slate-200 uppercase font-bold text-xs flex items-center justify-center h-full">No Visual Data</div>`;
+                    }
+                    
+                    card.appendChild(cardContent);
+                    itemsContainer.appendChild(card);
+                });
+            }
+            itemCountBadge.textContent = `${filteredItems.length} RECORDS FOUND`;
+        };
+
+        const renderAdminPanel = () => {
+            const listEl = document.getElementById('adminListingsList');
+            listEl.innerHTML = '';
+            items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'bg-slate-800 rounded-2xl p-6 flex items-center gap-6 border border-slate-700';
+                row.innerHTML = `
+                    <div class="w-16 h-16 bg-black shrink-0 rounded-xl overflow-hidden">
+                        ${item.images?.[0] ? `<img src="${item.images[0]}" class="w-full h-full object-cover">` : ''}
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-bold text-amber-500 text-lg">${item.name}</div>
+                        <div class="text-slate-400 text-xs">₹${item.price} • ${item.category}${item.targetGender ? ' ('+item.targetGender+')' : ''}</div>
+                    </div>
+                `;
+                
+                const delBtn = document.createElement('button');
+                delBtn.className = 'px-6 py-2 bg-red-600 text-white font-bold rounded-lg uppercase text-xs';
+                delBtn.textContent = 'Delete';
+                delBtn.onclick = () => window.removeAsset(item.id);
+                row.appendChild(delBtn);
+                listEl.appendChild(row);
+            });
+
+            const usersEl = document.getElementById('adminUsersList');
+            usersEl.innerHTML = '';
+            const uniqueUsers = [...new Map(items.map(item => [item.sellerId, item])).values()];
+            uniqueUsers.forEach(u => {
+                if(!u.sellerId) return;
+                const isBlocked = blockedUsers.includes(u.sellerId);
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-700/50 hover:bg-slate-800/30';
+                row.innerHTML = `
+                    <td class="p-6 text-slate-400 text-xs font-mono">${u.sellerId}</td>
+                    <td class="p-6 font-bold text-slate-100">${u.email}</td>
+                    <td class="p-6 text-center">
+                        <span class="${isBlocked ? 'text-red-500' : 'text-emerald-500'} font-bold">${isBlocked ? 'Blocked' : 'Active'}</span>
+                    </td>
+                    <td class="p-6 text-right"></td>
+                `;
+                
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = `px-5 py-2 ${isBlocked ? 'bg-emerald-600' : 'bg-red-900'} text-white font-bold rounded-lg text-xs`;
+                toggleBtn.textContent = isBlocked ? 'Unblock' : 'Block';
+                toggleBtn.onclick = () => window.toggleUserBlock(u.sellerId);
+                row.querySelector('td:last-child').appendChild(toggleBtn);
+                usersEl.appendChild(row);
+            });
+        };
+
+        const renderRequestsPanel = () => {
+            const listEl = document.getElementById('incomingRequestsList');
+            const badge = document.getElementById('requestBadge');
+            if (!user) return;
+
+            const myIncoming = connectionRequests.filter(r => r.ownerId === user.uid && r.status === 'pending');
+            
+            if (myIncoming.length > 0) {
+                badge.textContent = myIncoming.length;
+                badge.classList.remove('hidden');
+                listEl.innerHTML = '';
+                myIncoming.forEach(req => {
+                    const item = items.find(i => i.id === req.listingId);
+                    const row = document.createElement('div');
+                    row.className = 'p-6 bg-slate-50 border rounded-2xl flex items-center justify-between gap-4';
+                    row.innerHTML = `
+                        <div class="flex-1">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Incoming Request for:</p>
+                            <p class="text-sm font-bold text-slate-800 uppercase truncate">${item ? item.name : 'Unknown Item'}</p>
+                            <p class="text-[0.65rem] text-slate-500 font-mono mt-1">From ID: ${req.requesterId}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="respondToRequest('${req.id}', 'approved')" class="px-4 py-2 bg-emerald-500 text-white text-[0.6rem] font-bold rounded-lg uppercase">Approve</button>
+                            <button onclick="respondToRequest('${req.id}', 'rejected')" class="px-4 py-2 bg-slate-200 text-slate-600 text-[0.6rem] font-bold rounded-lg uppercase">Reject</button>
+                        </div>
+                    `;
+                    listEl.appendChild(row);
+                });
+            } else {
+                badge.classList.add('hidden');
+                listEl.innerHTML = '<p class="text-slate-400 text-center py-10 uppercase text-xs font-bold">No Pending Requests</p>';
+            }
+        };
+
+        // --- HANDLERS ---
+        window.phoneEmailReceiver = async function(userObj) { 
+            window.isUserVerified = true; 
+            window.verifiedUserEmail = userObj.user_email_id;
+            
+            document.getElementById('verificationContainer').classList.add('hidden'); 
+            document.getElementById('verifiedStatus').classList.remove('hidden'); 
+            
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'));
+                if (userDoc.exists()) {
+                    window.currentUserGender = userDoc.data().gender;
+                    updateGenderBadge();
+                    updateUI();
+                } else {
+                    window.toggleModal('genderModal', true);
+                }
+            }
+            const sellerEmailInput = document.getElementById('sellerEmail');
+            if (sellerEmailInput && !sellerEmailInput.value) sellerEmailInput.value = window.verifiedUserEmail;
+            showToast('Identity Verified'); 
+        };
+
+        window.setIdentity = async (gender) => {
+            if(!user) return;
+            window.currentUserGender = gender;
+            await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'), {
+                gender: gender,
+                updatedAt: Date.now()
+            });
+            window.toggleModal('genderModal', false);
+            updateGenderBadge();
+            updateUI();
+            showToast(`Profile: ${gender}`);
+        };
+
+        const updateGenderBadge = () => {
+            const badge = document.getElementById('userGenderBadge');
+            if (window.currentUserGender) {
+                badge.textContent = window.currentUserGender;
+                badge.classList.remove('hidden');
+            }
+        };
+
+        window.respondToRequest = async (requestId, status) => {
+            if (!user) return;
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'connection_requests', requestId), { status });
+            showToast(`Request ${status.toUpperCase()}`);
+        };
+
+        window.sendConnectionRequest = async (listingId, ownerId) => {
+            if (!window.isUserVerified) return showToast('Verify identity first');
+            if (user.uid === ownerId) return showToast('Cannot request your own item');
+            
+            const existing = connectionRequests.find(r => r.listingId === listingId && r.requesterId === user.uid);
+            if (existing) return showToast('Request already sent');
+
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), {
+                listingId,
+                ownerId,
+                requesterId: user.uid,
+                status: 'pending',
+                createdAt: Date.now()
+            });
+            showToast('Connection Request Sent');
+        };
+        
+        window.handleNewListingClick = () => {
+            if (!window.isUserVerified) return showToast('Please sign in first');
+            if (blockedUsers.includes(user.uid)) return showToast('Account restricted');
+            window.toggleModal('sellingModal', true);
+        };
+        
+        window.toggleFilterMenu = () => document.getElementById('filterMenu').classList.toggle('hidden');
+        window.setFilter = (cat) => {
+            currentFilter = cat;
+            document.querySelectorAll('.category-pill').forEach(pill => {
+                const text = pill.textContent.toUpperCase();
+                pill.classList.toggle('active', text.includes(cat.toUpperCase()) || (cat === 'ALL' && text === 'ALL ASSETS'));
+            });
+            document.getElementById('currentViewTitle').textContent = cat === 'ALL' ? 'All Assets' : cat;
+            updateUI();
+        };
+
+        window.handleSearch = () => { searchQuery = document.getElementById('searchInput').value.toLowerCase(); updateUI(); };
+        window.setSort = (mode) => { sortMode = mode; document.getElementById('filterMenu').classList.add('hidden'); updateUI(); };
+        window.setCondition = (mode) => { conditionFilter = mode; document.getElementById('filterMenu').classList.add('hidden'); updateUI(); };
+
+        window.openItemDetails = (id) => {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            activeDetailsIndex = items.indexOf(item);
+            activeImageIndex = 0;
+            document.getElementById('detailsName').textContent = item.name;
+            document.getElementById('detailsCategory').textContent = item.category;
+            document.getElementById('detailsCondition').textContent = item.condition;
+            document.getElementById('detailsPrice').textContent = `₹${parseInt(item.price).toLocaleString()}`;
+            document.getElementById('detailsDesc').textContent = item.description || 'No description provided.';
+            
+            const genderTag = document.getElementById('detailsGenderTag');
+            if(item.targetGender) {
+                genderTag.textContent = item.targetGender;
+                genderTag.classList.remove('hidden');
+            } else {
+                genderTag.classList.add('hidden');
+            }
+
+            const btn = document.getElementById('connectBtn');
+            const req = connectionRequests.find(r => r.listingId === item.id && r.requesterId === user?.uid);
+            
+            if (user?.uid === item.sellerId) {
+                btn.textContent = "Your Listing";
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            } else if (req) {
+                if (req.status === 'approved') {
+                    btn.textContent = "View Contact Details";
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    btn.onclick = () => window.openContact(item.id);
+                } else if (req.status === 'pending') {
+                    btn.textContent = "Request Pending";
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50');
+                } else {
+                    btn.textContent = "Request Rejected";
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50');
+                }
+            } else {
+                btn.textContent = "Connect with Owner";
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                btn.onclick = () => window.sendConnectionRequest(item.id, item.sellerId);
+            }
+
+            window.updateGallery();
+            window.toggleModal('itemDetailsModal', true);
+        };
+
+        window.updateGallery = () => {
+            const item = items[activeDetailsIndex];
+            const container = document.getElementById('detailsGallery');
+            const oldImg = container.querySelector('.main-img');
+            if (oldImg) oldImg.remove();
+            if (item && item.images?.length) {
+                const img = document.createElement('img'); 
+                img.src = item.images[activeImageIndex]; 
+                img.className = 'main-img w-full h-full object-contain'; 
+                container.prepend(img);
+            }
+        };
+
+        window.nextImage = () => { 
+            const total = items[activeDetailsIndex]?.images?.length;
+            if(total) { activeImageIndex = (activeImageIndex + 1) % total; window.updateGallery(); } 
+        };
+        window.prevImage = () => { 
+            const total = items[activeDetailsIndex]?.images?.length;
+            if(total) { activeImageIndex = (activeImageIndex - 1 + total) % total; window.updateGallery(); } 
+        };
+
+        window.openContact = (id) => {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            const container = document.getElementById('contactDetails');
+            container.innerHTML = `
+                <div class="flex flex-col gap-3">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">Email Contact</p>
+                    <a href="mailto:${item.email}" class="text-xl font-bold text-slate-800 hover:text-fuchsia-500 break-all underline decoration-2 decoration-fuchsia-200">${item.email}</a>
+                </div>
+                <div class="flex flex-col gap-3 pt-4">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">Phone Link</p>
+                    <a href="tel:${item.phone}" class="text-2xl font-black text-slate-800 hover:text-fuchsia-500">${item.phone || 'N/A'}</a>
+                </div>
+            `;
+            window.toggleModal('contactModal', true);
+        };
+
+        window.handleAdminAccess = () => {
+            if (window.verifiedUserEmail === 'km0334109@gmail.com') {
+                window.toggleView('admin');
+                showToast('ADMIN_ACCESS_GRANTED');
+            } else if (!window.isUserVerified) {
+                showToast('Verify identity first');
+            } else {
+                showToast('Access Restricted');
+            }
+        };
+
+        window.toggleView = (view) => {
+            isAdminView = (view === 'admin');
+            document.getElementById('marketplaceView').classList.toggle('hidden', isAdminView);
+            document.getElementById('adminView').classList.toggle('hidden', !isAdminView);
+            if(isAdminView) renderAdminPanel();
+        };
+
+        window.setAdminTab = (tab) => {
+            document.getElementById('tab-listings').classList.toggle('active', tab === 'listings');
+            document.getElementById('tab-users').classList.toggle('active', tab === 'users');
+            document.getElementById('admin-tab-listings').classList.toggle('hidden', tab !== 'listings');
+            document.getElementById('admin-tab-users').classList.toggle('hidden', tab !== 'users');
+        };
+
+        window.removeAsset = async (id) => {
+            if (!user) return;
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
+            showToast('Item Removed');
+        };
+
+        window.toggleUserBlock = async (uid) => {
+            if (!user) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', uid);
+            if (blockedUsers.includes(uid)) { 
+                await deleteDoc(ref); 
+                showToast('Unblocked'); 
+            } else { 
+                await setDoc(ref, { blockedAt: Date.now() }); 
+                showToast('Blocked'); 
+            }
+        };
+
+        // --- FIREBASE DATA ---
+        const setupDataSync = () => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), (snap) => {
+                items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateUI();
+                if(isAdminView) renderAdminPanel();
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users'), (snap) => {
+                blockedUsers = snap.docs.map(d => d.id);
+                if(isAdminView) renderAdminPanel();
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), (snap) => {
+                connectionRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderRequestsPanel();
+                // If detailed view open, refresh button state
+                if (activeDetailsIndex !== null) {
+                    const activeItem = items[activeDetailsIndex];
+                    if (activeItem) window.openItemDetails(activeItem.id);
+                }
+            });
+        };
+
+        const initAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else { await signInAnonymously(auth); }
+        };
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('itemImage').addEventListener('change', function() {
+            const files = Array.from(this.files);
+            document.getElementById('imgPreview').innerHTML = ''; 
+            currentImagesData = [];
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImagesData.push(e.target.result);
+                    const img = document.createElement('img'); 
+                    img.src = e.target.result; 
+                    img.className = 'img-preview-item'; 
+                    document.getElementById('imgPreview').appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        document.getElementById('itemForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!user || blockedUsers.includes(user.uid)) return showToast('Restricted Action');
+            
+            const cat = document.getElementById('itemCategory').value;
+            const targetGender = cat === 'Clothing' ? document.querySelector('input[name="targetGender"]:checked').value : null;
+
+            const newItem = { 
+                name: document.getElementById('itemName').value, 
+                price: parseFloat(document.getElementById('itemPrice').value), 
+                category: cat, 
+                targetGender: targetGender,
+                condition: document.querySelector('input[name="itemCondition"]:checked').value, 
+                description: document.getElementById('itemDesc').value, 
+                email: document.getElementById('sellerEmail').value, 
+                phone: document.getElementById('sellerPhone').value, 
+                images: [...currentImagesData], 
+                approved: true, 
+                sellerId: user.uid, 
+                createdAt: Date.now() 
+            };
+            
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), newItem);
+            window.toggleModal('sellingModal', false);
+            showToast('Listing Posted Successfully');
+        });
+
+        function showToast(m) { 
+            const msg = document.getElementById('toastMsg'); 
+            msg.textContent = m; 
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-40'); 
+            setTimeout(() => toast.classList.add('translate-y-40'), 3000); 
+        }
+
+        onAuthStateChanged(auth, async (u) => { 
+            user = u; 
+            if (user) {
+                setupDataSync(); 
+                if(window.isUserVerified) {
+                    const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'));
+                    if (userDoc.exists()) {
+                        window.currentUserGender = userDoc.data().gender;
+                        updateGenderBadge();
+                        updateUI();
+                    }
+                }
+            }
+        });
+
+        window.onload = initAuth;
+    </script>
+</body>
+</html>

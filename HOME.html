@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Retro Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pixel-font: 'Press Start 2P', cursive;
+            --bg-beige: #f5f5dc; /* Classic retro computer beige */
+            --accent-pink: #e2a9be; /* Sophisticated light pink */
+            --deep-rose: #b07d8e;
+            --text-main: #4a4a4a;
+            --border-color: #d1d1bc;
+        }
+
+        body {
+            background-color: #e8e8d0;
+            color: var(--text-main);
+            overflow: hidden;
+            font-family: var(--pixel-font);
+            margin: 0;
+            image-rendering: pixelated;
+        }
+
+        /* Subtler scanlines for a cleaner look */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.03) 50%, transparent 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #c64-container, #dashboard, #app-window {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-beige);
+            border: 20px solid var(--border-color);
+            outline: 4px solid white; /* Double border effect */
+            outline-offset: -12px;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            box-sizing: border-box;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .system-text {
+            font-size: 0.75rem;
+            line-height: 2.5;
+            text-transform: uppercase;
+            color: var(--deep-rose);
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            color: var(--text-main);
+        }
+
+        .cursor {
+            width: 15px;
+            height: 15px;
+            background-color: var(--accent-pink);
+            animation: blink 0.8s infinite steps(2);
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+        #dashboard, #app-window { display: none; opacity: 0; z-index: 10; align-items: center; justify-content: center; }
+        #dashboard.visible, #app-window.visible { display: flex; opacity: 1; }
+
+        .enter-btn {
+            background: white;
+            border: 4px solid var(--accent-pink);
+            color: var(--deep-rose);
+            padding: 15px 45px;
+            font-family: var(--pixel-font);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px var(--accent-pink);
+        }
+
+        .enter-btn:hover {
+            background: var(--accent-pink);
+            color: white;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--deep-rose);
+        }
+
+        .negocio-box {
+            border: 2px solid var(--deep-rose);
+            padding: 8px 24px;
+            margin-bottom: 25px;
+            color: var(--deep-rose);
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.5);
+            letter-spacing: 4px;
+        }
+
+        .donkey-container {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .window-header {
+            border-bottom: 2px solid var(--accent-pink);
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 0.6rem;
+        }
+
+        #start-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-beige);
+            color: var(--deep-rose);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <div id="start-overlay">
+        <p>[ INITIALIZE SYSTEM ]</p>
+    </div>
+
+    <div id="c64-container">
+        <div class="system-text">
+            ** SYSTEM LOADED **<br>
+            STATION: BEIGE_CORE_01<br>
+            STATUS: SECURE
+        </div>
+        <div class="command-line">
+            <span id="typed-command"></span>
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <header class="mb-12 text-center flex flex-col items-center">
+            <div class="donkey-container">
+                <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
+                    <rect x="5" y="7" width="8" height="5" fill="#a0a0a0" />
+                    <rect x="13" y="6" width="1" height="3" fill="#a0a0a0" />
+                    <rect x="4" y="4" width="3" height="4" fill="#a0a0a0" />
+                    <rect x="2" y="5" width="2" height="3" fill="#a0a0a0" />
+                    <rect x="5" y="12" width="1" height="3" fill="#a0a0a0" />
+                    <rect x="7" y="12" width="1" height="3" fill="#a0a0a0" />
+                    <rect x="10" y="12" width="1" height="3" fill="#a0a0a0" />
+                    <rect x="12" y="12" width="1" height="3" fill="#a0a0a0" />
+                </svg>
+            </div>
+            <div class="negocio-box">NEGOCIO</div>
+            <p class="text-[0.7rem] uppercase tracking-[0.2em] mb-4">Welcome, Authorized User</p>
+        </header>
+        <button class="enter-btn" id="enter-button">ENTER</button>
+    </div>
+
+    <div id="app-window">
+        <div class="window-header">
+            <span>TERMINAL // MAIN_VIEW</span>
+            <button onclick="backToMain()" style="cursor: pointer; color: var(--deep-rose)">[ ESCAPE ]</button>
+        </div>
+        <div class="text-center">
+            <p class="text-sm">REDIRECTING...</p>
+            <p class="text-[0.5rem] mt-4 opacity-60">ANALYZING DEVICE ARCHITECTURE</p>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let bgMusic = null;
+
+        function playC64Key() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(80, now); 
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        }
+
+        function playBootSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+
+        function playIntroMusic() {
+            bgMusic = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3'); 
+            bgMusic.volume = 0.4;
+            bgMusic.play().catch(() => {});
+            setTimeout(() => fadeMusic(), 20000);
+        }
+
+        function fadeMusic() {
+            if (!bgMusic) return;
+            const fadeInterval = setInterval(() => {
+                if (bgMusic.volume > 0.02) {
+                    bgMusic.volume -= 0.02;
+                } else {
+                    bgMusic.pause();
+                    clearInterval(fadeInterval);
+                }
+            }, 150);
+        }
+
+        async function runSequence() {
+            if (window.sequenceStarted) return;
+            window.sequenceStarted = true;
+            document.getElementById('start-overlay').style.display = 'none';
+            const command = "BOOT SEQUENCE";
+            const display = document.getElementById('typed-command');
+            playIntroMusic();
+            await new Promise(r => setTimeout(r, 600));
+            for (let char of command) {
+                display.innerText += char;
+                playC64Key(); 
+                await new Promise(r => setTimeout(r, 100));
+            }
+            await new Promise(r => setTimeout(r, 500));
+            playBootSound();
+            document.getElementById('c64-container').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('c64-container').style.display = 'none';
+                document.getElementById('dashboard').classList.add('visible');
+            }, 500);
+        }
+
+        function detectAndRedirect() {
+            playBootSound();
+            document.getElementById('dashboard').classList.remove('visible');
+            document.getElementById('app-window').classList.add('visible');
+
+            // Wait briefly for visual effect before redirecting
+            setTimeout(() => {
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+
+                if (isMobile) {
+                    // Path to your Mobile HTML file
+                    window.open('NEGOCIO MOBILE final product.html', '_self');
+                } else {
+                    // Path to your PC HTML file
+                    window.open('NEGOCIO PC FINAL PRODUCT.html', '_self');
+                }
+            }, 1200);
+        }
+
+        function backToMain() {
+            playC64Key();
+            document.getElementById('app-window').classList.remove('visible');
+            document.getElementById('dashboard').classList.add('visible');
+        }
+
+        window.addEventListener('mousedown', runSequence);
+        window.addEventListener('keydown', runSequence);
+        document.getElementById('enter-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            detectAndRedirect();
+        });
+    </script>
+</body>
+</html>
