@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Professional Retro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -23,6 +23,7 @@
             font-family: var(--pixel-font);
             margin: 0;
             image-rendering: pixelated;
+            touch-action: manipulation; /* Optimizes for taps */
         }
 
         /* Subtler scanlines for a cleaner look */
@@ -49,6 +50,19 @@
             transition: opacity 0.4s ease-in-out;
         }
 
+        /* Mobile specific adjustments for borders and padding */
+        @media (max-width: 640px) {
+            #c64-container, #dashboard, #app-window {
+                border-width: 10px;
+                outline-width: 2px;
+                outline-offset: -6px;
+                padding: 20px;
+            }
+            .system-text { font-size: 0.6rem !important; }
+            .enter-btn { padding: 12px 30px !important; font-size: 0.8rem !important; }
+            .negocio-box { font-size: 0.55rem !important; letter-spacing: 2px !important; }
+        }
+
         .system-text {
             font-size: 0.75rem;
             line-height: 2.5;
@@ -64,10 +78,13 @@
         }
 
         .cursor {
+            display: inline-block;
             width: 15px;
             height: 15px;
             background-color: var(--accent-pink);
             animation: blink 0.8s infinite steps(2);
+            vertical-align: middle;
+            margin-left: 5px;
         }
 
         @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
@@ -86,13 +103,12 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             box-shadow: 4px 4px 0px var(--accent-pink);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .enter-btn:hover {
-            background: var(--accent-pink);
-            color: white;
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px var(--deep-rose);
+        .enter-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--deep-rose);
         }
 
         .negocio-box {
@@ -132,6 +148,9 @@
             background: var(--bg-beige);
             color: var(--deep-rose);
             cursor: pointer;
+            text-align: center;
+            padding: 20px;
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
@@ -140,7 +159,7 @@
     <div class="scanlines"></div>
 
     <div id="start-overlay">
-        <p>[ INITIALIZE SYSTEM ]</p>
+        <p>[ TAP OR PRESS KEY TO INITIALIZE ]</p>
     </div>
 
     <div id="c64-container">
@@ -224,7 +243,7 @@
         function playIntroMusic() {
             bgMusic = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3'); 
             bgMusic.volume = 0.4;
-            bgMusic.play().catch(() => {});
+            bgMusic.play().catch((err) => console.log("Audio playback deferred until user interaction."));
             setTimeout(() => fadeMusic(), 20000);
         }
 
@@ -240,19 +259,29 @@
             }, 150);
         }
 
-        async function runSequence() {
+        async function runSequence(e) {
+            // Prevent double triggers from touch and mouse
+            if (e && e.type === 'touchstart') e.preventDefault();
+            
             if (window.sequenceStarted) return;
             window.sequenceStarted = true;
+            
+            // Resume AudioContext for mobile browsers
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+
             document.getElementById('start-overlay').style.display = 'none';
             const command = "BOOT SEQUENCE";
             const display = document.getElementById('typed-command');
+            
             playIntroMusic();
             await new Promise(r => setTimeout(r, 600));
+            
             for (let char of command) {
                 display.innerText += char;
                 playC64Key(); 
                 await new Promise(r => setTimeout(r, 100));
             }
+            
             await new Promise(r => setTimeout(r, 500));
             playBootSound();
             document.getElementById('c64-container').style.opacity = '0';
@@ -267,19 +296,16 @@
             document.getElementById('dashboard').classList.remove('visible');
             document.getElementById('app-window').classList.add('visible');
 
-            // Wait briefly for visual effect before redirecting
             setTimeout(() => {
                 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
                 const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
 
                 if (isMobile) {
-                    // Path to your Mobile HTML file
                     window.open('NEGOCIO MOBILE final product.html', '_self');
                 } else {
-                    // Path to your PC HTML file
                     window.open('NEGOCIO PC FINAL PRODUCT.html', '_self');
                 }
-            }, 1200);
+            }, 1500);
         }
 
         function backToMain() {
@@ -288,12 +314,22 @@
             document.getElementById('dashboard').classList.add('visible');
         }
 
+        // Added touchstart for mobile compatibility
+        window.addEventListener('touchstart', runSequence, { passive: false });
         window.addEventListener('mousedown', runSequence);
         window.addEventListener('keydown', runSequence);
+
         document.getElementById('enter-button').addEventListener('click', (e) => {
             e.stopPropagation();
             detectAndRedirect();
         });
+        
+        // Ensure enter button also works with touch specifically
+        document.getElementById('enter-button').addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            detectAndRedirect();
+        }, { passive: false });
     </script>
 </body>
 </html>
