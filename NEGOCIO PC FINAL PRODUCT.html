@@ -445,12 +445,20 @@
     </div>
 
     <script type="module">
+        // Import Firebase SDKs
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
+        // CONFIGURATION: Using environment variables for environment compatibility
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
+        
+        // Analytics may not be available in all environment configs
+        let analytics;
+        try { analytics = getAnalytics(app); } catch (e) {}
+
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'negocio-v4';
@@ -489,11 +497,8 @@
 
         window.toggleGenderSelect = (val) => {
             const group = document.getElementById('clothingGenderGroup');
-            if(val === 'Clothing') {
-                group.classList.remove('hidden');
-            } else {
-                group.classList.add('hidden');
-            }
+            if(val === 'Clothing') group.classList.remove('hidden');
+            else group.classList.add('hidden');
         };
 
         const updateUI = () => {
@@ -888,26 +893,34 @@
                 items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 updateUI();
                 if(isAdminView) renderAdminPanel();
-            });
+            }, (err) => console.error("Listings sync error:", err));
+            
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users'), (snap) => {
                 blockedUsers = snap.docs.map(d => d.id);
                 if(isAdminView) renderAdminPanel();
-            });
+            }, (err) => console.error("Blocked users sync error:", err));
+            
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), (snap) => {
                 connectionRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderRequestsPanel();
-                // If detailed view open, refresh button state
                 if (activeDetailsIndex !== null) {
                     const activeItem = items[activeDetailsIndex];
                     if (activeItem) window.openItemDetails(activeItem.id);
                 }
-            });
+            }, (err) => console.error("Requests sync error:", err));
         };
 
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else { await signInAnonymously(auth); }
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Authentication failed, falling back to anonymous session:", err);
+                await signInAnonymously(auth);
+            }
         };
 
         // --- EVENT LISTENERS ---
