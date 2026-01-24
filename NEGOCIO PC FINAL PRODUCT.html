@@ -430,7 +430,7 @@
 
     <!-- Contact Modal -->
     <div id="contactModal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-md p-12 relative text-center rounded-[2rem] shadow-2xl">
+        <div class="bg-white w-full max-w-md p-12 relative text-center rounded-[2rem] shadow-2xl">
             <button onclick="toggleModal('contactModal', false)" class="absolute top-6 right-6 text-slate-300 text-2xl font-bold">&times;</button>
             <div class="mb-8 inline-block p-6 bg-fuchsia-50 rounded-3xl">
                 <svg class="w-12 h-12 text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -744,7 +744,9 @@
         };
         
         window.handleNewListingClick = () => {
+            // Check if verification script is even loaded/run
             if (!window.isUserVerified) return showToast('Please verify identity first');
+            if (!user) return showToast('System initializing...');
             if (blockedUsers.includes(user.uid)) return showToast('Account restricted');
             window.toggleModal('sellingModal', true);
         };
@@ -775,6 +777,24 @@
             conditionFilter = mode; 
             document.getElementById('filterMenu').classList.add('hidden'); 
             updateUI(); 
+        };
+
+        window.updateGallery = () => {
+            const item = items[activeDetailsIndex];
+            const container = document.getElementById('detailsGallery');
+            const oldImg = container.querySelector('.main-img');
+            if (oldImg) oldImg.remove();
+            if (item && item.images?.length) {
+                const img = document.createElement('img'); 
+                img.src = item.images[activeImageIndex]; 
+                img.className = 'main-img w-full h-full object-contain'; 
+                container.prepend(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'main-img w-full h-full flex items-center justify-center text-slate-300 font-bold uppercase text-xs';
+                placeholder.textContent = 'No Images Available';
+                container.prepend(placeholder);
+            }
         };
 
         window.openItemDetails = (id) => {
@@ -824,24 +844,6 @@
                 btn.className = "w-full py-5 bg-fuchsia-500 text-white rounded-2xl text-lg font-bold shadow-lg hover:bg-fuchsia-600 transition-all uppercase tracking-wide";
                 btn.onclick = () => window.sendConnectionRequest(item.id, item.sellerId);
             }
-
-            window.updateGallery = () => {
-                const item = items[activeDetailsIndex];
-                const container = document.getElementById('detailsGallery');
-                const oldImg = container.querySelector('.main-img');
-                if (oldImg) oldImg.remove();
-                if (item && item.images?.length) {
-                    const img = document.createElement('img'); 
-                    img.src = item.images[activeImageIndex]; 
-                    img.className = 'main-img w-full h-full object-contain'; 
-                    container.prepend(img);
-                } else {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'main-img w-full h-full flex items-center justify-center text-slate-300 font-bold uppercase text-xs';
-                    placeholder.textContent = 'No Images Available';
-                    container.prepend(placeholder);
-                }
-            };
 
             window.updateGallery();
             window.toggleModal('itemDetailsModal', true);
