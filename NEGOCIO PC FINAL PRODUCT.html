@@ -449,8 +449,8 @@
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // --- MANUALLY ADD YOUR FIREBASE CONFIG HERE FOR CLOUDFLARE ---
-        const firebaseConfig = {
+        // --- FIREBASE CONFIGURATION (Compatible with Cloudflare and Sandbox) ---
+        const liveConfig = {
             apiKey: "AIzaSyA3Ko6qTqJZpzRA7aorYApQm-Zv4wUx100",
             authDomain: "negocio-e3311.firebaseapp.com",
             projectId: "negocio-e3311",
@@ -460,11 +460,11 @@
             measurementId: "G-69EFTCF0L4"
         };
         
-        // --- FALLBACK FOR SANDBOX (Keep this if you want it to work in both places) ---
-        const finalConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : firebaseConfig;
-        const finalAppId = (typeof __app_id !== 'undefined' && __app_id) ? __app_id : 'negocio-v4';
+        // Use environment variables if they exist (for the sandbox), otherwise use the hardcoded live config
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : liveConfig;
+        const appId = (typeof __app_id !== 'undefined' && __app_id) ? __app_id : 'negocio-v4';
 
-        const app = initializeApp(finalConfig);
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
@@ -682,7 +682,7 @@
             document.getElementById('verifiedStatus').classList.remove('hidden'); 
             
             if (user) {
-                const profileRef = doc(db, 'artifacts', finalAppId, 'users', user.uid, 'profile', 'settings');
+                const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings');
                 const userDoc = await getDoc(profileRef);
                 if (userDoc.exists()) {
                     window.currentUserGender = userDoc.data().gender;
@@ -700,7 +700,7 @@
         window.setIdentity = async (gender) => {
             if(!user) return;
             window.currentUserGender = gender;
-            const profileRef = doc(db, 'artifacts', finalAppId, 'users', user.uid, 'profile', 'settings');
+            const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings');
             await setDoc(profileRef, {
                 gender: gender,
                 updatedAt: Date.now()
@@ -721,7 +721,7 @@
 
         window.respondToRequest = async (requestId, status) => {
             if (!user) return;
-            const reqRef = doc(db, 'artifacts', finalAppId, 'public', 'data', 'connection_requests', requestId);
+            const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'connection_requests', requestId);
             await updateDoc(reqRef, { status });
             showToast(`Request ${status.toUpperCase()}`);
         };
@@ -733,7 +733,7 @@
             const existing = connectionRequests.find(r => r.listingId === listingId && r.requesterId === user.uid);
             if (existing) return showToast('Request already sent');
 
-            await addDoc(collection(db, 'artifacts', finalAppId, 'public', 'data', 'connection_requests'), {
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), {
                 listingId,
                 ownerId,
                 requesterId: user.uid,
@@ -744,9 +744,15 @@
         };
         
         window.handleNewListingClick = () => {
-            // Check if verification script is even loaded/run
-            if (!window.isUserVerified) return showToast('Please verify identity first');
-            if (!user) return showToast('System initializing...');
+            // STRICT VERIFICATION CHECK
+            if (!window.isUserVerified) {
+                showToast('Please verify identity first');
+                // Nudge user to top where the verification widget is
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            
+            if (!user) return showToast('Authenticating... try again.');
             if (blockedUsers.includes(user.uid)) return showToast('Account restricted');
             window.toggleModal('sellingModal', true);
         };
@@ -902,13 +908,13 @@
 
         window.removeAsset = async (id) => {
             if (!user) return;
-            await deleteDoc(doc(db, 'artifacts', finalAppId, 'public', 'data', 'listings', id));
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
             showToast('Item Removed');
         };
 
         window.toggleUserBlock = async (uid) => {
             if (!user) return;
-            const ref = doc(db, 'artifacts', finalAppId, 'public', 'data', 'blocked_users', uid);
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', uid);
             if (blockedUsers.includes(uid)) { 
                 await deleteDoc(ref); 
                 showToast('Unblocked'); 
@@ -920,20 +926,20 @@
 
         // --- FIREBASE DATA SYNC ---
         const setupDataSync = () => {
-            const listingsRef = collection(db, 'artifacts', finalAppId, 'public', 'data', 'listings');
+            const listingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
             onSnapshot(listingsRef, (snap) => {
                 items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 updateUI();
                 if(isAdminView) renderAdminPanel();
             }, (err) => console.error("Firestore Error:", err));
 
-            const blockedRef = collection(db, 'artifacts', finalAppId, 'public', 'data', 'blocked_users');
+            const blockedRef = collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users');
             onSnapshot(blockedRef, (snap) => {
                 blockedUsers = snap.docs.map(d => d.id);
                 if(isAdminView) renderAdminPanel();
             }, (err) => console.error("Firestore Error:", err));
 
-            const requestsRef = collection(db, 'artifacts', finalAppId, 'public', 'data', 'connection_requests');
+            const requestsRef = collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests');
             onSnapshot(requestsRef, (snap) => {
                 connectionRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderRequestsPanel();
@@ -975,6 +981,13 @@
 
         document.getElementById('itemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // SECONDARY VERIFICATION CHECK ON SUBMIT
+            if (!window.isUserVerified) {
+                showToast('Verification required to post');
+                return;
+            }
+            
             if(!user || blockedUsers.includes(user.uid)) return showToast('Restricted Action');
             
             const cat = document.getElementById('itemCategory').value;
@@ -995,7 +1008,7 @@
                 createdAt: Date.now() 
             };
             
-            await addDoc(collection(db, 'artifacts', finalAppId, 'public', 'data', 'listings'), newItem);
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), newItem);
             window.toggleModal('sellingModal', false);
             showToast('Listing Posted Successfully');
         });
@@ -1013,7 +1026,7 @@
             if (user) {
                 setupDataSync(); 
                 if(window.isUserVerified) {
-                    const profileRef = doc(db, 'artifacts', finalAppId, 'users', user.uid, 'profile', 'settings');
+                    const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings');
                     const userDoc = await getDoc(profileRef);
                     if (userDoc.exists()) {
                         window.currentUserGender = userDoc.data().gender;
