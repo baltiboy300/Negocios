@@ -367,7 +367,7 @@
                             <option value="Books">Books</option>
                             <option value="Daily needs">Daily needs</option>
                         </select>
-                        <div id="clothingGenderGroup" class="hidden animate-pulse">
+                        <div id="clothingGenderGroup" class="hidden">
                             <label class="text-[0.65rem] text-fuchsia-600 font-black uppercase mb-2 block">Item Target Gender</label>
                             <div class="flex gap-4">
                                 <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Male" class="accent-fuchsia-500"> Male</label>
@@ -430,7 +430,7 @@
 
     <!-- Contact Modal -->
     <div id="contactModal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-md p-12 relative text-center rounded-[2rem] shadow-2xl">
+        <div class="bg-white w-full max-md p-12 relative text-center rounded-[2rem] shadow-2xl">
             <button onclick="toggleModal('contactModal', false)" class="absolute top-6 right-6 text-slate-300 text-2xl font-bold">&times;</button>
             <div class="mb-8 inline-block p-6 bg-fuchsia-50 rounded-3xl">
                 <svg class="w-12 h-12 text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -445,23 +445,28 @@
     </div>
 
     <script type="module">
-        // Import Firebase SDKs
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        // CONFIGURATION: Using environment variables for environment compatibility
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
+        // --- MANUALLY ADD YOUR FIREBASE CONFIG HERE FOR CLOUDFLARE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3Ko6qTqJZpzRA7aorYApQm-Zv4wUx100",
+            authDomain: "negocio-e3311.firebaseapp.com",
+            projectId: "negocio-e3311",
+            storageBucket: "negocio-e3311.firebasestorage.app",
+            messagingSenderId: "180839458446",
+            appId: "1:180839458446:web:3efebab1d0fa175edb0bdf",
+            measurementId: "G-69EFTCF0L4"
+        };
         
-        // Analytics may not be available in all environment configs
-        let analytics;
-        try { analytics = getAnalytics(app); } catch (e) {}
+        // --- FALLBACK FOR SANDBOX (Keep this if you want it to work in both places) ---
+        const finalConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : firebaseConfig;
+        const finalAppId = (typeof __app_id !== 'undefined' && __app_id) ? __app_id : 'negocio-v4';
 
+        const app = initializeApp(finalConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'negocio-v4';
 
         // --- GLOBAL STATE ---
         let items = [];
@@ -481,14 +486,14 @@
         window.verifiedUserEmail = null;
         window.currentUserGender = null;
 
-        // --- UI FUNCTIONS ---
+        // --- UI UTILS ---
         window.toggleModal = (id, show) => {
             const m = document.getElementById(id);
             if(m) {
                 m.classList.toggle('hidden', !show);
                 if (!show && id === 'sellingModal') { 
                     document.getElementById('itemForm').reset(); 
-                    document.getElementById('imgPreview').innerHTML = 'No images selected'; 
+                    document.getElementById('imgPreview').innerHTML = '<span class="text-sm text-slate-400 mx-auto">No images selected</span>'; 
                     document.getElementById('clothingGenderGroup').classList.add('hidden');
                     currentImagesData = []; 
                 }
@@ -497,15 +502,18 @@
 
         window.toggleGenderSelect = (val) => {
             const group = document.getElementById('clothingGenderGroup');
-            if(val === 'Clothing') group.classList.remove('hidden');
-            else group.classList.add('hidden');
+            if(val === 'Clothing') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+            }
         };
 
         const updateUI = () => {
             filteredItems = items.filter(i => {
                 if(!i.approved) return false;
                 if (i.category === 'Clothing' && i.targetGender && window.currentUserGender) {
-                    if (i.targetGender !== window.currentUserGender) return false;
+                    if (i.targetGender !== window.currentUserGender && window.currentUserGender !== 'Other') return false;
                 }
                 return true;
             });
@@ -674,7 +682,8 @@
             document.getElementById('verifiedStatus').classList.remove('hidden'); 
             
             if (user) {
-                const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'));
+                const profileRef = doc(db, 'artifacts', finalAppId, 'users', user.uid, 'profile', 'settings');
+                const userDoc = await getDoc(profileRef);
                 if (userDoc.exists()) {
                     window.currentUserGender = userDoc.data().gender;
                     updateGenderBadge();
@@ -691,7 +700,8 @@
         window.setIdentity = async (gender) => {
             if(!user) return;
             window.currentUserGender = gender;
-            await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'), {
+            const profileRef = doc(db, 'artifacts', finalAppId, 'users', user.uid, 'profile', 'settings');
+            await setDoc(profileRef, {
                 gender: gender,
                 updatedAt: Date.now()
             });
@@ -711,7 +721,8 @@
 
         window.respondToRequest = async (requestId, status) => {
             if (!user) return;
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'connection_requests', requestId), { status });
+            const reqRef = doc(db, 'artifacts', finalAppId, 'public', 'data', 'connection_requests', requestId);
+            await updateDoc(reqRef, { status });
             showToast(`Request ${status.toUpperCase()}`);
         };
 
@@ -722,7 +733,7 @@
             const existing = connectionRequests.find(r => r.listingId === listingId && r.requesterId === user.uid);
             if (existing) return showToast('Request already sent');
 
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), {
+            await addDoc(collection(db, 'artifacts', finalAppId, 'public', 'data', 'connection_requests'), {
                 listingId,
                 ownerId,
                 requesterId: user.uid,
@@ -733,7 +744,7 @@
         };
         
         window.handleNewListingClick = () => {
-            if (!window.isUserVerified) return showToast('Please sign in first');
+            if (!window.isUserVerified) return showToast('Please verify identity first');
             if (blockedUsers.includes(user.uid)) return showToast('Account restricted');
             window.toggleModal('sellingModal', true);
         };
@@ -749,9 +760,22 @@
             updateUI();
         };
 
-        window.handleSearch = () => { searchQuery = document.getElementById('searchInput').value.toLowerCase(); updateUI(); };
-        window.setSort = (mode) => { sortMode = mode; document.getElementById('filterMenu').classList.add('hidden'); updateUI(); };
-        window.setCondition = (mode) => { conditionFilter = mode; document.getElementById('filterMenu').classList.add('hidden'); updateUI(); };
+        window.handleSearch = () => { 
+            searchQuery = document.getElementById('searchInput').value.toLowerCase(); 
+            updateUI(); 
+        };
+        
+        window.setSort = (mode) => { 
+            sortMode = mode; 
+            document.getElementById('filterMenu').classList.add('hidden'); 
+            updateUI(); 
+        };
+        
+        window.setCondition = (mode) => { 
+            conditionFilter = mode; 
+            document.getElementById('filterMenu').classList.add('hidden'); 
+            updateUI(); 
+        };
 
         window.openItemDetails = (id) => {
             const item = items.find(i => i.id === id);
@@ -778,44 +802,49 @@
             if (user?.uid === item.sellerId) {
                 btn.textContent = "Your Listing";
                 btn.disabled = true;
-                btn.classList.add('opacity-50');
+                btn.className = "w-full py-5 bg-slate-200 text-slate-400 rounded-2xl text-lg font-bold uppercase cursor-not-allowed";
             } else if (req) {
                 if (req.status === 'approved') {
                     btn.textContent = "View Contact Details";
                     btn.disabled = false;
-                    btn.classList.remove('opacity-50');
+                    btn.className = "w-full py-5 bg-emerald-500 text-white rounded-2xl text-lg font-bold shadow-lg hover:bg-emerald-600 transition-all uppercase tracking-wide";
                     btn.onclick = () => window.openContact(item.id);
                 } else if (req.status === 'pending') {
                     btn.textContent = "Request Pending";
                     btn.disabled = true;
-                    btn.classList.add('opacity-50');
+                    btn.className = "w-full py-5 bg-amber-100 text-amber-600 rounded-2xl text-lg font-bold uppercase cursor-not-allowed";
                 } else {
                     btn.textContent = "Request Rejected";
                     btn.disabled = true;
-                    btn.classList.add('opacity-50');
+                    btn.className = "w-full py-5 bg-red-100 text-red-600 rounded-2xl text-lg font-bold uppercase cursor-not-allowed";
                 }
             } else {
                 btn.textContent = "Connect with Owner";
                 btn.disabled = false;
-                btn.classList.remove('opacity-50');
+                btn.className = "w-full py-5 bg-fuchsia-500 text-white rounded-2xl text-lg font-bold shadow-lg hover:bg-fuchsia-600 transition-all uppercase tracking-wide";
                 btn.onclick = () => window.sendConnectionRequest(item.id, item.sellerId);
             }
 
+            window.updateGallery = () => {
+                const item = items[activeDetailsIndex];
+                const container = document.getElementById('detailsGallery');
+                const oldImg = container.querySelector('.main-img');
+                if (oldImg) oldImg.remove();
+                if (item && item.images?.length) {
+                    const img = document.createElement('img'); 
+                    img.src = item.images[activeImageIndex]; 
+                    img.className = 'main-img w-full h-full object-contain'; 
+                    container.prepend(img);
+                } else {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'main-img w-full h-full flex items-center justify-center text-slate-300 font-bold uppercase text-xs';
+                    placeholder.textContent = 'No Images Available';
+                    container.prepend(placeholder);
+                }
+            };
+
             window.updateGallery();
             window.toggleModal('itemDetailsModal', true);
-        };
-
-        window.updateGallery = () => {
-            const item = items[activeDetailsIndex];
-            const container = document.getElementById('detailsGallery');
-            const oldImg = container.querySelector('.main-img');
-            if (oldImg) oldImg.remove();
-            if (item && item.images?.length) {
-                const img = document.createElement('img'); 
-                img.src = item.images[activeImageIndex]; 
-                img.className = 'main-img w-full h-full object-contain'; 
-                container.prepend(img);
-            }
         };
 
         window.nextImage = () => { 
@@ -871,13 +900,13 @@
 
         window.removeAsset = async (id) => {
             if (!user) return;
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
+            await deleteDoc(doc(db, 'artifacts', finalAppId, 'public', 'data', 'listings', id));
             showToast('Item Removed');
         };
 
         window.toggleUserBlock = async (uid) => {
             if (!user) return;
-            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', uid);
+            const ref = doc(db, 'artifacts', finalAppId, 'public', 'data', 'blocked_users', uid);
             if (blockedUsers.includes(uid)) { 
                 await deleteDoc(ref); 
                 showToast('Unblocked'); 
@@ -887,39 +916,40 @@
             }
         };
 
-        // --- FIREBASE DATA ---
+        // --- FIREBASE DATA SYNC ---
         const setupDataSync = () => {
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), (snap) => {
+            const listingsRef = collection(db, 'artifacts', finalAppId, 'public', 'data', 'listings');
+            onSnapshot(listingsRef, (snap) => {
                 items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 updateUI();
                 if(isAdminView) renderAdminPanel();
-            }, (err) => console.error("Listings sync error:", err));
-            
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users'), (snap) => {
+            }, (err) => console.error("Firestore Error:", err));
+
+            const blockedRef = collection(db, 'artifacts', finalAppId, 'public', 'data', 'blocked_users');
+            onSnapshot(blockedRef, (snap) => {
                 blockedUsers = snap.docs.map(d => d.id);
                 if(isAdminView) renderAdminPanel();
-            }, (err) => console.error("Blocked users sync error:", err));
-            
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), (snap) => {
+            }, (err) => console.error("Firestore Error:", err));
+
+            const requestsRef = collection(db, 'artifacts', finalAppId, 'public', 'data', 'connection_requests');
+            onSnapshot(requestsRef, (snap) => {
                 connectionRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderRequestsPanel();
                 if (activeDetailsIndex !== null) {
                     const activeItem = items[activeDetailsIndex];
-                    if (activeItem) window.openItemDetails(activeItem.id);
+                    if (activeItem) {
+                        const req = connectionRequests.find(r => r.listingId === activeItem.id && r.requesterId === user?.uid);
+                        if(req) window.openItemDetails(activeItem.id); 
+                    }
                 }
-            }, (err) => console.error("Requests sync error:", err));
+            }, (err) => console.error("Firestore Error:", err));
         };
 
         const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Authentication failed, falling back to anonymous session:", err);
-                await signInAnonymously(auth);
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else { 
+                await signInAnonymously(auth); 
             }
         };
 
@@ -963,7 +993,7 @@
                 createdAt: Date.now() 
             };
             
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), newItem);
+            await addDoc(collection(db, 'artifacts', finalAppId, 'public', 'data', 'listings'), newItem);
             window.toggleModal('sellingModal', false);
             showToast('Listing Posted Successfully');
         });
@@ -981,7 +1011,8 @@
             if (user) {
                 setupDataSync(); 
                 if(window.isUserVerified) {
-                    const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'));
+                    const profileRef = doc(db, 'artifacts', finalAppId, 'users', user.uid, 'profile', 'settings');
+                    const userDoc = await getDoc(profileRef);
                     if (userDoc.exists()) {
                         window.currentUserGender = userDoc.data().gender;
                         updateGenderBadge();
