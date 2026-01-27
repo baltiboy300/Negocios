@@ -8,14 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #f5f2e9;
-            --bg-accent: #ede6d3;
+            --bg-deep: #f8fafc;
+            --bg-accent: #f1f5f9;
             --accent-primary: #0891b2;
-            --accent-secondary: #e879f9;
-            --accent-highlight: #b45309;
+            --accent-secondary: #B0E0E6; /* Powder Blue */
+            --accent-dark: #7dbbc3;      /* Darker shade for contrast */
             --text-main: #1e293b;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --border-glow: rgba(232, 121, 249, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --border-glow: rgba(176, 224, 230, 0.4);
         }
 
         body { 
@@ -27,57 +27,64 @@
             overflow-x: hidden;
         }
 
+        /* Reverted Logo Font */
         .font-script { font-family: 'Satisfy', cursive; letter-spacing: 1px; }
-        .subtle-glow { text-shadow: 0 0 12px rgba(232, 121, 249, 0.3); }
+        .subtle-glow { text-shadow: 0 0 12px rgba(176, 224, 230, 0.8); }
 
         .pixel-card {
             background: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 24px;
         }
 
         .pixel-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(148, 163, 184, 0.2);
             border-color: var(--accent-secondary);
         }
 
         .sidebar {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.5);
             border-right: 1px solid rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
         }
 
         .btn-retro {
             background: var(--accent-secondary);
-            color: #fff;
+            color: #0f172a; 
             transition: all 0.2s ease;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.025em;
         }
 
         .btn-retro:hover {
-            filter: brightness(1.05);
+            filter: brightness(0.95);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.3);
+            box-shadow: 0 8px 20px rgba(176, 224, 230, 0.4);
         }
 
         .category-pill {
             font-size: 0.875rem;
-            font-weight: 500;
-            padding: 12px 16px;
+            font-weight: 600;
+            padding: 10px 16px;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 12px;
             color: #64748b;
             transition: all 0.2s;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        .category-pill:hover {
+            background: #fff;
+            color: var(--text-main);
         }
 
         .category-pill.active {
             background: var(--accent-secondary);
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(232, 121, 249, 0.2);
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(176, 224, 230, 0.3);
         }
 
         input, textarea, select {
@@ -85,16 +92,21 @@
             border: 1px solid #e2e8f0 !important;
             color: var(--text-main) !important;
             font-size: 0.95rem !important;
-            padding: 12px 16px !important;
-            border-radius: 8px !important;
+            padding: 14px 20px !important;
+            border-radius: 14px !important;
             outline: none;
             transition: all 0.2s;
         }
 
+        input:focus {
+            border-color: var(--accent-secondary) !important;
+            box-shadow: 0 0 0 4px rgba(176, 224, 230, 0.2);
+        }
+
         .img-preview-container {
             width: 100%;
-            height: 140px;
-            border: 2px dashed #cbd5e1;
+            height: 160px;
+            border: 2px dashed #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: flex-start;
@@ -102,32 +114,78 @@
             background: #f8fafc;
             padding: 12px;
             gap: 12px;
-            border-radius: 12px;
+            border-radius: 16px;
         }
 
         .img-preview-item {
             height: 100%;
             aspect-ratio: 1;
             object-fit: cover;
-            border-radius: 6px;
+            background: #fff;
+            border-radius: 12px;
             border: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .modal-overlay {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-bar {
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            padding: 18px 24px;
+            width: 100%;
+            font-size: 1rem;
+            color: var(--text-main);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         }
 
         .verified-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #10b981;
-            color: white;
+            background: #0f172a;
+            color: #B0E0E6;
             padding: 8px 16px;
             border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .gallery-main {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .btn-view-info {
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 800;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 2px solid var(--accent-secondary);
+            color: #475569;
+            text-transform: uppercase;
+        }
+        
+        .btn-view-info:hover { background: var(--accent-secondary); color: #0f172a; border-color: transparent; }
+
+        .admin-nav-item {
+            padding: 1rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .admin-nav-item.active {
+            opacity: 1;
+            border-bottom: 3px solid #B0E0E6;
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -137,9 +195,10 @@
 </head>
 <body class="min-h-screen">
 
+    <!-- Marketplace View Wrapper -->
     <div id="marketplaceView" class="flex flex-col md:flex-row min-h-screen">
         
-        <!-- Verification & Profile Widget -->
+        <!-- Identity Verification Widget -->
         <div class="fixed top-0 right-0 z-[100] p-0 m-0">
             <div id="verificationContainer" class="transform scale-75 origin-top-right">
                 <div class="pe_verify_email" data-client-id="13401266232106403409">
@@ -147,53 +206,96 @@
                 </div>
             </div>
             <div id="verifiedStatus" class="hidden transform scale-90 origin-top-right mt-1 mr-1 flex items-center gap-2">
-                <div id="userGenderBadge" class="bg-slate-800 text-white px-3 py-2 rounded-full text-[0.65rem] font-bold uppercase hidden border-2 border-white shadow-sm"></div>
-                <div class="verified-badge shadow-lg">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div id="userGenderBadge" class="bg-slate-800 text-white px-3 py-2 rounded-full text-[0.65rem] font-bold uppercase hidden"></div>
+                <div class="verified-badge">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     VERIFIED
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar -->
+        <!-- Sidebar Navigation -->
         <aside class="w-full md:w-72 sidebar p-8 flex flex-col shrink-0">
             <header class="mb-12 text-center md:text-left">
-                <h1 class="text-5xl font-script subtle-glow italic text-fuchsia-500 mb-2">Negocio</h1>
-                <p class="font-script text-xl text-slate-500 lowercase opacity-80">para estudiantes</p>
+                <h1 class="text-5xl font-script subtle-glow italic text-slate-800 mb-2">Negocio</h1>
+                <p class="font-script text-xl text-slate-400 lowercase opacity-80 ml-1">para estudiantes</p>
             </header>
 
             <div class="mb-8 space-y-4">
-                <button onclick="handleNewListingClick()" class="w-full btn-retro py-4 rounded-xl text-lg shadow-lg mb-6">
+                <button onclick="handleNewListingClick()" class="w-full btn-retro py-4 rounded-2xl text-lg shadow-xl mb-6">
                     + New Listing
                 </button>
 
-                <div>
-                    <h3 class="text-xs font-bold text-slate-400 mt-10 mb-4 tracking-[0.2em] uppercase px-4">Categories</h3>
+                <button onclick="toggleModal('requestsModal', true)" class="w-full relative px-6 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                    <span class="text-sm">Requests</span>
+                    <div id="requestBadge" class="hidden bg-red-500 text-white text-[0.6rem] px-2 py-1 rounded-full">0</div>
+                </button>
+
+                <div class="pt-6">
+                    <h3 class="text-[0.65rem] font-black text-slate-400 mb-6 tracking-[0.2em] uppercase px-4">Categories</h3>
                     <nav id="categoryFilter" class="flex flex-col gap-1">
-                        <div class="category-pill active" onclick="setFilter('ALL')">All Assets</div>
+                        <div class="category-pill active" onclick="setFilter('ALL')">Everything</div>
                         <div class="category-pill" onclick="setFilter('Electronics')">Electronics</div>
                         <div class="category-pill" onclick="setFilter('Clothing')">Clothing</div>
                         <div class="category-pill" onclick="setFilter('Accessories')">Accessories</div>
+                        <div class="category-pill" onclick="setFilter('Decorations')">Decorations</div>
                         <div class="category-pill" onclick="setFilter('Beauty')">Beauty</div>
                         <div class="category-pill" onclick="setFilter('Books')">Books</div>
                         <div class="category-pill" onclick="setFilter('Daily needs')">Daily Needs</div>
                     </nav>
                 </div>
             </div>
+
+            <div class="mt-auto pt-8">
+                <div id="adminTrigger" onclick="handleAdminAccess()" class="text-[0.6rem] text-slate-400 uppercase font-bold tracking-[0.2em] cursor-pointer select-none hover:text-slate-600 transition-colors">
+                    Active Session v5.7
+                </div>
+            </div>
         </aside>
 
-        <!-- Main Product Feed -->
+        <!-- Product Content Area -->
         <main class="flex-1 p-6 md:p-12 overflow-y-auto relative">
             <div class="max-w-6xl mx-auto">
-                <div class="mb-12 flex flex-col lg:flex-row gap-6 items-center">
-                    <div class="relative flex-1 w-full">
-                        <input type="text" id="searchInput" placeholder="Search for items..." class="w-full bg-white px-6 py-4 rounded-2xl border border-slate-200 shadow-sm" oninput="handleSearch()">
+                <div class="mb-12">
+                    <div class="flex flex-col lg:flex-row gap-6 items-center">
+                        <div class="relative flex-1 w-full">
+                            <input type="text" id="searchInput" placeholder="Search campus listings..." class="search-bar" oninput="handleSearch()">
+                        </div>
+                        
+                        <div class="relative w-full lg:w-auto">
+                            <button onclick="toggleFilterMenu()" class="w-full lg:w-auto px-8 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-sm text-slate-600 flex items-center justify-center gap-3 hover:bg-slate-50 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                                Filters
+                            </button>
+                            <div id="filterMenu" class="pixel-card absolute right-0 top-full mt-3 w-64 p-6 rounded-[2rem] hidden z-50">
+                                <div class="space-y-6">
+                                    <div>
+                                        <h4 class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-3">Price Sort</h4>
+                                        <div class="grid grid-cols-1 gap-2">
+                                            <button onclick="setSort('none')" id="sortNone" class="text-left text-xs py-2.5 px-3 rounded-xl hover:bg-slate-50 font-bold text-slate-600">Default</button>
+                                            <button onclick="setSort('high-to-low')" id="sortHighLow" class="text-left text-xs py-2.5 px-3 rounded-xl hover:bg-slate-50 font-bold text-slate-600">High to Low</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-3">Condition</h4>
+                                        <div class="grid grid-cols-1 gap-2">
+                                            <button onclick="setCondition('all')" id="condAll" class="text-left text-xs py-2.5 px-3 rounded-xl hover:bg-slate-50 font-bold text-slate-600">Any</button>
+                                            <button onclick="setCondition('unused')" id="condUnused" class="text-left text-xs py-2.5 px-3 rounded-xl hover:bg-slate-50 font-bold text-slate-600">New</button>
+                                            <button onclick="setCondition('used')" id="condUsed" class="text-left text-xs py-2.5 px-3 rounded-xl hover:bg-slate-50 font-bold text-slate-600">Pre-loved</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="itemCount" class="text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white/50 px-4 py-2 rounded-full">0 Records Found</div>
+                    <div class="flex justify-between items-center mt-8 px-2">
+                        <h2 id="currentViewTitle" class="text-[0.7rem] font-black text-slate-500 tracking-[0.2em] uppercase">Everything</h2>
+                        <span id="itemCount" class="text-[0.65rem] font-extrabold text-slate-400 uppercase">0 Found</span>
+                    </div>
                 </div>
 
-                <div id="emptyState" class="text-center py-32 pixel-card rounded-[3rem] border-2 border-dashed border-slate-200">
-                    <p class="text-lg font-semibold text-slate-400 uppercase tracking-widest">No listings available</p>
+                <div id="emptyState" class="text-center py-32 pixel-card border-2 border-dashed border-slate-200">
+                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">No matching items</p>
                 </div>
 
                 <div id="itemsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
@@ -201,410 +303,602 @@
         </main>
     </div>
 
-    <!-- Identity Selection Modal -->
+    <!-- Gender Selection Modal -->
     <div id="genderModal" class="fixed inset-0 modal-overlay z-[500] flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-md p-10 relative rounded-[2.5rem] shadow-2xl text-center">
-            <h2 class="text-2xl font-bold text-slate-800 mb-4 uppercase tracking-tight">Identity Preference</h2>
-            <p class="text-slate-500 text-sm mb-8 leading-relaxed">Choose your gender to customize your experience. This will filter clothing listings accordingly.</p>
+            <h2 class="text-2xl font-black text-slate-800 mb-4 tracking-tighter">Your Preference</h2>
+            <p class="text-slate-400 text-sm mb-8">We'll use this to tailor clothing results for you. Stay private.</p>
             <div class="grid grid-cols-1 gap-3">
-                <button onclick="setIdentity('Male')" class="w-full py-4 border-2 border-slate-100 rounded-2xl hover:border-fuchsia-500 hover:text-fuchsia-600 font-bold transition-all uppercase text-sm">Male</button>
-                <button onclick="setIdentity('Female')" class="w-full py-4 border-2 border-slate-100 rounded-2xl hover:border-fuchsia-500 hover:text-fuchsia-600 font-bold transition-all uppercase text-sm">Female</button>
-                <button onclick="setIdentity('Other')" class="w-full py-4 border-2 border-slate-100 rounded-2xl hover:border-fuchsia-500 hover:text-fuchsia-600 font-bold transition-all uppercase text-sm">Other</button>
+                <button onclick="setIdentity('Male')" class="w-full py-4 border-2 border-slate-50 rounded-2xl hover:bg-slate-50 hover:border-slate-200 font-bold transition-all text-sm">Male</button>
+                <button onclick="setIdentity('Female')" class="w-full py-4 border-2 border-slate-50 rounded-2xl hover:bg-slate-50 hover:border-slate-200 font-bold transition-all text-sm">Female</button>
+                <button onclick="setIdentity('Other')" class="w-full py-4 border-2 border-slate-50 rounded-2xl hover:bg-slate-50 hover:border-slate-200 font-bold transition-all text-sm">Prefer not to say</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Moderation View -->
+    <div id="adminView" class="hidden flex flex-col min-h-screen bg-slate-900 text-white p-8 md:p-16">
+        <header class="flex justify-between items-center mb-12 border-b border-slate-800 pb-8">
+            <h1 class="text-3xl font-black text-blue-300 tracking-tighter">System Control</h1>
+            <button onclick="toggleView('market')" class="px-6 py-3 bg-slate-800 rounded-xl font-bold text-[0.65rem] uppercase tracking-widest">Exit Terminal</button>
+        </header>
+
+        <div class="flex gap-12 mb-10 border-b border-slate-800">
+            <button onclick="setAdminTab('listings')" id="tab-listings" class="admin-nav-item active font-black uppercase text-[0.65rem] tracking-widest">Listings</button>
+            <button onclick="setAdminTab('users')" id="tab-users" class="admin-nav-item font-black uppercase text-[0.65rem] tracking-widest">User Base</button>
+        </div>
+
+        <div id="adminContent" class="flex-1 overflow-y-auto">
+            <div id="admin-tab-listings" class="space-y-4">
+                <div id="adminListingsList" class="grid grid-cols-1 gap-4"></div>
+            </div>
+            <div id="admin-tab-users" class="hidden">
+                <div class="overflow-hidden rounded-3xl bg-slate-800/50 border border-slate-700">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-800 text-slate-400 uppercase text-[0.6rem] font-black tracking-widest">
+                            <tr><th class="p-6">UID</th><th class="p-6">Auth</th><th class="p-6 text-center">Status</th><th class="p-6 text-right">Ops</th></tr>
+                        </thead>
+                        <tbody id="adminUsersList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests Modal -->
+    <div id="requestsModal" class="fixed inset-0 modal-overlay z-[300] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-xl p-10 relative rounded-[2.5rem] shadow-2xl overflow-y-auto max-h-[80vh]">
+            <button onclick="toggleModal('requestsModal', false)" class="absolute top-8 right-8 text-slate-300 text-3xl">&times;</button>
+            <h2 class="text-2xl font-black text-slate-800 mb-8">Active Connections</h2>
+            <div id="incomingRequestsList" class="space-y-4">
+                <p class="text-slate-400 text-center py-10 font-bold italic">Checking for handshakes...</p>
             </div>
         </div>
     </div>
 
     <!-- Selling Modal -->
     <div id="sellingModal" class="fixed inset-0 modal-overlay z-[150] flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-2xl p-10 relative max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl">
-            <button onclick="toggleModal('sellingModal', false)" class="absolute top-6 right-6 text-slate-400 text-2xl font-bold hover:text-slate-800 transition-colors">&times;</button>
-            <h2 class="text-2xl font-bold text-slate-800 mb-10 uppercase tracking-tight">Register Asset</h2>
-            <form id="itemForm" class="space-y-6">
+        <div class="bg-white w-full max-w-2xl p-10 relative max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl">
+            <button onclick="toggleModal('sellingModal', false)" class="absolute top-8 right-8 text-slate-300 text-3xl hover:text-slate-800 transition-colors">&times;</button>
+            <h2 class="text-3xl font-black text-slate-800 mb-10">List an Asset</h2>
+            <form id="itemForm" class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <input type="text" id="itemName" required placeholder="Asset Name" class="w-full">
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="number" id="itemPrice" required placeholder="Price (₹)" class="w-full">
-                            <select id="itemCategory" class="w-full" onchange="toggleClothingGenderGroup(this.value)">
-                                <option value="Electronics">Electronics</option>
-                                <option value="Clothing">Clothing</option>
-                                <option value="Accessories">Accessories</option>
-                                <option value="Beauty">Beauty</option>
-                                <option value="Books">Books</option>
-                                <option value="Daily needs">Daily needs</option>
-                            </select>
+                    <div class="space-y-6">
+                        <input type="text" id="itemName" required placeholder="What are you selling?" class="w-full">
+                        <div class="relative">
+                            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-black">₹</span>
+                            <input type="number" id="itemPrice" required placeholder="Price" class="w-full pl-10">
                         </div>
-                        <div id="clothingGenderGroup" class="hidden p-4 bg-fuchsia-50 rounded-2xl">
-                            <label class="text-[0.65rem] text-fuchsia-600 font-black uppercase mb-3 block">Target Gender</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Male" class="accent-fuchsia-500"> Male</label>
-                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Female" checked class="accent-fuchsia-500"> Female</label>
-                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Other" class="accent-fuchsia-500"> Other</label>
+                        <select id="itemCategory" class="w-full" onchange="toggleGenderSelect(this.value)">
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Decorations">Decorations</option>
+                            <option value="Beauty">Beauty</option>
+                            <option value="Books">Books</option>
+                            <option value="Daily needs">Daily needs</option>
+                        </select>
+                        <div id="clothingGenderGroup" class="hidden">
+                            <label class="text-[0.65rem] text-slate-400 font-black uppercase mb-3 block tracking-widest">Target Gender</label>
+                            <div class="flex gap-6">
+                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Male" class="accent-slate-800"> Male</label>
+                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Female" checked class="accent-slate-800"> Female</label>
+                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="targetGender" value="Other" class="accent-slate-800"> All</label>
                             </div>
                         </div>
-                        <div class="flex gap-4 p-4 bg-slate-50 rounded-2xl">
-                            <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><input type="radio" name="itemCondition" value="unused" checked> Unused</label>
-                            <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><input type="radio" name="itemCondition" value="used"> Used</label>
-                        </div>
-
-                        <div class="space-y-2 pt-2 border-t border-slate-100">
-                            <label class="text-[0.65rem] font-bold text-slate-400 uppercase block mb-1">Contact Information</label>
-                            <input type="email" id="itemEmail" required placeholder="Your Email Address" class="w-full">
-                            <input type="tel" id="itemPhone" placeholder="Mobile Number (Optional)" class="w-full">
+                        <div class="flex gap-8">
+                            <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="itemCondition" value="unused" checked class="accent-slate-800"> New</label>
+                            <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="itemCondition" value="used" class="accent-slate-800"> Used</label>
                         </div>
                     </div>
-
                     <div class="space-y-4">
-                        <div class="img-preview-container" id="imgPreview">
-                            <span class="text-sm text-slate-400 mx-auto font-bold uppercase tracking-tighter italic">Upload Images</span>
-                        </div>
-                        <input type="file" id="itemImage" accept="image/*" multiple class="text-xs">
-                        <textarea id="itemDesc" rows="5" placeholder="Detailed Information (Age, flaws, etc)..." class="w-full"></textarea>
+                        <div class="img-preview-container" id="imgPreview"><span class="text-[0.65rem] font-black text-slate-300 uppercase tracking-widest mx-auto">Drop images here</span></div>
+                        <input type="file" id="itemImage" accept="image/*" multiple class="text-[0.65rem] font-bold text-slate-400">
                     </div>
                 </div>
-                <button type="submit" class="w-full py-5 btn-retro rounded-2xl text-lg font-bold uppercase tracking-widest shadow-xl">Submit Listing</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[0.65rem] text-slate-400 font-black uppercase ml-1 tracking-widest">Public Email</label>
+                        <input type="email" id="sellerEmail" required placeholder="student@edu.com">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[0.65rem] text-slate-400 font-black uppercase ml-1 tracking-widest">WhatsApp (Optional)</label>
+                        <input type="tel" id="sellerPhone" placeholder="+91 ...">
+                    </div>
+                </div>
+                <textarea id="itemDesc" rows="4" placeholder="Tell us about the product... why is it cool?" class="w-full"></textarea>
+                <button type="submit" class="w-full py-5 btn-retro rounded-[1.5rem] text-lg">Post to Marketplace</button>
             </form>
         </div>
     </div>
 
-    <!-- Item Details Modal -->
-    <div id="itemDetailsModal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative">
-            <button onclick="toggleModal('itemDetailsModal', false)" class="absolute top-6 right-6 z-10 bg-black/20 text-white w-10 h-10 flex items-center justify-center rounded-full text-2xl hover:bg-black/50 transition-all">&times;</button>
-            <div class="flex flex-col md:flex-row max-h-[90vh]">
-                <div class="w-full md:w-1/2 bg-slate-100 flex items-center justify-center">
-                    <img id="detailsImg" class="w-full h-full object-contain max-h-[400px] md:max-h-full">
+    <!-- Item Details -->
+    <div id="itemDetailsModal" class="fixed inset-0 modal-overlay z-[140] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-5xl p-0 relative max-h-[95vh] overflow-y-auto rounded-[3rem] overflow-hidden shadow-2xl">
+            <button onclick="toggleModal('itemDetailsModal', false)" class="absolute top-8 right-8 z-20 bg-white/80 backdrop-blur p-3 text-slate-800 w-12 h-12 flex items-center justify-center rounded-2xl text-2xl transition-all">&times;</button>
+            <div class="flex flex-col lg:flex-row">
+                <div class="w-full lg:w-1/2 bg-slate-50">
+                    <div class="gallery-main h-full" id="detailsGallery">
+                        <button onclick="prevImage()" class="absolute left-6 top-1/2 -translate-y-1/2 bg-white/90 p-4 rounded-2xl shadow-xl z-10 hover:bg-white transition-colors">◀</button>
+                        <button onclick="nextImage()" class="absolute right-6 top-1/2 -translate-y-1/2 bg-white/90 p-4 rounded-2xl shadow-xl z-10 hover:bg-white transition-colors">▶</button>
+                    </div>
                 </div>
-                <div class="w-full md:w-1/2 p-10 overflow-y-auto flex flex-col">
-                    <div class="mb-2">
-                        <span id="detailsCategory" class="text-[0.65rem] font-bold text-fuchsia-500 uppercase tracking-widest"></span>
-                    </div>
-                    <h2 id="detailsName" class="text-3xl font-bold text-slate-800 uppercase mb-4 leading-tight"></h2>
-                    <div class="text-3xl font-black text-slate-900 mb-6" id="detailsPrice"></div>
-                    <p id="detailsDesc" class="text-slate-600 mb-8 whitespace-pre-wrap flex-grow"></p>
-                    
-                    <div id="contactArea" class="mt-auto pt-6 border-t border-slate-100">
-                        <button id="connectBtn" onclick="revealContact()" class="w-full py-4 bg-fuchsia-500 text-white rounded-xl font-bold uppercase tracking-wide hover:bg-fuchsia-600 transition-all">Connect with Seller</button>
-                        <div id="contactInfo" class="hidden space-y-4 pt-4 animate-fade-in">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Email</span>
-                                <a id="detailsEmail" class="font-bold text-slate-800 underline decoration-fuchsia-200"></a>
+                <div class="w-full lg:w-1/2 p-14 bg-white flex flex-col justify-center">
+                    <div class="mb-10">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex gap-2">
+                                <span id="detailsCategory" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[0.65rem] font-black uppercase tracking-widest"></span>
+                                <span id="detailsGenderTag" class="hidden px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[0.65rem] font-black uppercase tracking-widest"></span>
                             </div>
-                            <div id="phoneRow" class="flex flex-col gap-1">
-                                <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Mobile</span>
-                                <span id="detailsPhone" class="font-bold text-slate-800"></span>
-                            </div>
+                            <span id="detailsCondition" class="text-[0.6rem] font-black text-slate-300 uppercase tracking-[0.2em]"></span>
                         </div>
+                        <h2 id="detailsName" class="text-4xl font-black text-slate-800 uppercase mb-4 leading-none"></h2>
+                        <div class="text-5xl font-black text-slate-900 mb-10" id="detailsPrice"></div>
+                        <p id="detailsDesc" class="text-slate-500 text-lg leading-relaxed font-medium"></p>
                     </div>
+                    <button id="connectBtn" class="w-full py-5 bg-slate-900 text-blue-100 rounded-[1.5rem] text-lg font-black shadow-2xl hover:bg-slate-800 transition-all uppercase tracking-widest">Connect with Seller</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold text-sm shadow-2xl transform translate-y-40 transition-transform duration-300 z-[1000]">
-        <span id="toastMsg">System Updated</span>
+    <!-- Contact Modal -->
+    <div id="contactModal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md p-14 relative text-center rounded-[3rem] shadow-2xl">
+            <button onclick="toggleModal('contactModal', false)" class="absolute top-8 right-8 text-slate-200 text-3xl font-logo">&times;</button>
+            <div class="mb-8 inline-block p-6 bg-slate-50 rounded-[2rem]">
+                <svg class="w-12 h-12 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-1.173-10.99c.001-.03.001-.06.001-.091a4 4 0 014-4c.451 0 .883.076 1.284.216M14.552 8.29a6.733 6.733 0 011.947 4.71m.998 8.584V20a2 2 0 012-2h.01a2 2 0 012 2v2m-6-10H3a2 2 0 00-2 2v2a2 2 0 002 2h10a2 2 0 002-2v-2a2 2 0 00-2-2z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 mb-10 tracking-tighter uppercase">Handshake Authorized</h2>
+            <div id="contactDetails" class="space-y-6"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-blue-100 px-10 py-5 rounded-[2rem] font-black text-xs tracking-widest shadow-2xl transform translate-y-40 transition-transform duration-300 z-[1000] uppercase">
+        <span id="toastMsg">Marketplace Updated</span>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, doc, onSnapshot, query, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // --- NEW FIREBASE CONFIGURATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
-            authDomain: "negocios-8e8a4.firebaseapp.com",
-            projectId: "negocios-8e8a4",
-            storageBucket: "negocios-8e8a4.firebasestorage.app",
-            messagingSenderId: "298423907311",
-            appId: "1:298423907311:web:92b79b23776a4f56557c1a"
-        };
-        
-        const finalConfig = (typeof __firebase_config !== 'undefined') ? JSON.parse(__firebase_config) : firebaseConfig;
-        const app = initializeApp(finalConfig);
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'negocio-v4';
 
-        // --- GLOBAL STATE ---
         let items = [];
+        let filteredItems = [];
+        let blockedUsers = [];
+        let connectionRequests = [];
+        let user = null;
+        let isAdminView = false;
         let currentFilter = 'ALL';
         let searchQuery = '';
+        let sortMode = 'none';
+        let conditionFilter = 'all';
         let currentImagesData = [];
-        let currentUser = null;
+        let activeDetailsIndex = null;
+        let activeImageIndex = 0;
         window.isUserVerified = false;
         window.verifiedUserEmail = null;
         window.currentUserGender = null;
 
-        // --- UI HANDLERS ---
         window.toggleModal = (id, show) => {
             const m = document.getElementById(id);
             if(m) {
                 m.classList.toggle('hidden', !show);
                 if (!show && id === 'sellingModal') { 
                     document.getElementById('itemForm').reset(); 
-                    document.getElementById('imgPreview').innerHTML = 'Upload Images'; 
+                    document.getElementById('imgPreview').innerHTML = '<span class="text-[0.65rem] font-black text-slate-300 uppercase tracking-widest mx-auto">Drop images here</span>'; 
                     document.getElementById('clothingGenderGroup').classList.add('hidden');
                     currentImagesData = []; 
                 }
             }
         };
 
-        window.toggleClothingGenderGroup = (val) => {
-            document.getElementById('clothingGenderGroup').classList.toggle('hidden', val !== 'Clothing');
-        };
-
-        window.revealContact = () => {
-            document.getElementById('connectBtn').classList.add('hidden');
-            document.getElementById('contactInfo').classList.remove('hidden');
-        };
-
-        window.openItemDetails = (itemId) => {
-            const item = items.find(i => i.id === itemId);
-            if(!item) return;
-
-            document.getElementById('detailsImg').src = item.images?.[0] || '';
-            document.getElementById('detailsName').textContent = item.name;
-            document.getElementById('detailsPrice').textContent = `₹${parseInt(item.price).toLocaleString()}`;
-            document.getElementById('detailsCategory').textContent = item.category;
-            document.getElementById('detailsDesc').textContent = item.description || "No additional details provided.";
-            
-            // Hidden data
-            const emailLink = document.getElementById('detailsEmail');
-            emailLink.textContent = item.email;
-            emailLink.href = `mailto:${item.email}`;
-
-            const phoneEl = document.getElementById('detailsPhone');
-            if(item.phone) {
-                phoneEl.textContent = item.phone;
-                document.getElementById('phoneRow').classList.remove('hidden');
-            } else {
-                document.getElementById('phoneRow').classList.add('hidden');
-            }
-
-            // Reset reveal state
-            document.getElementById('connectBtn').classList.remove('hidden');
-            document.getElementById('contactInfo').classList.add('hidden');
-
-            window.toggleModal('itemDetailsModal', true);
+        window.toggleGenderSelect = (val) => {
+            const group = document.getElementById('clothingGenderGroup');
+            if(val === 'Clothing') group.classList.remove('hidden');
+            else group.classList.add('hidden');
         };
 
         const updateUI = () => {
-            const filteredItems = items.filter(i => {
-                // Gender Filter logic
-                if (i.category === 'Clothing' && i.targetGender === 'Female') {
-                    if (!window.currentUserGender || window.currentUserGender !== 'Female') return false;
+            filteredItems = items.filter(i => {
+                if(!i.approved) return false;
+                if (i.category === 'Clothing' && i.targetGender && window.currentUserGender) {
+                    if (i.targetGender !== window.currentUserGender && i.targetGender !== 'Other') return false;
                 }
-                
-                if (currentFilter !== 'ALL' && i.category !== currentFilter) return false;
-                if (searchQuery && !i.name.toLowerCase().includes(searchQuery)) return false;
                 return true;
             });
+            
+            if (currentFilter !== 'ALL') {
+                const map = {'Electronics': 'Electronics', 'Clothing': 'Clothing', 'Accessories': 'Accessories', 'Decorations': 'Decorations', 'Beauty': 'Beauty', 'Books': 'Books', 'Daily Needs': 'Daily needs'};
+                filteredItems = filteredItems.filter(i => i.category === (map[currentFilter] || currentFilter));
+            }
+            if (searchQuery) {
+                filteredItems = filteredItems.filter(i => i.name.toLowerCase().includes(searchQuery));
+            }
+            if (conditionFilter !== 'all') {
+                filteredItems = filteredItems.filter(i => i.condition === conditionFilter);
+            }
+            if (sortMode === 'high-to-low') {
+                filteredItems.sort((a, b) => b.price - a.price);
+            }
 
-            const container = document.getElementById('itemsContainer');
-            const empty = document.getElementById('emptyState');
-            document.getElementById('itemCount').textContent = `${filteredItems.length} RECORDS FOUND`;
+            const itemsContainer = document.getElementById('itemsContainer');
+            const emptyState = document.getElementById('emptyState');
+            const itemCountBadge = document.getElementById('itemCount');
 
-            if (filteredItems.length === 0) {
-                container.classList.add('hidden');
-                empty.classList.remove('hidden');
+            if (!filteredItems.length) { 
+                emptyState.classList.remove('hidden'); 
+                itemsContainer.classList.add('hidden'); 
             } else {
-                container.classList.remove('hidden');
-                empty.classList.add('hidden');
-                container.innerHTML = '';
+                emptyState.classList.add('hidden'); 
+                itemsContainer.classList.remove('hidden'); 
+                itemsContainer.innerHTML = '';
                 filteredItems.forEach((item) => {
                     const card = document.createElement('div');
-                    card.className = 'pixel-card flex flex-col overflow-hidden rounded-[2.5rem] cursor-pointer group bg-white';
+                    card.className = 'pixel-card flex flex-col overflow-hidden cursor-pointer group bg-white';
                     card.onclick = () => window.openItemDetails(item.id);
-                    card.innerHTML = `
-                        <div class="w-full aspect-square bg-slate-50 border-b border-slate-100 flex items-center justify-center overflow-hidden relative">
-                            ${item.images?.[0] ? `<img src="${item.images[0]}" class="w-full h-full object-cover group-hover:scale-105 transition-all">` : '<span class="text-slate-200 font-bold uppercase text-[0.6rem]">No Visual</span>'}
-                            ${item.targetGender ? `<div class="absolute top-4 right-4 bg-fuchsia-500 text-white text-[0.55rem] px-2.5 py-1 rounded font-black uppercase tracking-tighter">${item.targetGender}</div>` : ''}
+                    
+                    const cardContent = document.createElement('div');
+                    cardContent.innerHTML = `
+                        <div class="w-full aspect-square bg-slate-50 border-b border-slate-50 flex items-center justify-center overflow-hidden relative">
+                            <div class="img-wrapper w-full h-full"></div>
+                            ${item.images?.length > 1 ? `<div class="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur text-blue-100 text-[0.6rem] px-3 py-1.5 rounded-xl font-black">+${item.images.length - 1}</div>` : ''}
+                            ${item.targetGender ? `<div class="absolute top-4 right-4 bg-slate-900 text-blue-100 text-[0.55rem] px-2.5 py-1 rounded-lg font-black uppercase tracking-widest">${item.targetGender}</div>` : ''}
                         </div>
                         <div class="p-8">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[0.65rem] font-bold text-fuchsia-500 uppercase tracking-widest">${item.category}</span>
-                                <span class="text-[0.6rem] font-black bg-slate-50 px-2 py-1 rounded-lg text-slate-400 uppercase">${item.condition}</span>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="category-text text-[0.6rem] font-black text-slate-400 uppercase tracking-widest"></span>
+                                <span class="condition-text text-[0.55rem] text-slate-400 uppercase font-black bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100"></span>
                             </div>
-                            <h3 class="text-xl font-bold text-slate-800 uppercase truncate mb-6">${item.name}</h3>
+                            <h3 class="name-text text-lg font-bold text-slate-700 mb-8 uppercase leading-tight truncate"></h3>
                             <div class="flex items-center justify-between">
-                                <span class="text-2xl font-black text-slate-900">₹${parseInt(item.price).toLocaleString()}</span>
-                                <div class="px-4 py-2 border-2 border-fuchsia-500 text-fuchsia-500 text-[0.6rem] font-black uppercase rounded-lg group-hover:bg-fuchsia-500 group-hover:text-white transition-all">View Details</div>
+                                <span class="price-text text-2xl font-black text-slate-900"></span>
+                                <div class="btn-view-info">View Info</div>
                             </div>
                         </div>
                     `;
-                    container.appendChild(card);
+                    
+                    cardContent.querySelector('.category-text').textContent = item.category;
+                    cardContent.querySelector('.condition-text').textContent = item.condition === 'unused' ? 'New' : 'Used';
+                    cardContent.querySelector('.name-text').textContent = item.name;
+                    cardContent.querySelector('.price-text').textContent = `₹${parseInt(item.price).toLocaleString()}`;
+                    
+                    const imgWrapper = cardContent.querySelector('.img-wrapper');
+                    if (item.images?.[0]) {
+                        const img = document.createElement('img');
+                        img.src = item.images[0];
+                        img.className = 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500';
+                        imgWrapper.appendChild(img);
+                    } else {
+                        imgWrapper.innerHTML = `<div class="text-slate-200 uppercase font-black text-[0.6rem] flex items-center justify-center h-full tracking-widest">Visual Missing</div>`;
+                    }
+                    
+                    card.appendChild(cardContent);
+                    itemsContainer.appendChild(card);
                 });
             }
+            itemCountBadge.textContent = `${filteredItems.length} RECORDS FOUND`;
         };
 
-        // --- DATA SYNC ---
-        const setupSync = (user) => {
-            if (!user) return;
-            const listingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-            onSnapshot(listingsRef, (snap) => {
-                items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                updateUI();
-            }, (err) => {
-                console.error("Firestore sync error:", err);
-                if (err.code === 'permission-denied') {
-                    showToast("System Permission Denied.");
-                }
+        const renderAdminPanel = () => {
+            const listEl = document.getElementById('adminListingsList');
+            listEl.innerHTML = '';
+            items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'bg-slate-800 rounded-3xl p-6 flex items-center gap-6 border border-slate-700';
+                row.innerHTML = `
+                    <div class="w-16 h-16 bg-black shrink-0 rounded-2xl overflow-hidden">
+                        ${item.images?.[0] ? `<img src="${item.images[0]}" class="w-full h-full object-cover">` : ''}
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-black text-blue-200 text-lg">${item.name}</div>
+                        <div class="text-slate-400 text-[0.6rem] font-bold uppercase tracking-widest">₹${item.price} • ${item.category}</div>
+                    </div>
+                `;
+                
+                const delBtn = document.createElement('button');
+                delBtn.className = 'px-6 py-2 bg-red-600 text-white font-black rounded-xl uppercase text-[0.6rem] tracking-widest';
+                delBtn.textContent = 'Delete';
+                delBtn.onclick = () => window.removeAsset(item.id);
+                row.appendChild(delBtn);
+                listEl.appendChild(row);
+            });
+
+            const usersEl = document.getElementById('adminUsersList');
+            usersEl.innerHTML = '';
+            const uniqueUsers = [...new Map(items.map(item => [item.sellerId, item])).values()];
+            uniqueUsers.forEach(u => {
+                if(!u.sellerId) return;
+                const isBlocked = blockedUsers.includes(u.sellerId);
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-700/50 hover:bg-slate-800/30';
+                row.innerHTML = `
+                    <td class="p-6 text-slate-400 text-[0.6rem] font-mono">${u.sellerId}</td>
+                    <td class="p-6 font-bold text-slate-100 text-xs">${u.email}</td>
+                    <td class="p-6 text-center">
+                        <span class="${isBlocked ? 'text-red-500' : 'text-emerald-500'} font-black uppercase text-[0.6rem] tracking-widest">${isBlocked ? 'Blocked' : 'Active'}</span>
+                    </td>
+                    <td class="p-6 text-right"></td>
+                `;
+                
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = `px-5 py-2 ${isBlocked ? 'bg-emerald-600' : 'bg-red-900'} text-white font-black rounded-xl text-[0.6rem] tracking-widest`;
+                toggleBtn.textContent = isBlocked ? 'Unblock' : 'Block';
+                toggleBtn.onclick = () => window.toggleUserBlock(u.sellerId);
+                row.querySelector('td:last-child').appendChild(toggleBtn);
+                usersEl.appendChild(row);
             });
         };
 
-        const checkProfile = async (user) => {
-            try {
-                const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings');
-                const userDoc = await getDoc(profileRef);
-                if (userDoc.exists()) {
-                    window.currentUserGender = userDoc.data().gender;
-                    updateGenderBadge();
-                    updateUI();
-                } else if (window.isUserVerified) {
-                    window.toggleModal('genderModal', true);
-                }
-            } catch (e) {
-                if (window.isUserVerified) window.toggleModal('genderModal', true);
-            }
-        };
+        const renderRequestsPanel = () => {
+            const listEl = document.getElementById('incomingRequestsList');
+            const badge = document.getElementById('requestBadge');
+            if (!user) return;
 
-        // --- AUTH FLOW ---
-        const initAuth = async () => {
-            try {
-                let userCredential;
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    userCredential = await signInAnonymously(auth);
-                }
-                currentUser = userCredential.user;
-                setupSync(currentUser);
-            } catch (err) {
-                console.error("Auth Error:", err);
-                showToast("Auth Error: Check Console.");
-            }
-        };
-
-        // --- FORM HANDLING ---
-        document.getElementById('itemForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!window.isUserVerified || !currentUser) return;
-            const category = document.getElementById('itemCategory').value;
-            const targetGender = category === 'Clothing' ? document.querySelector('input[name="targetGender"]:checked').value : null;
-
-            const newItem = { 
-                name: document.getElementById('itemName').value, 
-                price: parseFloat(document.getElementById('itemPrice').value), 
-                category: category, 
-                targetGender: targetGender,
-                condition: document.querySelector('input[name="itemCondition"]:checked').value, 
-                description: document.getElementById('itemDesc').value, 
-                email: document.getElementById('itemEmail').value, 
-                phone: document.getElementById('itemPhone').value,
-                images: [...currentImagesData], 
-                approved: true, 
-                sellerId: currentUser.uid, 
-                createdAt: Date.now() 
-            };
+            const myIncoming = connectionRequests.filter(r => r.ownerId === user.uid && r.status === 'pending');
             
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), newItem);
-                window.toggleModal('sellingModal', false);
-                showToast('Listing Posted Successfully');
-            } catch (err) {
-                console.error("Submit error:", err);
-                showToast('Publishing Error: Check Database Rules.');
+            if (myIncoming.length > 0) {
+                badge.textContent = myIncoming.length;
+                badge.classList.remove('hidden');
+                listEl.innerHTML = '';
+                myIncoming.forEach(req => {
+                    const item = items.find(i => i.id === req.listingId);
+                    const row = document.createElement('div');
+                    row.className = 'p-6 bg-slate-50 border border-slate-100 rounded-[1.5rem] flex items-center justify-between gap-4';
+                    row.innerHTML = `
+                        <div class="flex-1">
+                            <p class="text-[0.6rem] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Incoming Handshake for:</p>
+                            <p class="text-sm font-bold text-slate-800 uppercase truncate">${item ? item.name : 'Unknown Item'}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="respondToRequest('${req.id}', 'approved')" class="px-5 py-2.5 bg-slate-900 text-blue-100 text-[0.6rem] font-black rounded-xl uppercase tracking-widest">Approve</button>
+                            <button onclick="respondToRequest('${req.id}', 'rejected')" class="px-5 py-2.5 bg-slate-200 text-slate-600 text-[0.6rem] font-black rounded-xl uppercase tracking-widest">Dismiss</button>
+                        </div>
+                    `;
+                    listEl.appendChild(row);
+                });
+            } else {
+                badge.classList.add('hidden');
+                listEl.innerHTML = '<p class="text-slate-300 text-center py-10 uppercase text-[0.65rem] font-black tracking-widest">No Active Sessions</p>';
             }
-        });
+        };
 
-        // --- HELPERS ---
         window.phoneEmailReceiver = async function(userObj) { 
             window.isUserVerified = true; 
             window.verifiedUserEmail = userObj.user_email_id;
             document.getElementById('verificationContainer').classList.add('hidden'); 
             document.getElementById('verifiedStatus').classList.remove('hidden'); 
-            if (currentUser) checkProfile(currentUser);
-            showToast('Identity Verified'); 
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'));
+                if (userDoc.exists()) {
+                    window.currentUserGender = userDoc.data().gender;
+                    updateGenderBadge();
+                    updateUI();
+                } else {
+                    window.toggleModal('genderModal', true);
+                }
+            }
+            const sellerEmailInput = document.getElementById('sellerEmail');
+            if (sellerEmailInput && !sellerEmailInput.value) sellerEmailInput.value = window.verifiedUserEmail;
+            showToast('Identity Synced'); 
         };
 
         window.setIdentity = async (gender) => {
-            if(!currentUser) return;
+            if(!user) return;
             window.currentUserGender = gender;
-            const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'settings');
-            try {
-                await setDoc(profileRef, { gender: gender, updatedAt: Date.now() });
-                window.toggleModal('genderModal', false);
-                updateGenderBadge();
-                updateUI();
-                showToast(`Profile: ${gender}`);
-            } catch (e) {
-                showToast("Profile save denied.");
-            }
+            await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings'), { gender: gender, updatedAt: Date.now() });
+            window.toggleModal('genderModal', false);
+            updateGenderBadge();
+            updateUI();
+            showToast(`Profile: ${gender}`);
         };
 
         const updateGenderBadge = () => {
             const badge = document.getElementById('userGenderBadge');
-            if (window.currentUserGender) {
-                badge.textContent = window.currentUserGender;
-                badge.classList.remove('hidden');
-            }
+            if (window.currentUserGender) { badge.textContent = window.currentUserGender; badge.classList.remove('hidden'); }
         };
 
+        window.respondToRequest = async (requestId, status) => {
+            if (!user) return;
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'connection_requests', requestId), { status });
+            showToast(`Request ${status.toUpperCase()}`);
+        };
+
+        window.sendConnectionRequest = async (listingId, ownerId) => {
+            if (!window.isUserVerified) return showToast('Verify identity first');
+            if (user.uid === ownerId) return showToast('Cannot request your own item');
+            const existing = connectionRequests.find(r => r.listingId === listingId && r.requesterId === user.uid);
+            if (existing) return showToast('Request already sent');
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), { listingId, ownerId, requesterId: user.uid, status: 'pending', createdAt: Date.now() });
+            showToast('Handshake Requested');
+        };
+        
         window.handleNewListingClick = () => {
-            if (!window.isUserVerified) {
-                showToast('Verify identity first (Top Right)');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
-            if (!currentUser) return showToast('Authenticating...');
+            if (!window.isUserVerified) return showToast('Please sign in first');
+            if (blockedUsers.includes(user.uid)) return showToast('Session restricted');
             window.toggleModal('sellingModal', true);
         };
-
+        
+        window.toggleFilterMenu = () => document.getElementById('filterMenu').classList.toggle('hidden');
         window.setFilter = (cat) => {
-            currentFilter = cat;
+            currentFilter = cat === 'Everything' ? 'ALL' : cat;
             document.querySelectorAll('.category-pill').forEach(pill => {
-                pill.classList.toggle('active', pill.textContent.includes(cat) || (cat === 'ALL' && pill.textContent.includes('All')));
+                pill.classList.toggle('active', pill.textContent.toUpperCase() === cat.toUpperCase());
             });
+            document.getElementById('currentViewTitle').textContent = cat;
             updateUI();
         };
 
-        window.handleSearch = () => { 
-            searchQuery = document.getElementById('searchInput').value.toLowerCase(); 
-            updateUI(); 
+        window.handleSearch = () => { searchQuery = document.getElementById('searchInput').value.toLowerCase(); updateUI(); };
+        window.setSort = (mode) => { sortMode = mode; document.getElementById('filterMenu').classList.add('hidden'); updateUI(); };
+        window.setCondition = (mode) => { conditionFilter = mode; document.getElementById('filterMenu').classList.add('hidden'); updateUI(); };
+
+        window.openItemDetails = (id) => {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            activeDetailsIndex = items.indexOf(item);
+            activeImageIndex = 0;
+            document.getElementById('detailsName').textContent = item.name;
+            document.getElementById('detailsCategory').textContent = item.category;
+            document.getElementById('detailsCondition').textContent = item.condition === 'unused' ? 'Factory New' : 'Used';
+            document.getElementById('detailsPrice').textContent = `₹${parseInt(item.price).toLocaleString()}`;
+            document.getElementById('detailsDesc').textContent = item.description || 'The owner has not provided additional context.';
+            
+            const genderTag = document.getElementById('detailsGenderTag');
+            if(item.targetGender) { genderTag.textContent = item.targetGender; genderTag.classList.remove('hidden'); } else { genderTag.classList.add('hidden'); }
+
+            const btn = document.getElementById('connectBtn');
+            const req = connectionRequests.find(r => r.listingId === item.id && r.requesterId === user?.uid);
+            
+            if (user?.uid === item.sellerId) {
+                btn.textContent = "Owner Perspective"; btn.disabled = true; btn.classList.add('opacity-50');
+            } else if (req) {
+                if (req.status === 'approved') {
+                    btn.textContent = "View Auth Details"; btn.disabled = false; btn.classList.remove('opacity-50'); btn.onclick = () => window.openContact(item.id);
+                } else if (req.status === 'pending') {
+                    btn.textContent = "Awaiting Handshake"; btn.disabled = true; btn.classList.add('opacity-50');
+                } else {
+                    btn.textContent = "Access Denied"; btn.disabled = true; btn.classList.add('opacity-50');
+                }
+            } else {
+                btn.textContent = "Connect with Seller"; btn.disabled = false; btn.classList.remove('opacity-50'); btn.onclick = () => window.sendConnectionRequest(item.id, item.sellerId);
+            }
+
+            window.updateGallery();
+            window.toggleModal('itemDetailsModal', true);
+        };
+
+        window.updateGallery = () => {
+            const item = items[activeDetailsIndex];
+            const container = document.getElementById('detailsGallery');
+            const oldImg = container.querySelector('.main-img');
+            if (oldImg) oldImg.remove();
+            if (item && item.images?.length) {
+                const img = document.createElement('img'); img.src = item.images[activeImageIndex]; img.className = 'main-img w-full h-full object-contain'; container.prepend(img);
+            }
+        };
+
+        window.nextImage = () => { 
+            const total = items[activeDetailsIndex]?.images?.length;
+            if(total) { activeImageIndex = (activeImageIndex + 1) % total; window.updateGallery(); } 
+        };
+        window.prevImage = () => { 
+            const total = items[activeDetailsIndex]?.images?.length;
+            if(total) { activeImageIndex = (activeImageIndex - 1 + total) % total; window.updateGallery(); } 
+        };
+
+        window.openContact = (id) => {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            const container = document.getElementById('contactDetails');
+            container.innerHTML = `
+                <div class="flex flex-col gap-3">
+                    <p class="text-[0.6rem] text-slate-400 uppercase font-black tracking-widest">Digital Contact</p>
+                    <a href="mailto:${item.email}" class="text-xl font-black text-slate-800 break-all underline decoration-4 decoration-[#B0E0E6]">${item.email}</a>
+                </div>
+                <div class="flex flex-col gap-3 pt-6">
+                    <p class="text-[0.6rem] text-slate-400 uppercase font-black tracking-widest">Mobile Link</p>
+                    <a href="tel:${item.phone}" class="text-3xl font-black text-slate-800">${item.phone || 'N/A'}</a>
+                </div>
+            `;
+            window.toggleModal('contactModal', true);
+        };
+
+        window.handleAdminAccess = () => {
+            if (window.verifiedUserEmail === 'km0334109@gmail.com') { window.toggleView('admin'); showToast('TERMINAL_ROOT_ACCESS'); } else if (!window.isUserVerified) { showToast('Verify identity'); } else { showToast('Unprivileged session'); }
+        };
+
+        window.toggleView = (view) => {
+            isAdminView = (view === 'admin');
+            document.getElementById('marketplaceView').classList.toggle('hidden', isAdminView);
+            document.getElementById('adminView').classList.toggle('hidden', !isAdminView);
+            if(isAdminView) renderAdminPanel();
+        };
+
+        window.setAdminTab = (tab) => {
+            document.getElementById('tab-listings').classList.toggle('active', tab === 'listings');
+            document.getElementById('tab-users').classList.toggle('active', tab === 'users');
+            document.getElementById('admin-tab-listings').classList.toggle('hidden', tab !== 'listings');
+            document.getElementById('admin-tab-users').classList.toggle('hidden', tab !== 'users');
+        };
+
+        window.removeAsset = async (id) => {
+            if (!user) return;
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
+            showToast('Asset Purged');
+        };
+
+        window.toggleUserBlock = async (uid) => {
+            if (!user) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', uid);
+            if (blockedUsers.includes(uid)) { await deleteDoc(ref); showToast('Privilege Restored'); } else { await setDoc(ref, { blockedAt: Date.now() }); showToast('Session Restricted'); }
+        };
+
+        const setupDataSync = () => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), (snap) => {
+                items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateUI(); if(isAdminView) renderAdminPanel();
+            }, (err) => console.error("Sync failure:", err));
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users'), (snap) => {
+                blockedUsers = snap.docs.map(d => d.id); if(isAdminView) renderAdminPanel();
+            }, (err) => console.error("Sync failure:", err));
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'connection_requests'), (snap) => {
+                connectionRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderRequestsPanel();
+                if (activeDetailsIndex !== null) { const activeItem = items[activeDetailsIndex]; if (activeItem) window.openItemDetails(activeItem.id); }
+            }, (err) => console.error("Sync failure:", err));
+        };
+
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); }
+            } catch (err) { console.error("Auth Exception:", err); await signInAnonymously(auth); }
         };
 
         document.getElementById('itemImage').addEventListener('change', function() {
-            const preview = document.getElementById('imgPreview');
-            preview.innerHTML = ''; 
+            const files = Array.from(this.files);
+            document.getElementById('imgPreview').innerHTML = ''; 
             currentImagesData = [];
-            Array.from(this.files).forEach(file => {
+            files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     currentImagesData.push(e.target.result);
-                    const img = document.createElement('img'); 
-                    img.src = e.target.result; 
-                    img.className = 'img-preview-item'; 
-                    preview.appendChild(img);
+                    const img = document.createElement('img'); img.src = e.target.result; img.className = 'img-preview-item'; document.getElementById('imgPreview').appendChild(img);
                 };
                 reader.readAsDataURL(file);
             });
         });
 
+        document.getElementById('itemForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!user || blockedUsers.includes(user.uid)) return showToast('Operation Rejected');
+            const cat = document.getElementById('itemCategory').value;
+            const targetGender = cat === 'Clothing' ? document.querySelector('input[name="targetGender"]:checked').value : null;
+            const newItem = { 
+                name: document.getElementById('itemName').value, price: parseFloat(document.getElementById('itemPrice').value), category: cat, targetGender: targetGender,
+                condition: document.querySelector('input[name="itemCondition"]:checked').value, description: document.getElementById('itemDesc').value, 
+                email: document.getElementById('sellerEmail').value, phone: document.getElementById('sellerPhone').value, images: [...currentImagesData], approved: true, sellerId: user.uid, createdAt: Date.now() 
+            };
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'listings'), newItem);
+            window.toggleModal('sellingModal', false);
+            showToast('Asset Registered');
+        });
+
         function showToast(m) { 
-            const msg = document.getElementById('toastMsg'); 
-            msg.textContent = m; 
-            const toast = document.getElementById('toast');
-            toast.classList.remove('translate-y-40'); 
+            const msg = document.getElementById('toastMsg'); msg.textContent = m; 
+            const toast = document.getElementById('toast'); toast.classList.remove('translate-y-40'); 
             setTimeout(() => toast.classList.add('translate-y-40'), 3000); 
         }
 
         onAuthStateChanged(auth, async (u) => { 
-            currentUser = u; 
-            if (u && window.isUserVerified && !window.currentUserGender) checkProfile(u);
+            user = u; if (user) { setupDataSync(); if(window.isUserVerified) { const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings')); if (userDoc.exists()) { window.currentUserGender = userDoc.data().gender; updateGenderBadge(); updateUI(); } } }
         });
-
         window.onload = initAuth;
     </script>
 </body>
