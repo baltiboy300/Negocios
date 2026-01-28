@@ -326,10 +326,10 @@
     <!-- Confirmation Modal -->
     <div id="confirmModal" class="modal-overlay hidden">
         <div class="modal-content !pb-6">
-            <h3 class="text-lg font-black uppercase mb-4">Confirm Action</h3>
-            <p id="confirmMsg" class="text-sm text-slate-500 mb-6 font-medium">Are you sure you want to delete this asset from the database?</p>
+            <h3 id="confirmTitle" class="text-lg font-black uppercase mb-4">Confirm Action</h3>
+            <p id="confirmMsg" class="text-sm text-slate-500 mb-6 font-medium">Are you sure you want to perform this action?</p>
             <div class="flex gap-4">
-                <button id="confirmBtn" class="flex-1 py-3 bg-red-500 text-white font-black uppercase text-xs rounded-xl">Delete</button>
+                <button id="confirmBtn" class="flex-1 py-3 bg-red-500 text-white font-black uppercase text-xs rounded-xl">Confirm</button>
                 <button onclick="toggleModal('confirmModal', false)" class="flex-1 py-3 bg-slate-100 font-black uppercase text-xs rounded-xl">Cancel</button>
             </div>
         </div>
@@ -341,7 +341,6 @@
                 <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span>HOME</span>
             </button>
-            <!-- Hidden by default until email verification matches admin -->
             <button onclick="switchTab('admin')" id="navAdmin" class="nav-btn hidden">
                 <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span>ADMIN</span>
@@ -378,6 +377,7 @@
         const appId = 'negocio-v4';
 
         let items = [];
+        let blockedUsers = [];
         let user = null;
         let currentFilter = 'ALL';
         let currentImagesData = [];
@@ -400,7 +400,6 @@
             document.getElementById('clothingTargetGroup').classList.toggle('hidden', val !== 'Clothing');
         };
 
-        // ENFORCED ACCESS CONTROL
         window.switchTab = (tab) => {
             if (tab === 'admin') {
                 if (!window.isUserVerified || window.verifiedEmail !== ADMIN_EMAIL) {
@@ -420,7 +419,6 @@
             if (tab === 'admin') updateAdminUI();
         };
 
-        // UI VISIBILITY FOR ADMIN BUTTON
         const updateAdminVisibilityUI = () => {
             const adminBtn = document.getElementById('navAdmin');
             if (window.isUserVerified && window.verifiedEmail === ADMIN_EMAIL) {
@@ -460,6 +458,11 @@
         document.getElementById('itemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!user) return window.showToast("Wait for authentication...");
+
+            // BLOCK CHECK
+            if (blockedUsers.some(b => b.id === user.uid)) {
+                return window.showToast("BLOCKED: Access to broadcasting revoked.");
+            }
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
@@ -542,6 +545,8 @@
 
             const container = document.getElementById('itemsContainer');
             const filtered = items.filter(i => {
+                // Filter out items from blocked users for public view
+                if (blockedUsers.some(b => b.id === i.sellerId)) return false;
                 if (i.category === 'Clothing' && i.targetGender === 'Female' && window.userGender !== 'Female') return false;
                 if (currentFilter !== 'ALL' && i.category !== currentFilter) return false;
                 return true;
@@ -576,7 +581,10 @@
             body.innerHTML = '';
             
             items.sort((a, b) => b.createdAt - a.createdAt).forEach(item => {
+                const isBlocked = blockedUsers.some(b => b.id === item.sellerId);
                 const tr = document.createElement('tr');
+                if (isBlocked) tr.classList.add('opacity-40', 'bg-red-50');
+                
                 const date = new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
                 tr.innerHTML = `
                     <td class="p-4">
@@ -590,25 +598,69 @@
                     </td>
                     <td class="p-4">
                         <p class="text-[10px] font-medium text-slate-500 lowercase">${item.email}</p>
-                        <p class="text-[8px] font-black text-slate-400 uppercase">${item.sellerId.substring(0, 8)}...</p>
+                        <p class="text-[8px] font-black ${isBlocked ? 'text-red-500' : 'text-slate-400'} uppercase">
+                            ${isBlocked ? 'BLACKLISTED' : item.sellerId.substring(0, 8) + '...'}
+                        </p>
                     </td>
                     <td class="p-4">
                         <p class="text-[10px] font-bold text-slate-400 uppercase">${date}</p>
                     </td>
-                    <td class="p-4 text-right">
-                        <button onclick="window.confirmDelete('${item.id}')" class="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[9px] font-black uppercase border border-red-100 hover:bg-red-500 hover:text-white transition-colors">
-                            Remove
+                    <td class="p-4 text-right flex gap-2 justify-end">
+                        <button onclick="window.confirmAction('delete', '${item.id}')" class="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[9px] font-black uppercase border border-red-100 hover:bg-red-500 hover:text-white transition-colors">
+                            Scrub
                         </button>
+                        ${isBlocked ? 
+                            `<button onclick="window.confirmAction('unblock', '${item.sellerId}')" class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase border border-emerald-100">Restore</button>` : 
+                            `<button onclick="window.confirmAction('block', '${item.sellerId}')" class="px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase border border-slate-900">Block</button>`
+                        }
                     </td>
                 `;
                 body.appendChild(tr);
             });
         };
 
-        window.confirmDelete = (id) => {
-            const confirmBtn = document.getElementById('confirmBtn');
-            confirmBtn.onclick = () => window.deleteListing(id);
+        window.confirmAction = (type, id) => {
+            const title = document.getElementById('confirmTitle');
+            const msg = document.getElementById('confirmMsg');
+            const btn = document.getElementById('confirmBtn');
+
+            if (type === 'delete') {
+                title.textContent = "Scrub Asset";
+                msg.textContent = "Permanently remove this listing from the database?";
+                btn.onclick = () => window.deleteListing(id);
+            } else if (type === 'block') {
+                title.textContent = "Blacklist User";
+                msg.textContent = "Prevent this seller from posting any further listings?";
+                btn.onclick = () => window.blockUser(id);
+            } else if (type === 'unblock') {
+                title.textContent = "Restore User";
+                msg.textContent = "Allow this user to broadcast assets again?";
+                btn.onclick = () => window.unblockUser(id);
+            }
+
             window.toggleModal('confirmModal', true);
+        };
+
+        window.blockUser = async (userId) => {
+            try {
+                const blockRef = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', userId);
+                await setDoc(blockRef, { blockedAt: Date.now() });
+                window.toggleModal('confirmModal', false);
+                window.showToast("User Blacklisted");
+            } catch (err) {
+                window.showToast("Block Failed");
+            }
+        };
+
+        window.unblockUser = async (userId) => {
+            try {
+                const blockRef = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', userId);
+                await deleteDoc(blockRef);
+                window.toggleModal('confirmModal', false);
+                window.showToast("User Restored");
+            } catch (err) {
+                window.showToast("Restore Failed");
+            }
         };
 
         window.deleteListing = async (id) => {
@@ -619,7 +671,7 @@
                 window.showToast("Listing scrubbed from DB");
             } catch (err) {
                 console.error(err);
-                window.showToast("Delete Failed: Network Error");
+                window.showToast("Scrub Failed");
             }
         };
 
@@ -649,13 +701,20 @@
         onAuthStateChanged(auth, async (u) => {
             user = u;
             if (user) {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-                onSnapshot(q, (snap) => {
+                // Listen for Listings
+                const qListings = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
+                onSnapshot(qListings, (snap) => {
                     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     updateUI();
-                }, (err) => {
-                    console.error(err);
                 });
+
+                // Listen for Blocked Users
+                const qBlocked = collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users');
+                onSnapshot(qBlocked, (snap) => {
+                    blockedUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    updateUI();
+                });
+
                 if (window.isUserVerified) checkProfile(user);
             }
         });
