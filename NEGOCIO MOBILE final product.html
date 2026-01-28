@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NEGOCIO Marketplace</title>
+    <title>NEGOCIO Marketplace | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
     <style>
@@ -79,6 +79,7 @@
             align-items: center; justify-content: center;
             color: var(--text-light); font-size: 0.65rem;
             font-weight: 800; background: none; border: none;
+            transition: all 0.2s ease;
         }
 
         .nav-btn.active { color: var(--accent-secondary); }
@@ -156,6 +157,14 @@
             width: 60px; height: 60px; object-fit: cover;
             border-radius: 8px; border: 1px solid #ddd;
         }
+
+        .admin-table {
+            width: 100%; border-collapse: separate; border-spacing: 0 0.5rem;
+        }
+        .admin-table tr { background: white; border-radius: 0.5rem; }
+        .admin-table td { padding: 1rem; }
+        .admin-table td:first-child { border-radius: 0.75rem 0 0 0.75rem; }
+        .admin-table td:last-child { border-radius: 0 0.75rem 0.75rem 0; }
     </style>
 </head>
 <body>
@@ -178,7 +187,8 @@
         </div>
     </header>
 
-    <section id="marketplace">
+    <!-- Marketplace View -->
+    <section id="marketplaceView">
         <div class="container mx-auto">
             <div class="w-full space-y-4">
                 <div class="category-bar">
@@ -192,7 +202,7 @@
                 </div>
 
                 <div class="flex justify-between items-center px-4">
-                    <h2 id="viewTitle" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Global Feed</h2>
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Global Feed</h2>
                     <span id="itemCount" class="text-[10px] font-black text-fuchsia-500">0 ITEMS</span>
                 </div>
             </div>
@@ -202,6 +212,38 @@
             <div id="emptyState" class="hidden py-20 text-center space-y-4">
                 <div class="text-5xl opacity-20">📡</div>
                 <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No signals detected</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Console View -->
+    <section id="adminView" class="hidden">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-black uppercase">Admin Console</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Database Moderation</p>
+                </div>
+                <div class="text-right">
+                    <p id="adminStats" class="text-xl font-black text-fuchsia-500">0</p>
+                    <p class="text-[8px] font-black text-slate-400 uppercase">Live Listings</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead class="text-[9px] font-black text-slate-400 uppercase">
+                        <tr>
+                            <th class="text-left p-4">Asset</th>
+                            <th class="text-left p-4">Seller</th>
+                            <th class="text-left p-4">Date</th>
+                            <th class="text-right p-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <!-- Admin rows injected here -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
@@ -281,14 +323,33 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay hidden">
+        <div class="modal-content !pb-6">
+            <h3 class="text-lg font-black uppercase mb-4">Confirm Action</h3>
+            <p id="confirmMsg" class="text-sm text-slate-500 mb-6 font-medium">Are you sure you want to delete this asset from the database?</p>
+            <div class="flex gap-4">
+                <button id="confirmBtn" class="flex-1 py-3 bg-red-500 text-white font-black uppercase text-xs rounded-xl">Delete</button>
+                <button onclick="toggleModal('confirmModal', false)" class="flex-1 py-3 bg-slate-100 font-black uppercase text-xs rounded-xl">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <div class="nav-items-container">
-            <button onclick="setFilter('ALL')" class="nav-btn active"><span>HOME</span></button>
-            <button class="nav-btn"><span>SEARCH</span></button>
+            <button onclick="switchTab('marketplace')" id="navHome" class="nav-btn active">
+                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span>HOME</span>
+            </button>
+            <!-- Hidden by default until email verification matches admin -->
+            <button onclick="switchTab('admin')" id="navAdmin" class="nav-btn hidden">
+                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>ADMIN</span>
+            </button>
         </div>
     </nav>
 
-    <button onclick="handleNewListingClick()" class="fab">
+    <button onclick="handleNewListingClick()" class="fab" id="mainFab">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M12 6v12m6-6H6"></path></svg>
     </button>
 
@@ -299,9 +360,9 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, doc, onSnapshot, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, doc, onSnapshot, getDoc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // TERMINOLOGY: Firebase is the platform, Firestore is the database service used here.
+        const ADMIN_EMAIL = 'km0334109@gmail.com';
         const firebaseConfig = {
             apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
             authDomain: "negocios-8e8a4.firebaseapp.com",
@@ -313,20 +374,21 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // Initializing Cloud Firestore
+        const db = getFirestore(app);
         const appId = 'negocio-v4';
 
         let items = [];
         let user = null;
         let currentFilter = 'ALL';
         let currentImagesData = [];
+        let activeTab = 'marketplace';
 
         window.showToast = (m) => { 
             const msg = document.getElementById('toastMsg'); 
             msg.textContent = m;
             const t = document.getElementById('toast');
             t.style.transform = "translateX(-50%) translateY(0)";
-            setTimeout(() => t.style.transform = "translateX(-50%) translateY(10rem)", 5000);
+            setTimeout(() => t.style.transform = "translateX(-50%) translateY(10rem)", 4000);
         };
 
         window.toggleModal = (id, show) => {
@@ -338,7 +400,36 @@
             document.getElementById('clothingTargetGroup').classList.toggle('hidden', val !== 'Clothing');
         };
 
-        // Firestore optimized image handling
+        // ENFORCED ACCESS CONTROL
+        window.switchTab = (tab) => {
+            if (tab === 'admin') {
+                if (!window.isUserVerified || window.verifiedEmail !== ADMIN_EMAIL) {
+                    window.showToast("ACCESS DENIED: SECURE ZONE");
+                    return;
+                }
+            }
+
+            activeTab = tab;
+            document.getElementById('marketplaceView').classList.toggle('hidden', tab !== 'marketplace');
+            document.getElementById('adminView').classList.toggle('hidden', tab !== 'admin');
+            document.getElementById('mainFab').classList.toggle('hidden', tab === 'admin');
+            
+            document.getElementById('navHome').classList.toggle('active', tab === 'marketplace');
+            document.getElementById('navAdmin').classList.toggle('active', tab === 'admin');
+            
+            if (tab === 'admin') updateAdminUI();
+        };
+
+        // UI VISIBILITY FOR ADMIN BUTTON
+        const updateAdminVisibilityUI = () => {
+            const adminBtn = document.getElementById('navAdmin');
+            if (window.isUserVerified && window.verifiedEmail === ADMIN_EMAIL) {
+                adminBtn.classList.remove('hidden');
+            } else {
+                adminBtn.classList.add('hidden');
+            }
+        };
+
         async function processImage(base64) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -349,7 +440,7 @@
                     canvas.width = img.width * scale;
                     canvas.height = img.height * scale;
                     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.5)); // High compression for Firestore limits
+                    resolve(canvas.toDataURL('image/jpeg', 0.5));
                 };
             });
         }
@@ -366,14 +457,13 @@
             reader.readAsDataURL(file);
         });
 
-        // BROADCAST TO CLOUD FIRESTORE
         document.getElementById('itemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!user) return window.showToast("Wait for authentication...");
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = "Connecting to Firestore...";
+            btn.textContent = "Broadcasting...";
 
             const cat = document.getElementById('itemCategory').value;
             const newItem = {
@@ -390,29 +480,28 @@
             };
 
             try {
-                // Ensure the path follows Rule 1 exactly
                 const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
                 await addDoc(colRef, newItem);
                 window.toggleModal('sellingModal', false);
-                window.showToast("Listing Published to Firestore!");
+                window.showToast("Broadcasting successful!");
                 document.getElementById('itemForm').reset();
+                document.getElementById('imgPreview').innerHTML = '';
             } catch (err) {
-                console.error("Firestore Error:", err);
-                // Reveal exact Firestore error code for debugging on Cloudflare
-                window.showToast(`Firestore Error: ${err.code || 'unknown'}. Check Security Rules.`);
+                console.error(err);
+                window.showToast("Network Error: Broadcast failed.");
             } finally {
                 btn.disabled = false;
                 btn.textContent = "Broadcast Listing";
             }
         });
 
-        // IDENTITY LOGIC
         window.phoneEmailReceiver = (userObj) => {
             if (userObj?.user_email_id) {
                 window.isUserVerified = true;
                 window.verifiedEmail = userObj.user_email_id;
                 document.getElementById('verificationContainer').classList.add('hidden');
                 document.getElementById('verifiedStatus').classList.remove('hidden');
+                updateAdminVisibilityUI();
                 if (user) checkProfile(user);
             }
         };
@@ -445,8 +534,12 @@
             badge.classList.remove('hidden');
         };
 
-        // UI SYNC
         const updateUI = () => {
+            if (activeTab === 'admin') {
+                updateAdminUI();
+                return;
+            }
+
             const container = document.getElementById('itemsContainer');
             const filtered = items.filter(i => {
                 if (i.category === 'Clothing' && i.targetGender === 'Female' && window.userGender !== 'Female') return false;
@@ -455,6 +548,8 @@
             });
 
             document.getElementById('itemCount').textContent = `${filtered.length} ITEMS`;
+            document.getElementById('emptyState').classList.toggle('hidden', filtered.length > 0);
+            
             container.innerHTML = '';
             filtered.forEach(item => {
                 const li = document.createElement('li');
@@ -473,6 +568,59 @@
                 `;
                 container.appendChild(li);
             });
+        };
+
+        const updateAdminUI = () => {
+            const body = document.getElementById('adminTableBody');
+            document.getElementById('adminStats').textContent = items.length;
+            body.innerHTML = '';
+            
+            items.sort((a, b) => b.createdAt - a.createdAt).forEach(item => {
+                const tr = document.createElement('tr');
+                const date = new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.images?.[0] || ''}" class="w-10 h-10 rounded-lg object-cover bg-slate-100">
+                            <div>
+                                <p class="text-[11px] font-black uppercase text-slate-800">${item.name}</p>
+                                <p class="text-[9px] font-bold text-fuchsia-500 uppercase">₹${item.price}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <p class="text-[10px] font-medium text-slate-500 lowercase">${item.email}</p>
+                        <p class="text-[8px] font-black text-slate-400 uppercase">${item.sellerId.substring(0, 8)}...</p>
+                    </td>
+                    <td class="p-4">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">${date}</p>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="window.confirmDelete('${item.id}')" class="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[9px] font-black uppercase border border-red-100 hover:bg-red-500 hover:text-white transition-colors">
+                            Remove
+                        </button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        };
+
+        window.confirmDelete = (id) => {
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.onclick = () => window.deleteListing(id);
+            window.toggleModal('confirmModal', true);
+        };
+
+        window.deleteListing = async (id) => {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'listings', id);
+                await deleteDoc(docRef);
+                window.toggleModal('confirmModal', false);
+                window.showToast("Listing scrubbed from DB");
+            } catch (err) {
+                console.error(err);
+                window.showToast("Delete Failed: Network Error");
+            }
         };
 
         window.openItemDetails = (id) => {
@@ -498,25 +646,21 @@
             updateUI();
         };
 
-        // INIT CLOUD FIRESTORE SYNC
         onAuthStateChanged(auth, async (u) => {
             user = u;
             if (user) {
-                // Real-time snapshot from Firestore
                 const q = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
                 onSnapshot(q, (snap) => {
                     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     updateUI();
                 }, (err) => {
-                    console.error("Firestore Read Error:", err);
-                    if(err.code === 'permission-denied') window.showToast("Firestore Access Denied: Check Rules");
+                    console.error(err);
                 });
                 if (window.isUserVerified) checkProfile(user);
             }
         });
 
-        // Authenticate immediately (required for Firestore rules)
-        signInAnonymously(auth).catch(e => console.error("Auth Failed", e));
+        signInAnonymously(auth).catch(e => console.error("Auth Failure", e));
     </script>
 </body>
 </html>
