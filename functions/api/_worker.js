@@ -1,56 +1,59 @@
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request) {
+    // Handle CORS preflight OPTIONS requests
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "*",
+        },
+      });
+    }
+
     const url = new URL(request.url);
 
-    // Route for the IMD API Proxy
+    // Accept queries either via /api/imd?stationId=42111 or via ?url=...
+    let targetUrl;
     if (url.pathname === "/api/imd") {
       const stationId = url.searchParams.get("stationId") || "42111";
-      const targetUrl = `https://api.imd.gov.in/api/v1/cityforecast?id=${stationId}`;
-
-      try {
-        const response = await fetch(targetUrl, {
-          headers: {
-            "User-Agent": "Sentinel-HL-EWS/1.0",
-            "Accept": "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          return new Response(
-            JSON.stringify({ error: `IMD responded with HTTP ${response.status}` }),
-            { 
-              status: response.status, 
-              headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } 
-            }
-          );
-        }
-
-        const data = await response.json();
-        return new Response(JSON.stringify(data), {
+      targetUrl = `https://api.imd.gov.in/api/v1/cityforecast?id=${stationId}`;
+    } else if (url.searchParams.has("url")) {
+      targetUrl = url.searchParams.get("url");
+    } else {
+      return new Response(
+        JSON.stringify({ status: "IMD Proxy Worker is Online", usage: "/api/imd?stationId=42111" }),
+        {
           status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Cache-Control": "public, max-age=300"
-          }
-        });
-      } catch (err) {
-        return new Response(
-          JSON.stringify({ error: err.message || "Failed to reach IMD upstream" }),
-          { 
-            status: 500, 
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } 
-          }
-        );
-      }
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        }
+      );
     }
 
-    // Pass through all other requests (static HTML/CSS/JS)
-    if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
-    }
+    try {
+      const response = await fetch(targetUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          "Accept": "application/json",
+        },
+      });
 
-    return new Response("Not Found", { status: 404 });
-  }
+      const data = await response.text();
+
+      return new Response(data, {
+        status: response.status,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*", // <--- THIS PERMANENTLY FIXES CORS
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Cache-Control": "public, max-age=300",
+        },
+      });
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+  },
 };
