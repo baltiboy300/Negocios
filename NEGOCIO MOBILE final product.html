@@ -11,14 +11,16 @@
    Sentinel-HL — Design Tokens & Operations UI
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Baloo+Da+2:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root{
-  --ink-950:#080d17; --ink-900:#0b1220; --ink-800:#101b2d; --ink-700:#16243a; --ink-600:#1c2e45;
-  --line:#25384f; --line-soft:#1a2a3f;
-  --text-hi:#eef3f8; --text-mid:#a9bad0; --text-dim:#6d7f97;
-  --cyan:#6fc4e8; --cyan-dim:#3d6f8a; --green:#4cc38a; --amber:#e8a33d; --red:#e0503a;
-  --font-display:'Space Grotesk', sans-serif;
+  --ink-950:#0c0a13; --ink-900:#120e1c; --ink-800:#1b1729; --ink-700:#251f38; --ink-600:#2f2846;
+  --line:#3c3255; --line-soft:#251f38;
+  --text-hi:#f8f0e3; --text-mid:#bcaecb; --text-dim:#7c7096;
+  --cyan:#f5a428; --cyan-dim:#a9711f; --peacock:#1c8b8b; --peacock-dim:#155f5f;
+  --gold:#d9ae53; --green:#5f9e52; --amber:#e8a33d; --red:#e0503a;
+  --font-display:'Baloo 2', sans-serif;
+  --font-devanagari:'Baloo Da 2', sans-serif;
   --font-body:'Inter', sans-serif;
   --font-mono:'JetBrains Mono', monospace;
   --radius:10px;
@@ -28,7 +30,8 @@
 html,body{margin:0;padding:0;}
 body{
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(111,196,232,0.07), transparent 60%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(245,164,40,0.08), transparent 60%),
+    radial-gradient(900px 500px at -5% 100%, rgba(28,139,139,0.07), transparent 60%),
     var(--ink-900);
   color:var(--text-hi);
   font-family:var(--font-body);
@@ -39,8 +42,8 @@ body::before{
   content:"";
   position:fixed; inset:0;
   background-image:
-    linear-gradient(rgba(111,196,232,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(111,196,232,0.035) 1px, transparent 1px);
+    linear-gradient(rgba(217,174,83,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217,174,83,0.035) 1px, transparent 1px);
   background-size:42px 42px;
   pointer-events:none;
   z-index:0;
@@ -56,15 +59,17 @@ button{font-family:inherit;}
 }
 .brand{display:flex;align-items:center;gap:10px;padding:0 6px;}
 .brand-mark{
-  width:34px;height:34px;border-radius:8px;
-  background:conic-gradient(from 0deg, var(--cyan), transparent 65%, var(--cyan));
+  width:34px;height:34px;border-radius:50%;
+  background:conic-gradient(from 0deg, var(--cyan), var(--peacock) 40%, transparent 65%, var(--cyan));
   position:relative;flex:none;animation:sweep 4s linear infinite;
+  box-shadow:0 0 14px rgba(245,164,40,0.35);
 }
-.brand-mark::after{content:"";position:absolute;inset:5px;border-radius:5px;background:var(--ink-950);}
+.brand-mark::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--ink-950);}
 @keyframes sweep{to{transform:rotate(360deg);}}
 .brand-text{display:flex;flex-direction:column;line-height:1.15;}
-.brand-text b{font-family:var(--font-display);font-size:14.5px;letter-spacing:0.01em;}
+.brand-text b{font-family:var(--font-display);font-size:15.5px;font-weight:700;letter-spacing:0.01em;}
 .brand-text span{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.06em;}
+.brand-text .dev-tagline{font-family:var(--font-devanagari);font-size:11px;color:var(--gold);margin-top:3px;letter-spacing:0.01em;}
 
 .nav{display:flex;flex-direction:column;gap:3px;}
 .nav button{
@@ -74,10 +79,13 @@ button{font-family:inherit;}
   border:1px solid transparent;background:none;cursor:pointer;
   transition:all 0.15s ease;
 }
-.nav button .dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);flex:none;transition:all 0.15s ease;}
+.nav button .dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);flex:none;margin-top:2px;transition:all 0.15s ease;}
 .nav button:hover{background:var(--ink-800);color:var(--text-hi);}
 .nav button.active{background:var(--ink-800);border-color:var(--line);color:var(--text-hi);}
 .nav button.active .dot{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+.nav-label{display:flex;flex-direction:column;line-height:1.3;}
+.nav-label .dev{font-family:var(--font-devanagari);font-size:10.5px;color:var(--text-dim);font-weight:500;}
+.nav button.active .nav-label .dev{color:var(--gold);}
 
 .sidebar-foot{
   margin-top:auto;padding:12px;border-top:1px solid var(--line-soft);
@@ -90,7 +98,7 @@ button{font-family:inherit;}
 
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
 .topbar h1{font-family:var(--font-display);font-size:21px;font-weight:600;margin:0;letter-spacing:0.01em;}
-.topbar .sub{font-size:12.5px;color:var(--text-dim);margin-top:3px;}
+.topbar .sub{font-size:12.5px;color:var(--text-dim);margin-top:3px;font-family:var(--font-body), var(--font-devanagari);}
 
 .loc-picker{display:flex;align-items:center;gap:8px;background:var(--ink-800);border:1px solid var(--line);border-radius:9px;padding:6px 8px 6px 12px;}
 .loc-picker select{background:transparent;border:none;color:var(--text-hi);font-family:var(--font-mono);font-size:12.5px;outline:none;cursor:pointer;}
@@ -181,8 +189,26 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 .coverage-badge.live{background:rgba(76,195,138,0.15);color:var(--green);}
 .coverage-badge.sim{background:rgba(111,196,232,0.15);color:var(--cyan);}
 
-.note-box{border-left:2px solid var(--cyan-dim);padding:10px 14px;background:rgba(111,196,232,0.05);font-size:12.5px;color:var(--text-mid);border-radius:0 6px 6px 0;margin:12px 0;}
+.note-box{border-left:2px solid var(--cyan-dim);padding:10px 14px;background:rgba(245,164,40,0.06);font-size:12.5px;color:var(--text-mid);border-radius:0 6px 6px 0;margin:12px 0;}
 .small-dim{color:var(--text-dim);font-size:11.5px;}
+
+.shloka-strip{
+  position:relative;
+  background:linear-gradient(135deg, rgba(217,174,83,0.10), rgba(28,139,139,0.06));
+  border-top:1px solid rgba(217,174,83,0.4); border-bottom:1px solid rgba(217,174,83,0.4);
+  padding:12px 18px; margin-bottom:20px; border-radius:8px;
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+}
+.shloka-strip .shloka-dev{font-family:var(--font-devanagari);font-size:15.5px;color:var(--gold);letter-spacing:0.01em;flex:none;}
+.shloka-strip .shloka-en{font-size:11.5px;color:var(--text-dim);font-style:italic;line-height:1.5;flex:1;min-width:200px;}
+
+.app-footer{
+  margin-top:28px; padding-top:18px; border-top:1px solid rgba(217,174,83,0.3);
+  text-align:center;
+}
+.app-footer .footer-dev{font-family:var(--font-devanagari);font-size:14px;color:var(--gold);margin-bottom:6px;}
+.app-footer .footer-en{font-size:11px;color:var(--text-dim);font-style:italic;}
+.app-footer .footer-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);opacity:0.7;margin-top:8px;letter-spacing:0.04em;}
 ::-webkit-scrollbar{height:8px;width:8px;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
 </style>
@@ -194,19 +220,20 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark"></div>
-      <div class="brand-text"><b>SENTINEL-HL</b><span>HYPER-LOCAL EWS</span></div>
+      <div class="brand-text"><b>SENTINEL-HL</b><span>HYPER-LOCAL EWS</span><span class="dev-tagline">आपदा पूर्व चेतावनी</span></div>
     </div>
     <nav class="nav">
-      <button class="nav-btn active" data-view="dashboard"><span class="dot"></span> Dashboard</button>
-      <button class="nav-btn" data-view="weather"><span class="dot"></span> Weather Radar</button>
-      <button class="nav-btn" data-view="radar"><span class="dot"></span> Radar &amp; Seismic</button>
-      <button class="nav-btn" data-view="alerts"><span class="dot"></span> Alert Engine</button>
-      <button class="nav-btn" data-view="architecture"><span class="dot"></span> System Architecture</button>
+      <button class="nav-btn active" data-view="dashboard"><span class="dot"></span><span class="nav-label">Dashboard<span class="dev">सारांश</span></span></button>
+      <button class="nav-btn" data-view="weather"><span class="dot"></span><span class="nav-label">Weather Radar<span class="dev">मौसम</span></span></button>
+      <button class="nav-btn" data-view="radar"><span class="dot"></span><span class="nav-label">Radar &amp; Seismic<span class="dev">भूकंप राडार</span></span></button>
+      <button class="nav-btn" data-view="alerts"><span class="dot"></span><span class="nav-label">Alert Engine<span class="dev">चेतावनी</span></span></button>
+      <button class="nav-btn" data-view="architecture"><span class="dot"></span><span class="nav-label">System Architecture<span class="dev">संरचना</span></span></button>
     </nav>
     <div class="sidebar-foot">
       <span class="status-pill"><span class="dot"></span> LIVE FEEDS ACTIVE</span><br>
       RainViewer · Open-Meteo · USGS<br>
-      CORS Direct API Access
+      CORS Direct API Access<br>
+      <span style="font-family:var(--font-devanagari);color:var(--text-dim);font-size:11px;">सतर्क रहें, सुरक्षित रहें</span>
     </div>
   </aside>
 
@@ -224,6 +251,11 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
           <button id="loc-refresh">Refresh</button>
         </div>
       </div>
+    </div>
+
+    <div class="shloka-strip">
+      <div class="shloka-dev">वक्रतुण्ड महाकाय सूर्यकोटिसमप्रभ । निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा ॥</div>
+      <div class="shloka-en">"O Lord of the curved trunk, mighty of form, radiant as a million suns — keep every undertaking free of obstacles, always." A traditional invocation before any task, kept here in the spirit of an early-warning system built to clear the path of hazard.</div>
     </div>
 
     <!-- 1. DASHBOARD VIEW -->
@@ -273,7 +305,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
     <!-- 2. WEATHER (RAINVIEWER RADAR) VIEW -->
     <section id="view-weather" class="view">
       <div class="note-box">
-        <b>RainViewer Live Weather Radar:</b> Ingests live Doppler radar reflectivity mosaics. 
+        <b>RainViewer Live Weather Radar</b> <span style="font-family:var(--font-devanagari);color:var(--gold);">· वर्षा दर्शक</span> — ingests live Doppler radar reflectivity mosaics.
         Track convective cloudburst cells, rain clouds, and animated storm loops across your selected catchment.
       </div>
 
@@ -459,6 +491,12 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
       </div>
     </section>
 
+    <footer class="app-footer">
+      <div class="footer-dev">सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः । सर्वे भद्राणि पश्यन्तु मा कश्चिद्दुःखभाग्भवेत् ॥</div>
+      <div class="footer-en">"May all be happy, may all be free from illness. May all see auspiciousness, may none suffer." — Śānti Mantra, Bṛhadāraṇyaka Upaniṣad</div>
+      <div class="footer-meta">SENTINEL-HL · BUILT FOR HIMALAYAN &amp; WESTERN GHATS HILL COMMUNITIES · लोकहित</div>
+    </footer>
+
   </main>
 </div>
 
@@ -613,11 +651,11 @@ function clearAlertLog() {
    UI CONTROLLER & VIEW SWITCHER
    ========================================================================= */
 const VIEW_META = {
-  dashboard:    { title: "Situation Dashboard", sub: "Real-time conditions for the selected station" },
-  weather:      { title: "RainViewer Weather Radar", sub: "Live Doppler radar mosaic and convective precipitation tracking" },
-  radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map" },
-  alerts:       { title: "Alert Engine", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers" },
-  architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology" }
+  dashboard:    { title: "Situation Dashboard", sub: "Real-time conditions for the selected station · स्थिति सारांश" },
+  weather:      { title: "RainViewer Weather Radar", sub: "Live Doppler radar mosaic and convective precipitation tracking · वर्षा दर्शक" },
+  radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map · भूकंप एवं वर्षा" },
+  alerts:       { title: "Alert Engine", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers · चेतावनी तंत्र" },
+  architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology · प्रणाली संरचना" }
 };
 
 let dashMap, dashMarker, radarMap, radarLayer, quakeLayerGroup;
@@ -703,7 +741,7 @@ async function loadDashboard(loc) {
   document.getElementById("map-coords").textContent = `${loc.lat.toFixed(3)}, ${loc.lon.toFixed(3)} · ${loc.region}`;
   dashMap.setView([loc.lat, loc.lon], 9);
   if (dashMarker) dashMap.removeLayer(dashMarker);
-  dashMarker = L.circleMarker([loc.lat, loc.lon], { radius: 9, color: "#6fc4e8", fillColor: "#6fc4e8", fillOpacity: 0.5, weight: 2 })
+  dashMarker = L.circleMarker([loc.lat, loc.lon], { radius: 9, color: "#f5a428", fillColor: "#f5a428", fillOpacity: 0.5, weight: 2 })
     .addTo(dashMap).bindPopup(`<b>${loc.name}</b><br>Station Active`).openPopup();
 
   setDashBanner("warn", "Fetching live telemetry…", "Connecting to Open-Meteo and USGS Earthquake Catalog");
@@ -790,14 +828,14 @@ function drawPrecipChart(w) {
     const x = pad + i * barW;
     const y = H - pad - h;
     const isNow = i === nowIdx;
-    const color = v >= 8 ? "#e0503a" : v >= 3 ? "#e8a33d" : "#3d6f8a";
-    svg.insertAdjacentHTML("beforeend", `<rect x="${x}" y="${y}" width="${Math.max(1, barW - 1)}" height="${h}" fill="${isNow ? '#6fc4e8' : color}" rx="1"></rect>`);
+    const color = v >= 8 ? "#e0503a" : v >= 3 ? "#e8a33d" : "#1c6b6b";
+    svg.insertAdjacentHTML("beforeend", `<rect x="${x}" y="${y}" width="${Math.max(1, barW - 1)}" height="${h}" fill="${isNow ? '#f5a428' : color}" rx="1"></rect>`);
   });
-  svg.insertAdjacentHTML("beforeend", `<line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#25384f" stroke-width="1"></line>`);
+  svg.insertAdjacentHTML("beforeend", `<line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#251f38" stroke-width="1"></line>`);
   for (let i = 0; i < vals.length; i += 12) {
     const x = pad + i * barW;
     const label = new Date(times[i]).toLocaleTimeString(undefined, { hour: "2-digit" });
-    svg.insertAdjacentHTML("beforeend", `<text x="${x}" y="${H - 6}" fill="#6d7f97" font-size="9" font-family="JetBrains Mono, monospace">${label}</text>`);
+    svg.insertAdjacentHTML("beforeend", `<text x="${x}" y="${H - 6}" fill="#7c7096" font-size="9" font-family="JetBrains Mono, monospace">${label}</text>`);
   }
 }
 
@@ -823,7 +861,7 @@ async function loadWeatherView(loc) {
   if (!weatherMap) return;
   weatherMap.setView([loc.lat, loc.lon], 8);
   if (weatherMarker) weatherMap.removeLayer(weatherMarker);
-  weatherMarker = L.circleMarker([loc.lat, loc.lon], { radius: 9, color: "#6fc4e8", fillColor: "#6fc4e8", fillOpacity: 0.45, weight: 2 })
+  weatherMarker = L.circleMarker([loc.lat, loc.lon], { radius: 9, color: "#f5a428", fillColor: "#f5a428", fillOpacity: 0.45, weight: 2 })
     .addTo(weatherMap).bindPopup(`<b>${loc.name}</b><br>Doppler Radar Focus Point`).openPopup();
 
   document.getElementById("wv-summary").textContent = `Monitoring live convective radar cells over ${loc.name} (${loc.region}) via RainViewer Global Mosaic.`;
@@ -910,7 +948,7 @@ function initRadarMap() {
 function centerRadar(loc) {
   if (!radarMap) return;
   radarMap.setView([loc.lat, loc.lon], 8);
-  L.circleMarker([loc.lat, loc.lon], { radius: 8, color: "#6fc4e8", fillColor: "#6fc4e8", fillOpacity: 0.4, weight: 2 })
+  L.circleMarker([loc.lat, loc.lon], { radius: 8, color: "#f5a428", fillColor: "#f5a428", fillOpacity: 0.4, weight: 2 })
     .addTo(radarMap).bindPopup(`<b>${loc.name}</b>`);
 }
 
@@ -965,7 +1003,7 @@ function renderQuakeMarkers(features) {
   features.forEach(f => {
     const [lon, lat, depth] = f.geometry.coordinates;
     const mag = f.properties.mag;
-    const color = mag >= 4.5 ? "#e0503a" : mag >= 3.5 ? "#e8a33d" : "#4cc38a";
+    const color = mag >= 4.5 ? "#e0503a" : mag >= 3.5 ? "#e8a33d" : "#5f9e52";
     L.circleMarker([lat, lon], { radius: 4 + mag * 2, color, fillColor: color, fillOpacity: 0.35, weight: 1.5 })
       .bindPopup(`<b>M${mag.toFixed(1)} Earthquake</b><br>${f.properties.place}<br>Focal Depth: ${depth ? depth.toFixed(1) + ' km' : 'N/A'}<br>${fmtTime(f.properties.time)}`)
       .addTo(quakeLayerGroup);
