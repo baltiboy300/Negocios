@@ -155,7 +155,7 @@ tr:last-child td{border-bottom:none;}
 
 .map-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-soft);}
 .map-wrap .leaflet-container{background:var(--ink-900);}
-#map,#map-radar{height:440px;width:100%;}
+#map,#map-radar,#map-weather{height:440px;width:100%;}
 
 .layer-toggles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
 .layer-toggle{display:flex;align-items:center;gap:7px;background:var(--ink-800);border:1px solid var(--line);border-radius:20px;padding:6px 12px 6px 8px;font-size:12px;cursor:pointer;color:var(--text-mid);}
@@ -200,14 +200,15 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
     </div>
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard"><span class="dot"></span> Dashboard</button>
+      <button class="nav-btn" data-view="weather"><span class="dot"></span> Weather</button>
       <button class="nav-btn" data-view="radar"><span class="dot"></span> Radar &amp; Seismic</button>
       <button class="nav-btn" data-view="alerts"><span class="dot"></span> Alert Engine</button>
       <button class="nav-btn" data-view="architecture"><span class="dot"></span> System Architecture</button>
     </nav>
     <div class="sidebar-foot">
       <span class="status-pill"><span class="dot"></span> DIRECT PUBLIC FEEDS</span><br>
-      Open-Meteo · USGS · RainViewer<br>
-      CORS Enabled · Zero API Key
+      RainViewer · Open-Meteo · USGS<br>
+      Live Satellite Doppler Radar
     </div>
   </aside>
 
@@ -270,11 +271,75 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
       </div>
     </section>
 
+    <!-- ===================== WEATHER (RAINVIEWER RADAR) ===================== -->
+    <section id="view-weather" class="view">
+      <div class="note-box">
+        <b>RainViewer Live Weather Radar:</b> Ingests live global Doppler radar composite mosaics. 
+        Use the timeline scrubber to track approaching convective precipitation bands and cloudburst cells.
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>RainViewer Live Doppler Radar</h3>
+          <span class="tag" id="weather-radar-time">Syncing RainViewer Feed…</span>
+        </div>
+        <div class="map-wrap"><div id="map-weather"></div></div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="btn ghost" id="weather-play-btn">▶ Play Radar Loop</button>
+            <span class="mono small-dim" id="weather-frame-label">–</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:260px;">
+            <span class="mono small-dim">Frame</span>
+            <input type="range" id="weather-slider" min="0" max="0" value="0" style="flex:1;">
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="mono small-dim">Color:</span>
+            <select id="weather-color-scheme" style="background:var(--ink-800);color:var(--text-hi);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-family:var(--font-mono);font-size:11px;">
+              <option value="1">Original Color</option>
+              <option value="2" selected>Universal Blue</option>
+              <option value="3">TITAN Radar</option>
+              <option value="4">The Weather Channel</option>
+              <option value="6">Rainbow</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid cols-3" style="margin-top:16px;">
+        <div class="panel">
+          <div class="panel-head"><h3>Radar Reflectivity Key</h3></div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-mid);">
+            <div><span class="chip ok">Light (&lt; 2.5 mm/hr)</span> Green drizzle / light showers</div>
+            <div><span class="chip warn">Moderate (2.5 – 10 mm/hr)</span> Yellow / Orange rain bands</div>
+            <div><span class="chip danger">Severe (&gt; 25 mm/hr)</span> Red / Purple convective core</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Live RainViewer Telemetry</h3></div>
+          <table><tbody>
+            <tr><td>Total Radar Frames</td><td class="mono" id="wv-total-frames">–</td></tr>
+            <tr><td>Past History Frames</td><td class="mono" id="wv-past-frames">–</td></tr>
+            <tr><td>Nowcast Forecasts</td><td class="mono" id="wv-nowcast-frames">–</td></tr>
+            <tr><td>Update Interval</td><td class="mono">10 Minutes</td></tr>
+          </tbody></table>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Catchment Summary</h3></div>
+          <p class="small-dim" id="wv-summary" style="line-height:1.6;">
+            Monitoring hyper-local cloudburst signatures and high-altitude storm precipitation paths.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- ===================== RADAR & SEISMIC ===================== -->
     <section id="view-radar" class="view">
       <div class="note-box">
-        This map integrates <b>RainViewer's</b> global radar mosaic for precipitation dynamics and 
-        the official <b>USGS Earthquake Catalog API</b> for real-time seismic shocks and tremor detection within 300 km.
+        This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS Earthquake Catalog</b> to detect compound hazards (such as rain-triggered landslides and seismic rockfalls).
       </div>
 
       <div class="layer-toggles">
@@ -362,7 +427,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
       <div class="panel">
         <div class="panel-head"><h3>Data Pipeline Architecture</h3></div>
         <div class="flow">
-          <div class="flow-node"><b>Sensing Layer</b><span>Open-Meteo AWS, USGS Catalog, RainViewer Radar</span></div>
+          <div class="flow-node"><b>Sensing Layer</b><span>RainViewer Doppler, Open-Meteo AWS, USGS Catalog</span></div>
           <div class="flow-arrow">→</div>
           <div class="flow-node"><b>Client Ingestion</b><span>Parallel async fetch &amp; GeoJSON parsing</span></div>
           <div class="flow-arrow">→</div>
@@ -377,17 +442,17 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
       <div class="panel" style="margin-top:16px;">
         <div class="panel-head">
           <h3>Active Telemetry Endpoints</h3>
-          <span class="tag">live = active public api · proxy = open proxy layer · sim = client heuristic</span>
+          <span class="tag">live = active public api · sim = client heuristic</span>
         </div>
         <table>
           <thead><tr><th>Component</th><th>Status</th><th>Endpoint &amp; Implementation Details</th></tr></thead>
           <tbody>
+            <tr><td>Weather Radar (RainViewer)</td><td><span class="coverage-badge live">LIVE</span></td>
+              <td>RainViewer API (Live Doppler weather radar tile mosaic, animated loops, and multi-color palettes)</td></tr>
             <tr><td>Precipitation &amp; Atmosphere</td><td><span class="coverage-badge live">LIVE</span></td>
               <td>Open-Meteo High-Resolution Forecast API (Hourly rain, temp, humidity, pressure, soil saturation)</td></tr>
             <tr><td>Seismic Catalog</td><td><span class="coverage-badge live">LIVE</span></td>
               <td>USGS FDSN Earthquake Catalog API (GeoJSON radial search within 300 km radius, M2.0+ threshold)</td></tr>
-            <tr><td>Radar Reflectivity</td><td><span class="coverage-badge live">LIVE</span></td>
-              <td>RainViewer Global Radar Mosaic API (Live weather tile mosaic with timestamped historical replay)</td></tr>
             <tr><td>Risk &amp; Siren Engine</td><td><span class="coverage-badge sim">SIM</span></td>
               <td>Rule-based client evaluation engine with local persistence and automated alert states</td></tr>
           </tbody>
@@ -550,19 +615,23 @@ function clearAlertLog() {
    ========================================================================= */
 const VIEW_META = {
   dashboard:    { title: "Situation Dashboard", sub: "Real-time conditions for the selected station" },
+  weather:      { title: "RainViewer Weather Radar", sub: "Live Doppler radar mosaic and convective precipitation tracking" },
   radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map" },
   alerts:       { title: "Alert Engine", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers" },
   architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology" }
 };
 
 let dashMap, dashMarker, radarMap, radarLayer, quakeLayerGroup;
+let weatherMap, weatherLayer, weatherMarker;
 let radarFrames = [], currentFrame = 0, playTimer = null;
+let weatherFrames = [], weatherFrameIdx = 0, weatherPlayTimer = null, rainviewerHost = "https://tilecache.rainviewer.com";
 
 document.addEventListener("DOMContentLoaded", () => {
   wireTabs();
   wireClock();
   wireLocationPicker();
   initDashMap();
+  initWeatherMap();
   initRadarMap();
   bindSliders();
   renderLog();
@@ -583,6 +652,7 @@ function switchView(name) {
   document.getElementById("view-title").textContent = VIEW_META[name].title;
   document.getElementById("view-sub").textContent = VIEW_META[name].sub;
   if (name === "dashboard" && dashMap) setTimeout(() => dashMap.invalidateSize(), 80);
+  if (name === "weather" && weatherMap) setTimeout(() => weatherMap.invalidateSize(), 80);
   if (name === "radar" && radarMap) setTimeout(() => radarMap.invalidateSize(), 80);
 }
 
@@ -616,6 +686,7 @@ function wireLocationPicker() {
 
 function loadAll(loc) {
   loadDashboard(loc);
+  loadWeatherView(loc);
   centerRadar(loc);
   loadRadarQuakes(loc);
   runEvaluation(loc);
@@ -729,6 +800,91 @@ function drawPrecipChart(w) {
     const label = new Date(times[i]).toLocaleTimeString(undefined, { hour: "2-digit" });
     svg.insertAdjacentHTML("beforeend", `<text x="${x}" y="${H - 6}" fill="#6d7f97" font-size="9" font-family="JetBrains Mono, monospace">${label}</text>`);
   }
+}
+
+/* =========================================================================
+   WEATHER CONTROLLER (RAINVIEWER DEDICATED VIEW)
+   ========================================================================= */
+function initWeatherMap() {
+  weatherMap = L.map("map-weather").setView([28, 82], 6);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors, Radar &copy; RainViewer API", maxZoom: 18 }).addTo(weatherMap);
+
+  document.getElementById("weather-slider").addEventListener("input", (e) => {
+    showWeatherFrame(parseInt(e.target.value, 10));
+  });
+
+  document.getElementById("weather-play-btn").addEventListener("click", toggleWeatherPlay);
+
+  document.getElementById("weather-color-scheme").addEventListener("change", () => {
+    showWeatherFrame(weatherFrameIdx);
+  });
+}
+
+async function loadWeatherView(loc) {
+  if (!weatherMap) return;
+  weatherMap.setView([loc.lat, loc.lon], 8);
+  if (weatherMarker) weatherMap.removeLayer(weatherMarker);
+  weatherMarker = L.circleMarker([loc.lat, loc.lon], { radius: 9, color: "#6fc4e8", fillColor: "#6fc4e8", fillOpacity: 0.45, weight: 2 })
+    .addTo(weatherMap).bindPopup(`<b>${loc.name}</b><br>Doppler Radar Focus Point`).openPopup();
+
+  document.getElementById("wv-summary").textContent = `Monitoring live convective radar cells over ${loc.name} (${loc.region}) via RainViewer Global Mosaic.`;
+
+  try {
+    const res = await fetch(API.rainviewer());
+    const data = await res.json();
+    rainviewerHost = data.host || "https://tilecache.rainviewer.com";
+    const past = data.radar.past || [];
+    const nowcast = data.radar.nowcast || [];
+    weatherFrames = [...past, ...nowcast];
+
+    document.getElementById("wv-total-frames").textContent = weatherFrames.length;
+    document.getElementById("wv-past-frames").textContent = `${past.length} (Past 2 Hours)`;
+    document.getElementById("wv-nowcast-frames").textContent = `${nowcast.length} (30 Min Nowcast)`;
+
+    const slider = document.getElementById("weather-slider");
+    slider.max = weatherFrames.length - 1;
+    weatherFrameIdx = past.length > 0 ? past.length - 1 : 0;
+    slider.value = weatherFrameIdx;
+
+    showWeatherFrame(weatherFrameIdx);
+  } catch (err) {
+    document.getElementById("weather-radar-time").textContent = "RainViewer Feed Unavailable";
+  }
+}
+
+function showWeatherFrame(idx) {
+  if (!weatherFrames.length) return;
+  weatherFrameIdx = idx;
+  const frame = weatherFrames[idx];
+  const color = document.getElementById("weather-color-scheme").value || "2";
+
+  if (weatherLayer) weatherMap.removeLayer(weatherLayer);
+  weatherLayer = L.tileLayer(`${rainviewerHost}${frame.path}/256/{z}/{x}/{y}/${color}/1_1.png`, {
+    opacity: 0.75,
+    zIndex: 6
+  });
+  weatherLayer.addTo(weatherMap);
+
+  document.getElementById("weather-slider").value = idx;
+  const timeStr = fmtTime(new Date(frame.time * 1000).toISOString());
+  document.getElementById("weather-radar-time").textContent = `Frame: ${timeStr}`;
+  document.getElementById("weather-frame-label").textContent = new Date(frame.time * 1000).toLocaleTimeString();
+}
+
+function toggleWeatherPlay() {
+  const btn = document.getElementById("weather-play-btn");
+  if (weatherPlayTimer) {
+    clearInterval(weatherPlayTimer);
+    weatherPlayTimer = null;
+    btn.textContent = "▶ Play Radar Loop";
+    return;
+  }
+  btn.textContent = "⏸ Pause Loop";
+  weatherPlayTimer = setInterval(() => {
+    let next = weatherFrameIdx + 1;
+    if (next >= weatherFrames.length) next = 0;
+    showWeatherFrame(next);
+  }, 650);
 }
 
 /* =========================================================================
