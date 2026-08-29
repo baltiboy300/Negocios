@@ -1,725 +1,950 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NEGOCIO Marketplace | Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-deep: #f5f2e9;
-            --bg-white: #ffffff;
-            --accent-secondary: #e879f9;
-            --text-main: #1e293b;
-            --text-light: #64748b;
-            --sectionPadding: clamp(4rem, 10vh, 6rem);
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
+<meta charset="UTF-8">
+<title>Sentinel-HL · Hyper-Local Early Warning System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+/* ==========================================================================
+   Sentinel-HL — Design Tokens & Modern Dark Operations UI
+   Palette: Ink ground, instrument-cyan data, amber/red alert states
+   Type: Space Grotesk (display/readouts) + Inter (body) + JetBrains Mono (data)
+   ========================================================================== */
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-main);
-            margin: 0;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-            width: 100%;
-        }
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-        .font-script { font-family: 'Satisfy', cursive; }
-        section {
-            padding: var(--sectionPadding) 1rem;
-            padding-bottom: calc(7.5rem + var(--safe-bottom));
-            width: 100%;
-        }
+:root{
+  --ink-950:#080d17; --ink-900:#0b1220; --ink-800:#101b2d; --ink-700:#16243a; --ink-600:#1c2e45;
+  --line:#25384f; --line-soft:#1a2a3f;
+  --text-hi:#eef3f8; --text-mid:#a9bad0; --text-dim:#6d7f97;
+  --cyan:#6fc4e8; --cyan-dim:#3d6f8a; --green:#4cc38a; --amber:#e8a33d; --red:#e0503a;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --radius:10px;
+}
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            width: 100%;
-        }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(111,196,232,0.07), transparent 60%),
+    var(--ink-900);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(111,196,232,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(111,196,232,0.035) 1px, transparent 1px);
+  background-size:42px 42px;
+  pointer-events:none;
+  z-index:0;
+}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;}
 
-        .app-header {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            height: calc(4.5rem + var(--safe-top));
-            padding-top: var(--safe-top);
-            background: rgba(245, 242, 233, 0.95);
-            backdrop-filter: blur(12px);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-left: 1rem; padding-right: 1rem;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
+.app-shell{position:relative;z-index:1;display:grid;grid-template-columns:230px 1fr;min-height:100vh;}
 
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            padding-bottom: var(--safe-bottom);
-            background: var(--bg-white);
-            display: flex; flex-direction: column;
-            z-index: 100;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
-        }
+.sidebar{
+  background:var(--ink-950); border-right:1px solid var(--line-soft);
+  padding:22px 16px; display:flex; flex-direction:column; gap:28px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px;}
+.brand-mark{
+  width:34px;height:34px;border-radius:8px;
+  background:conic-gradient(from 0deg, var(--cyan), transparent 65%, var(--cyan));
+  position:relative;flex:none;animation:sweep 4s linear infinite;
+}
+.brand-mark::after{content:"";position:absolute;inset:5px;border-radius:5px;background:var(--ink-950);}
+@keyframes sweep{to{transform:rotate(360deg);}}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text b{font-family:var(--font-display);font-size:14.5px;letter-spacing:0.01em;}
+.brand-text span{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.06em;}
 
-        .nav-items-container {
-            display: flex; justify-content: space-around;
-            align-items: center; height: 3.5rem;
-        }
+.nav{display:flex;flex-direction:column;gap:2px;}
+.nav button{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:10px 12px;border-radius:8px;text-align:left;
+  font-size:13.5px;color:var(--text-mid);
+  border:1px solid transparent;background:none;cursor:pointer;
+}
+.nav button .dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);flex:none;}
+.nav button:hover{background:var(--ink-800);color:var(--text-hi);}
+.nav button.active{background:var(--ink-800);border-color:var(--line);color:var(--text-hi);}
+.nav button.active .dot{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
 
-        .nav-btn {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: var(--text-light); font-size: 0.65rem;
-            font-weight: 800; background: none; border: none;
-            transition: all 0.2s ease;
-        }
+.sidebar-foot{
+  margin-top:auto;padding:12px;border-top:1px solid var(--line-soft);
+  font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);line-height:1.6;
+}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--green);}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
 
-        .nav-btn.active { color: var(--accent-secondary); }
+.main{padding:22px 28px 40px;min-width:0;}
 
-        .fab {
-            position: fixed;
-            right: 1.25rem;
-            bottom: calc(7rem + var(--safe-bottom));
-            width: 3.75rem; height: 3.75rem;
-            background: var(--accent-secondary);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; box-shadow: 0 8px 25px rgba(232, 121, 249, 0.4);
-            z-index: 90;
-        }
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+.topbar h1{font-family:var(--font-display);font-size:21px;font-weight:600;margin:0;letter-spacing:0.01em;}
+.topbar .sub{font-size:12.5px;color:var(--text-dim);margin-top:3px;}
 
-        .listing-card {
-            background: var(--bg-white);
-            border-radius: 1.25rem; overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            height: 100%; display: flex; flex-direction: column;
-        }
+.loc-picker{display:flex;align-items:center;gap:8px;background:var(--ink-800);border:1px solid var(--line);border-radius:9px;padding:6px 8px 6px 12px;}
+.loc-picker select{background:transparent;border:none;color:var(--text-hi);font-family:var(--font-mono);font-size:12.5px;outline:none;cursor:pointer;}
+.loc-picker select option{background:var(--ink-900);color:var(--text-hi);}
+.loc-picker button{background:var(--cyan-dim);color:var(--text-hi);border:none;border-radius:6px;padding:6px 10px;font-size:11.5px;cursor:pointer;font-weight:500;}
+.loc-picker button:hover{background:var(--cyan);color:var(--ink-950);}
+.clock{font-family:var(--font-mono);font-size:12px;color:var(--text-mid);white-space:nowrap;}
 
-        .category-bar {
-            width: 100%; overflow-x: auto; white-space: nowrap;
-            display: flex; gap: 0.5rem; padding: 0.5rem 1rem;
-            scrollbar-width: none;
-        }
-        .category-bar::-webkit-scrollbar { display: none; }
+.view{display:none;}
+.view.active{display:block;}
 
-        .cat-pill {
-            padding: 0.5rem 1rem; background: var(--bg-white);
-            border-radius: 2rem; font-size: 0.75rem; font-weight: 700;
-            color: var(--text-light); border: 1px solid #e2e8f0; flex-shrink: 0;
-        }
+.grid{display:grid;gap:16px;}
+.grid.cols-4{grid-template-columns:repeat(4,1fr);}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-2{grid-template-columns:repeat(2,1fr);}
+@media (max-width:1100px){
+  .grid.cols-4{grid-template-columns:repeat(2,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(2,1fr);}
+}
 
-        .cat-pill.active {
-            background: var(--accent-secondary); color: white; border-color: var(--accent-secondary);
-        }
+.panel{background:linear-gradient(180deg, var(--ink-800), var(--ink-700));border:1px solid var(--line-soft);border-radius:var(--radius);padding:18px;}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.panel-head h3{font-family:var(--font-display);font-size:13px;font-weight:600;margin:0;color:var(--text-hi);letter-spacing:0.02em;text-transform:uppercase;}
+.panel-head .tag{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);}
 
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            z-index: 200; display: flex; justify-content: center; align-items: flex-end;
-        }
+.metric-card{background:linear-gradient(180deg, var(--ink-800), var(--ink-700));border:1px solid var(--line-soft);border-radius:var(--radius);padding:16px 18px;}
+.metric-card .label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;}
+.metric-card .value{font-family:var(--font-display);font-size:28px;font-weight:600;margin-top:6px;color:var(--text-hi);}
+.metric-card .value small{font-family:var(--font-mono);font-size:13px;color:var(--text-mid);font-weight:400;}
+.metric-card .meta{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-top:6px;}
 
-        .modal-content {
-            background: white; width: 100%; max-width: 42rem;
-            border-radius: 2rem 2rem 0 0; padding: 1.5rem;
-            padding-bottom: calc(2.5rem + var(--safe-bottom));
-            max-height: 92vh; overflow-y: auto;
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+.status-banner{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.status-banner.ok{background:rgba(76,195,138,0.09);border-color:rgba(76,195,138,0.35);}
+.status-banner.warn{background:rgba(232,163,61,0.10);border-color:rgba(232,163,61,0.4);}
+.status-banner.danger{background:rgba(224,80,58,0.12);border-color:rgba(224,80,58,0.5);}
+.status-banner .sb-left{display:flex;align-items:center;gap:14px;}
+.status-badge{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:0.08em;padding:6px 12px;border-radius:6px;}
+.status-banner.ok .status-badge{background:var(--green);color:#04231a;}
+.status-banner.warn .status-badge{background:var(--amber);color:#2b1a00;}
+.status-banner.danger .status-badge{background:var(--red);color:#2b0500;}
+.status-banner .sb-title{font-family:var(--font-display);font-size:15px;font-weight:600;}
+.status-banner .sb-sub{font-size:12.5px;color:var(--text-mid);margin-top:2px;}
+.pulse-dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.status-banner.ok .pulse-dot{background:var(--green);animation:pulse-g 2s infinite;}
+.status-banner.warn .pulse-dot{background:var(--amber);animation:pulse-a 1.6s infinite;}
+.status-banner.danger .pulse-dot{background:var(--red);animation:pulse-r 1s infinite;}
+@keyframes pulse-g{0%{box-shadow:0 0 0 0 rgba(76,195,138,.5);}100%{box-shadow:0 0 0 10px rgba(76,195,138,0);}}
+@keyframes pulse-a{0%{box-shadow:0 0 0 0 rgba(232,163,61,.5);}100%{box-shadow:0 0 0 12px rgba(232,163,61,0);}}
+@keyframes pulse-r{0%{box-shadow:0 0 0 0 rgba(224,80,58,.6);}100%{box-shadow:0 0 0 14px rgba(224,80,58,0);}}
 
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{text-align:left;font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em;padding:6px 8px;border-bottom:1px solid var(--line);}
+td{padding:9px 8px;border-bottom:1px solid var(--line-soft);color:var(--text-mid);}
+tr:last-child td{border-bottom:none;}
+.mono{font-family:var(--font-mono);}
 
-        input, select, textarea {
-            width: 100%; padding: 0.85rem; border-radius: 0.75rem;
-            border: 1px solid #e2e8f0; font-size: 16px; margin-bottom: 0.75rem;
-            background: #f8fafc;
-        }
+.chip{display:inline-block;padding:2px 8px;border-radius:5px;font-family:var(--font-mono);font-size:10.5px;font-weight:500;}
+.chip.ok{background:rgba(76,195,138,0.15);color:var(--green);}
+.chip.warn{background:rgba(232,163,61,0.15);color:var(--amber);}
+.chip.danger{background:rgba(224,80,58,0.18);color:var(--red);}
 
-        #toast {
-            position: fixed;
-            bottom: calc(7.5rem + var(--safe-bottom));
-            left: 50%; transform: translateX(-50%) translateY(10rem);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; z-index: 1000;
-        }
+.map-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-soft);}
+.map-wrap .leaflet-container{background:var(--ink-900);}
+#map,#map-radar{height:440px;width:100%;}
 
-        .img-preview-container {
-            display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;
-        }
-        .img-preview-item {
-            width: 60px; height: 60px; object-fit: cover;
-            border-radius: 8px; border: 1px solid #ddd;
-        }
+.layer-toggles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.layer-toggle{display:flex;align-items:center;gap:7px;background:var(--ink-800);border:1px solid var(--line);border-radius:20px;padding:6px 12px 6px 8px;font-size:12px;cursor:pointer;color:var(--text-mid);}
+.layer-toggle input{accent-color:var(--cyan);}
+.layer-toggle.on{color:var(--text-hi);border-color:var(--cyan-dim);}
 
-        .admin-table {
-            width: 100%; border-collapse: separate; border-spacing: 0 0.5rem;
-        }
-        .admin-table tr { background: white; border-radius: 0.5rem; }
-        .admin-table td { padding: 1rem; }
-        .admin-table td:first-child { border-radius: 0.75rem 0 0 0.75rem; }
-        .admin-table td:last-child { border-radius: 0 0.75rem 0.75rem 0; }
-    </style>
+.slider-row{margin-bottom:16px;}
+.slider-row .sr-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;}
+.slider-row .sr-top b{font-family:var(--font-mono);color:var(--cyan);}
+input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
+
+.btn{background:var(--cyan-dim);color:var(--text-hi);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;}
+.btn:hover{background:var(--cyan);color:var(--ink-950);}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text-mid);}
+.btn.ghost:hover{border-color:var(--cyan-dim);color:var(--text-hi);}
+
+.flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:6px 0 14px;}
+.flow-node{min-width:170px;background:var(--ink-800);border:1px solid var(--line);border-radius:10px;padding:14px;flex:none;}
+.flow-node b{font-family:var(--font-display);font-size:12.5px;display:block;margin-bottom:4px;}
+.flow-node span{font-size:11px;color:var(--text-dim);}
+.flow-arrow{display:flex;align-items:center;justify-content:center;width:36px;flex:none;color:var(--cyan-dim);font-size:18px;}
+
+.coverage-badge{font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;display:inline-block;}
+.coverage-badge.live{background:rgba(76,195,138,0.15);color:var(--green);}
+.coverage-badge.proxy{background:rgba(232,163,61,0.15);color:var(--amber);}
+.coverage-badge.sim{background:rgba(111,196,232,0.15);color:var(--cyan);}
+.coverage-badge.gap{background:rgba(224,80,58,0.15);color:var(--red);}
+
+.note-box{border-left:2px solid var(--cyan-dim);padding:10px 14px;background:rgba(111,196,232,0.05);font-size:12.5px;color:var(--text-mid);border-radius:0 6px 6px 0;margin:12px 0;}
+.small-dim{color:var(--text-dim);font-size:11.5px;}
+::-webkit-scrollbar{height:8px;width:8px;}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+</style>
 </head>
 <body>
+<div class="app-shell">
 
-    <header class="app-header">
-        <h1 class="text-2xl font-script text-fuchsia-500 italic">Negocio</h1>
-        <div id="authWrapper">
-            <div id="verifiedStatus" class="hidden flex items-center gap-2">
-                <span id="userGenderBadge" class="bg-slate-800 text-white px-2 py-0.5 rounded text-[8px] font-black uppercase"></span>
-                <div class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-100 flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    VERIFIED
-                </div>
-            </div>
-            <div id="verificationContainer">
-                <div class="pe_verify_email" data-client-id="13401266232106403409">
-                    <script src="https://www.phone.email/verify_email_v1.js" async></script>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Marketplace View -->
-    <section id="marketplaceView">
-        <div class="container mx-auto">
-            <div class="w-full space-y-4">
-                <div class="category-bar">
-                    <button onclick="setFilter('ALL')" class="cat-pill active">All Assets</button>
-                    <button onclick="setFilter('Electronics')" class="cat-pill">Electronics</button>
-                    <button onclick="setFilter('Clothing')" class="cat-pill">Clothing</button>
-                    <button onclick="setFilter('Accessories')" class="cat-pill">Accessories</button>
-                    <button onclick="setFilter('Beauty')" class="cat-pill">Beauty</button>
-                    <button onclick="setFilter('Books')" class="cat-pill">Books</button>
-                    <button onclick="setFilter('Daily needs')" class="cat-pill">Needs</button>
-                </div>
-
-                <div class="flex justify-between items-center px-4">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Global Feed</h2>
-                    <span id="itemCount" class="text-[10px] font-black text-fuchsia-500">0 ITEMS</span>
-                </div>
-            </div>
-
-            <ul id="itemsContainer" class="card-grid px-4 mt-6"></ul>
-
-            <div id="emptyState" class="hidden py-20 text-center space-y-4">
-                <div class="text-5xl opacity-20">📡</div>
-                <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No signals detected</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Admin Console View -->
-    <section id="adminView" class="hidden">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h2 class="text-2xl font-black uppercase">Admin Console</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Database Moderation</p>
-                </div>
-                <div class="text-right">
-                    <p id="adminStats" class="text-xl font-black text-fuchsia-500">0</p>
-                    <p class="text-[8px] font-black text-slate-400 uppercase">Live Listings</p>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="admin-table">
-                    <thead class="text-[9px] font-black text-slate-400 uppercase">
-                        <tr>
-                            <th class="text-left p-4">Asset</th>
-                            <th class="text-left p-4">Seller</th>
-                            <th class="text-left p-4">Date</th>
-                            <th class="text-right p-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTableBody">
-                        <!-- Admin rows injected here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Identity Preference Modal -->
-    <div id="genderModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 class="text-xl font-black uppercase mb-2">Final Step</h3>
-            <p class="text-xs text-slate-500 mb-8 font-bold leading-relaxed">
-                Choose your gender to personalize your feed.
-            </p>
-            <div class="space-y-3">
-                <button onclick="setIdentity('Male')" class="w-full py-4 bg-slate-100 rounded-xl font-bold uppercase text-xs">Male</button>
-                <button onclick="setIdentity('Female')" class="w-full py-4 bg-slate-100 rounded-xl font-bold uppercase text-xs">Female</button>
-                <button onclick="setIdentity('Other')" class="w-full py-4 bg-slate-100 rounded-xl font-bold uppercase text-xs">Other</button>
-            </div>
-        </div>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text"><b>SENTINEL-HL</b><span>HYPER-LOCAL EWS</span></div>
     </div>
-
-    <!-- Selling Modal -->
-    <div id="sellingModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-black uppercase tracking-tight">Register Asset</h3>
-                <button onclick="toggleModal('sellingModal', false)" class="text-3xl text-slate-300">&times;</button>
-            </div>
-            <form id="itemForm" class="space-y-1">
-                <input type="text" id="itemName" required placeholder="Asset Title">
-                <input type="number" id="itemPrice" required placeholder="Value (₹)">
-                <select id="itemCategory" onchange="toggleClothingGender(this.value)">
-                    <option value="Electronics">Electronics</option>
-                    <option value="Clothing">Clothing</option>
-                    <option value="Accessories">Accessories</option>
-                    <option value="Beauty">Beauty</option>
-                    <option value="Books">Books</option>
-                    <option value="Daily needs">Daily needs</option>
-                </select>
-
-                <div id="clothingTargetGroup" class="hidden p-4 bg-fuchsia-50 rounded-xl mb-3">
-                    <p class="text-[9px] font-black text-fuchsia-400 uppercase mb-2">Target Audience</p>
-                    <div class="flex gap-4">
-                        <label class="flex items-center gap-2 text-xs font-bold uppercase"><input type="radio" name="targetGender" value="Male"> Male</label>
-                        <label class="flex items-center gap-2 text-xs font-bold uppercase"><input type="radio" name="targetGender" value="Female" checked> Female</label>
-                    </div>
-                </div>
-
-                <div class="flex gap-6 py-2">
-                    <label class="flex items-center gap-2 font-black text-xs uppercase"><input type="radio" name="itemCondition" value="unused" checked> Unused</label>
-                    <label class="flex items-center gap-2 font-black text-xs uppercase"><input type="radio" name="itemCondition" value="used"> Used</label>
-                </div>
-                
-                <input type="file" id="itemImage" accept="image/*" class="text-xs">
-                <div class="img-preview-container" id="imgPreview"></div>
-                
-                <input type="email" id="itemEmail" required placeholder="Contact Email">
-                <textarea id="itemDesc" rows="3" placeholder="Description"></textarea>
-                
-                <button type="submit" id="submitBtn" class="w-full py-4 bg-fuchsia-500 text-white rounded-xl text-md font-black shadow-lg uppercase tracking-wider mt-4 disabled:opacity-50">Broadcast Listing</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Item Details Modal -->
-    <div id="itemDetailsModal" class="modal-overlay hidden">
-        <div class="modal-content !p-0 overflow-hidden">
-            <div class="relative h-72 bg-slate-100">
-                <button onclick="toggleModal('itemDetailsModal', false)" class="absolute top-4 right-4 z-20 bg-black/30 text-white w-10 h-10 rounded-full backdrop-blur-md">&times;</button>
-                <img id="detailsImg" class="w-full h-full object-contain">
-            </div>
-            <div class="p-6">
-                <span id="detailsCategory" class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[9px] font-black uppercase"></span>
-                <h2 id="detailsName" class="text-xl font-black text-slate-800 uppercase mt-2"></h2>
-                <div id="detailsPrice" class="text-2xl font-black text-fuchsia-600 mb-4"></div>
-                <p id="detailsDesc" class="text-slate-500 text-xs leading-relaxed mb-6"></p>
-                <a id="detailsEmailLink" class="block w-full py-4 bg-fuchsia-500 text-white rounded-xl text-center font-black uppercase">Contact Seller</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmModal" class="modal-overlay hidden">
-        <div class="modal-content !pb-6">
-            <h3 id="confirmTitle" class="text-lg font-black uppercase mb-4">Confirm Action</h3>
-            <p id="confirmMsg" class="text-sm text-slate-500 mb-6 font-medium">Are you sure you want to perform this action?</p>
-            <div class="flex gap-4">
-                <button id="confirmBtn" class="flex-1 py-3 bg-red-500 text-white font-black uppercase text-xs rounded-xl">Confirm</button>
-                <button onclick="toggleModal('confirmModal', false)" class="flex-1 py-3 bg-slate-100 font-black uppercase text-xs rounded-xl">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <div class="nav-items-container">
-            <button onclick="switchTab('marketplace')" id="navHome" class="nav-btn active">
-                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <span>HOME</span>
-            </button>
-            <button onclick="switchTab('admin')" id="navAdmin" class="nav-btn hidden">
-                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span>ADMIN</span>
-            </button>
-        </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="dashboard"><span class="dot"></span> Dashboard</button>
+      <button class="nav-btn" data-view="radar"><span class="dot"></span> Radar &amp; Seismic</button>
+      <button class="nav-btn" data-view="alerts"><span class="dot"></span> Alert Engine</button>
+      <button class="nav-btn" data-view="architecture"><span class="dot"></span> System Architecture</button>
     </nav>
+    <div class="sidebar-foot">
+      <span class="status-pill"><span class="dot"></span> DIRECT PUBLIC FEEDS</span><br>
+      Open-Meteo · USGS · RainViewer<br>
+      CORS Enabled · Zero API Key
+    </div>
+  </aside>
 
-    <button onclick="handleNewListingClick()" class="fab" id="mainFab">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M12 6v12m6-6H6"></path></svg>
-    </button>
-
-    <div id="toast" class="bg-slate-900 text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl max-w-[90vw] text-center">
-        <span id="toastMsg">Updated</span>
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="view-title">Situation Dashboard</h1>
+        <div class="sub" id="view-sub">Real-time conditions for the selected station</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="clock" id="clock"></div>
+        <div class="loc-picker">
+          <select id="loc-select"></select>
+          <button id="loc-refresh">Refresh</button>
+        </div>
+      </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, doc, onSnapshot, getDoc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="view-dashboard" class="view active">
+      <div id="dash-status-banner-slot" style="margin-bottom:18px;"></div>
 
-        const ADMIN_EMAIL = 'km0334109@gmail.com';
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
-            authDomain: "negocios-8e8a4.firebaseapp.com",
-            projectId: "negocios-8e8a4",
-            storageBucket: "negocios-8e8a4.firebasestorage.app",
-            messagingSenderId: "298423907311",
-            appId: "1:298423907311:web:92b79b23776a4f56557c1a"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = 'negocio-v4';
+      <div class="grid cols-4" style="margin-bottom:18px;">
+        <div class="metric-card">
+          <div class="label">Temperature</div>
+          <div class="value" id="m-temp">–<small>°C</small></div>
+          <div class="meta" id="m-cond">Loading…</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Current precipitation</div>
+          <div class="value" id="m-precip">–<small>mm/hr</small></div>
+          <div class="meta">rain rate, this hour</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Humidity &amp; Wind</div>
+          <div class="value" id="m-humidity">–<small>%</small></div>
+          <div class="meta" id="m-wind">Wind –</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Pressure &amp; Soil</div>
+          <div class="value" id="m-pressure">–<small>hPa</small></div>
+          <div class="meta" id="m-soil">Soil Saturation: –</div>
+        </div>
+      </div>
 
-        let items = [];
-        let blockedUsers = [];
-        let user = null;
-        let currentFilter = 'ALL';
-        let currentImagesData = [];
-        let activeTab = 'marketplace';
+      <div class="grid cols-3">
+        <div class="panel" style="grid-column:span 2;">
+          <div class="panel-head"><h3>48h precipitation outlook</h3><span class="tag">open-meteo · hourly mm</span></div>
+          <svg id="precip-chart" viewBox="0 0 640 180" style="width:100%;height:180px;"></svg>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Nearby seismic activity</h3><span class="tag">usgs catalog · 300km / 30d</span></div>
+          <div id="quake-list" class="small-dim">Loading…</div>
+        </div>
+      </div>
 
-        window.showToast = (m) => { 
-            const msg = document.getElementById('toastMsg'); 
-            msg.textContent = m;
-            const t = document.getElementById('toast');
-            t.style.transform = "translateX(-50%) translateY(0)";
-            setTimeout(() => t.style.transform = "translateX(-50%) translateY(10rem)", 4000);
-        };
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-head"><h3>Station map</h3><span class="tag" id="map-coords">–</span></div>
+        <div class="map-wrap"><div id="map"></div></div>
+      </div>
+    </section>
 
-        window.toggleModal = (id, show) => {
-            const m = document.getElementById(id);
-            if(m) m.classList.toggle('hidden', !show);
-        };
+    <!-- ===================== RADAR & SEISMIC ===================== -->
+    <section id="view-radar" class="view">
+      <div class="note-box">
+        This map integrates <b>RainViewer's</b> global radar mosaic for precipitation dynamics and 
+        the official <b>USGS Earthquake Catalog API</b> for real-time seismic shocks and tremor detection within 300 km.
+      </div>
 
-        window.toggleClothingGender = (val) => {
-            document.getElementById('clothingTargetGroup').classList.toggle('hidden', val !== 'Clothing');
-        };
+      <div class="layer-toggles">
+        <label class="layer-toggle on" id="tog-radar-label"><input type="checkbox" id="tog-radar" checked> Precipitation radar</label>
+        <label class="layer-toggle on" id="tog-quake-label"><input type="checkbox" id="tog-quake" checked> Seismic events (30d)</label>
+      </div>
 
-        window.switchTab = (tab) => {
-            if (tab === 'admin') {
-                if (!window.isUserVerified || window.verifiedEmail !== ADMIN_EMAIL) {
-                    window.showToast("ACCESS DENIED: SECURE ZONE");
-                    return;
-                }
-            }
+      <div class="panel">
+        <div class="panel-head"><h3>Live map</h3><span class="tag" id="radar-frame-time">syncing radar…</span></div>
+        <div class="map-wrap"><div id="map-radar"></div></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+          <button class="btn ghost" id="play-btn">▶ Play last hour</button>
+          <input type="range" id="frame-slider" min="0" max="0" value="0" style="flex:1;">
+          <span class="mono small-dim" id="frame-label">–</span>
+        </div>
+      </div>
 
-            activeTab = tab;
-            document.getElementById('marketplaceView').classList.toggle('hidden', tab !== 'marketplace');
-            document.getElementById('adminView').classList.toggle('hidden', tab !== 'admin');
-            document.getElementById('mainFab').classList.toggle('hidden', tab === 'admin');
-            
-            document.getElementById('navHome').classList.toggle('active', tab === 'marketplace');
-            document.getElementById('navAdmin').classList.toggle('active', tab === 'admin');
-            
-            if (tab === 'admin') updateAdminUI();
-        };
+      <div class="grid cols-2" style="margin-top:16px;">
+        <div class="panel">
+          <div class="panel-head"><h3>Seismic Risk Key</h3></div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--text-mid);">
+            <div><span class="chip ok">M2.0–3.4</span> Minor tremor — logged, baseline monitoring</div>
+            <div><span class="chip warn">M3.5–4.4</span> Elevated tremor — watch threshold for mass-movement &amp; rockfall risk</div>
+            <div><span class="chip danger">M4.5+</span> Significant shock — danger threshold for structural &amp; slope instability</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>USGS Earthquake Log</h3><span class="tag">300km radius / 30d</span></div>
+          <div id="quake-table"><span class="small-dim">Loading…</span></div>
+        </div>
+      </div>
+    </section>
 
-        const updateAdminVisibilityUI = () => {
-            const adminBtn = document.getElementById('navAdmin');
-            if (window.isUserVerified && window.verifiedEmail === ADMIN_EMAIL) {
-                adminBtn.classList.remove('hidden');
-            } else {
-                adminBtn.classList.add('hidden');
-            }
-        };
+    <!-- ===================== ALERT ENGINE ===================== -->
+    <section id="view-alerts" class="view">
+      <div class="note-box">
+        The Alert Engine ingests rainfall intensity, 3-hour forecasts, and seismic shocks, automatically evaluating 
+        downstream flood and slope failure conditions in real time.
+      </div>
 
-        async function processImage(base64) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.src = base64;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const scale = Math.min(1, 600 / Math.max(img.width, img.height));
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.5));
-                };
-            });
-        }
+      <div id="alert-status-banner-slot" style="margin-bottom:18px;"></div>
 
-        document.getElementById('itemImage').addEventListener('change', function() {
-            const file = this.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const compressed = await processImage(e.target.result);
-                currentImagesData = [compressed];
-                document.getElementById('imgPreview').innerHTML = `<img src="${compressed}" class="img-preview-item">`;
-            };
-            reader.readAsDataURL(file);
-        });
+      <div class="grid cols-2">
+        <div class="panel">
+          <div class="panel-head"><h3>Threshold Configuration</h3><span class="tag">persisted locally</span></div>
 
-        document.getElementById('itemForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!user) return window.showToast("Wait for authentication...");
+          <div class="slider-row"><div class="sr-top"><span>Rain rate — watch</span><b id="v-rainWarn"></b></div>
+            <input type="range" id="rainWarn" min="1" max="60" step="1"></div>
+          <div class="slider-row"><div class="sr-top"><span>Rain rate — danger</span><b id="v-rainDanger"></b></div>
+            <input type="range" id="rainDanger" min="5" max="120" step="1"></div>
+          <div class="slider-row"><div class="sr-top"><span>3h cumulative rain — danger</span><b id="v-rain3hDanger"></b></div>
+            <input type="range" id="rain3hDanger" min="10" max="200" step="5"></div>
+          <div class="slider-row"><div class="sr-top"><span>Seismic magnitude — watch</span><b id="v-quakeWarnMag"></b></div>
+            <input type="range" id="quakeWarnMag" min="2" max="6" step="0.1"></div>
+          <div class="slider-row"><div class="sr-top"><span>Seismic magnitude — danger</span><b id="v-quakeDangerMag"></b></div>
+            <input type="range" id="quakeDangerMag" min="3" max="7" step="0.1"></div>
 
-            // BLOCK CHECK
-            if (blockedUsers.some(b => b.id === user.uid)) {
-                return window.showToast("BLOCKED: Access to broadcasting revoked.");
-            }
-            
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = "Broadcasting...";
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn" id="save-thresholds">Save thresholds</button>
+            <button class="btn ghost" id="reset-thresholds">Reset to defaults</button>
+          </div>
+        </div>
 
-            const cat = document.getElementById('itemCategory').value;
-            const newItem = {
-                name: document.getElementById('itemName').value,
-                price: parseFloat(document.getElementById('itemPrice').value),
-                category: cat,
-                targetGender: cat === 'Clothing' ? document.querySelector('input[name="targetGender"]:checked').value : null,
-                condition: document.querySelector('input[name="itemCondition"]:checked').value,
-                description: document.getElementById('itemDesc').value,
-                email: document.getElementById('itemEmail').value,
-                images: currentImagesData,
-                sellerId: user.uid,
-                createdAt: Date.now()
-            };
+        <div class="panel">
+          <div class="panel-head"><h3>Live Evaluation Telemetry</h3></div>
+          <table><tbody>
+            <tr><td>Station</td><td class="mono" id="in-station">–</td></tr>
+            <tr><td>Current rain rate</td><td class="mono" id="in-rain">–</td></tr>
+            <tr><td>3h forecast total</td><td class="mono" id="in-rain3h">–</td></tr>
+            <tr><td>Max seismic event (24h, 300km)</td><td class="mono" id="in-quake">–</td></tr>
+            <tr><td>Evaluated at</td><td class="mono" id="in-time">–</td></tr>
+          </tbody></table>
+          <div class="note-box" id="trigger-note" style="margin-top:14px;">Evaluating live data inputs...</div>
+        </div>
+      </div>
 
-            try {
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-                await addDoc(colRef, newItem);
-                window.toggleModal('sellingModal', false);
-                window.showToast("Broadcasting successful!");
-                document.getElementById('itemForm').reset();
-                document.getElementById('imgPreview').innerHTML = '';
-            } catch (err) {
-                console.error(err);
-                window.showToast("Network Error: Broadcast failed.");
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Broadcast Listing";
-            }
-        });
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-head"><h3>Evaluation Log</h3><button class="btn ghost" id="clear-log" style="padding:5px 10px;font-size:11px;">Clear log</button></div>
+        <div id="log-table"><span class="small-dim">No evaluations yet this session.</span></div>
+      </div>
+    </section>
 
-        window.phoneEmailReceiver = (userObj) => {
-            if (userObj?.user_email_id) {
-                window.isUserVerified = true;
-                window.verifiedEmail = userObj.user_email_id;
-                document.getElementById('verificationContainer').classList.add('hidden');
-                document.getElementById('verifiedStatus').classList.remove('hidden');
-                updateAdminVisibilityUI();
-                if (user) checkProfile(user);
-            }
-        };
+    <!-- ===================== ARCHITECTURE ===================== -->
+    <section id="view-architecture" class="view">
+      <div class="panel">
+        <div class="panel-head"><h3>Data Pipeline Architecture</h3></div>
+        <div class="flow">
+          <div class="flow-node"><b>Sensing Layer</b><span>Open-Meteo AWS, USGS Catalog, RainViewer Radar</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><b>Client Ingestion</b><span>Parallel async fetch &amp; GeoJSON parsing</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><b>Risk Engine</b><span>Multi-signal threshold fusion model</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><b>Dispatch Layer</b><span>Automated sirens &amp; advisory broadcast</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><b>Operations UI</b><span>Sentinel-HL Dashboard</span></div>
+        </div>
+      </div>
 
-        const checkProfile = async (currUser) => {
-            const profileRef = doc(db, 'artifacts', appId, 'users', currUser.uid, 'profile', 'settings');
-            const snap = await getDoc(profileRef);
-            if (snap.exists()) {
-                window.userGender = snap.data().gender;
-                updateGenderBadge();
-                updateUI();
-            } else if (window.isUserVerified) {
-                window.toggleModal('genderModal', true);
-            }
-        };
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-head">
+          <h3>Active Telemetry Endpoints</h3>
+          <span class="tag">live = active public api · proxy = open proxy layer · sim = client heuristic</span>
+        </div>
+        <table>
+          <thead><tr><th>Component</th><th>Status</th><th>Endpoint &amp; Implementation Details</th></tr></thead>
+          <tbody>
+            <tr><td>Precipitation &amp; Atmosphere</td><td><span class="coverage-badge live">LIVE</span></td>
+              <td>Open-Meteo High-Resolution Forecast API (Hourly rain, temp, humidity, pressure, soil saturation)</td></tr>
+            <tr><td>Seismic Catalog</td><td><span class="coverage-badge live">LIVE</span></td>
+              <td>USGS FDSN Earthquake Catalog API (GeoJSON radial search within 300 km radius, M2.0+ threshold)</td></tr>
+            <tr><td>Radar Reflectivity</td><td><span class="coverage-badge live">LIVE</span></td>
+              <td>RainViewer Global Radar Mosaic API (Live weather tile mosaic with timestamped historical replay)</td></tr>
+            <tr><td>Risk &amp; Siren Engine</td><td><span class="coverage-badge sim">SIM</span></td>
+              <td>Rule-based client evaluation engine with local persistence and automated alert states</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-        window.setIdentity = async (gender) => {
-            if(!user) return;
-            window.userGender = gender;
-            const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'settings');
-            await setDoc(profileRef, { gender, updatedAt: Date.now() });
-            window.toggleModal('genderModal', false);
-            updateGenderBadge();
-            updateUI();
-        };
+  </main>
+</div>
 
-        const updateGenderBadge = () => {
-            const badge = document.getElementById('userGenderBadge');
-            badge.textContent = window.userGender;
-            badge.classList.remove('hidden');
-        };
+<script>
+/* =========================================================================
+   CONFIG & ENDPOINTS
+   ========================================================================= */
+const LOCATIONS = [
+  { id: "kedarnath",  name: "Kedarnath, Uttarakhand",     lat: 30.7346, lon: 79.0669, region: "Western Himalaya" },
+  { id: "uttarkashi", name: "Dharali / Uttarkashi, UK",    lat: 30.7900, lon: 78.4600, region: "Western Himalaya" },
+  { id: "kullu",      name: "Kullu-Manali, Himachal",      lat: 32.0998, lon: 77.1734, region: "Western Himalaya" },
+  { id: "wayanad",    name: "Wayanad, Kerala",             lat: 11.6850, lon: 76.1320, region: "Western Ghats" },
+  { id: "gangtok",    name: "Gangtok, Sikkim",              lat: 27.3389, lon: 88.6065, region: "Eastern Himalaya" },
+  { id: "rasuwa",     name: "Rasuwa / Syaprubesi, Nepal",   lat: 28.1667, lon: 85.3500, region: "Nepal-Tibet border" },
+  { id: "kathmandu",  name: "Kathmandu, Nepal",             lat: 27.7172, lon: 85.3240, region: "Nepal" }
+];
 
-        const updateUI = () => {
-            if (activeTab === 'admin') {
-                updateAdminUI();
-                return;
-            }
+const API = {
+  openMeteo: (lat, lon) =>
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    `&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,soil_moisture_0_to_7cm` +
+    `&hourly=precipitation,precipitation_probability` +
+    `&daily=precipitation_sum,precipitation_probability_max` +
+    `&timezone=auto&forecast_days=2`,
 
-            const container = document.getElementById('itemsContainer');
-            const filtered = items.filter(i => {
-                // Filter out items from blocked users for public view
-                if (blockedUsers.some(b => b.id === i.sellerId)) return false;
-                if (i.category === 'Clothing' && i.targetGender === 'Female' && window.userGender !== 'Female') return false;
-                if (currentFilter !== 'ALL' && i.category !== currentFilter) return false;
-                return true;
-            });
+  usgsQuakes: (lat, lon, radiusKm = 300, days = 30, minMag = 2.0) => {
+    const end = new Date();
+    const start = new Date(end.getTime() - days * 86400000);
+    const fmt = (d) => d.toISOString().slice(0, 10);
+    return `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson` +
+      `&starttime=${fmt(start)}&endtime=${fmt(end)}` +
+      `&latitude=${lat}&longitude=${lon}&maxradiuskm=${radiusKm}` +
+      `&minmagnitude=${minMag}&orderby=time&limit=30`;
+  },
 
-            document.getElementById('itemCount').textContent = `${filtered.length} ITEMS`;
-            document.getElementById('emptyState').classList.toggle('hidden', filtered.length > 0);
-            
-            container.innerHTML = '';
-            filtered.forEach(item => {
-                const li = document.createElement('li');
-                li.onclick = () => window.openItemDetails(item.id);
-                li.innerHTML = `
-                    <div class="listing-card">
-                        <div class="aspect-square bg-slate-100 flex items-center justify-center overflow-hidden">
-                            ${item.images?.[0] ? `<img src="${item.images[0]}" class="w-full h-full object-cover">` : '<span class="text-[8px] opacity-20">NO IMAGE</span>'}
-                        </div>
-                        <div class="p-3">
-                            <span class="text-[8px] font-black text-amber-600 uppercase">${item.category}</span>
-                            <h3 class="text-[11px] font-black text-slate-800 uppercase truncate">${item.name}</h3>
-                            <span class="text-sm font-black text-fuchsia-600">₹${item.price}</span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(li);
-            });
-        };
+  rainviewer: () => `https://api.rainviewer.com/public/weather-maps.json`
+};
 
-        const updateAdminUI = () => {
-            const body = document.getElementById('adminTableBody');
-            document.getElementById('adminStats').textContent = items.length;
-            body.innerHTML = '';
-            
-            items.sort((a, b) => b.createdAt - a.createdAt).forEach(item => {
-                const isBlocked = blockedUsers.some(b => b.id === item.sellerId);
-                const tr = document.createElement('tr');
-                if (isBlocked) tr.classList.add('opacity-40', 'bg-red-50');
-                
-                const date = new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-                tr.innerHTML = `
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <img src="${item.images?.[0] || ''}" class="w-10 h-10 rounded-lg object-cover bg-slate-100">
-                            <div>
-                                <p class="text-[11px] font-black uppercase text-slate-800">${item.name}</p>
-                                <p class="text-[9px] font-bold text-fuchsia-500 uppercase">₹${item.price}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <p class="text-[10px] font-medium text-slate-500 lowercase">${item.email}</p>
-                        <p class="text-[8px] font-black ${isBlocked ? 'text-red-500' : 'text-slate-400'} uppercase">
-                            ${isBlocked ? 'BLACKLISTED' : item.sellerId.substring(0, 8) + '...'}
-                        </p>
-                    </td>
-                    <td class="p-4">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">${date}</p>
-                    </td>
-                    <td class="p-4 text-right flex gap-2 justify-end">
-                        <button onclick="window.confirmAction('delete', '${item.id}')" class="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[9px] font-black uppercase border border-red-100 hover:bg-red-500 hover:text-white transition-colors">
-                            Scrub
-                        </button>
-                        ${isBlocked ? 
-                            `<button onclick="window.confirmAction('unblock', '${item.sellerId}')" class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase border border-emerald-100">Restore</button>` : 
-                            `<button onclick="window.confirmAction('block', '${item.sellerId}')" class="px-3 py-1 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase border border-slate-900">Block</button>`
-                        }
-                    </td>
-                `;
-                body.appendChild(tr);
-            });
-        };
+const WEATHER_CODES = {
+  0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+  45: "Fog", 48: "Depositing rime fog",
+  51: "Light drizzle", 53: "Drizzle", 55: "Dense drizzle",
+  61: "Slight rain", 63: "Rain", 65: "Heavy rain",
+  66: "Freezing rain", 67: "Heavy freezing rain",
+  71: "Slight snow", 73: "Snow", 75: "Heavy snow",
+  80: "Slight rain showers", 81: "Rain showers", 82: "Violent rain showers",
+  95: "Thunderstorm", 96: "Thunderstorm, slight hail", 99: "Thunderstorm, heavy hail"
+};
+function weatherLabel(code) { return WEATHER_CODES[code] || "Clear / Stable"; }
 
-        window.confirmAction = (type, id) => {
-            const title = document.getElementById('confirmTitle');
-            const msg = document.getElementById('confirmMsg');
-            const btn = document.getElementById('confirmBtn');
+function getSelectedLocationId() {
+  try { return localStorage.getItem("hlews_loc") || LOCATIONS[0].id; } catch (e) { return LOCATIONS[0].id; }
+}
+function setSelectedLocationId(id) {
+  try { localStorage.setItem("hlews_loc", id); } catch (e) {}
+}
+function getLocationById(id) {
+  return LOCATIONS.find(l => l.id === id) || LOCATIONS[0];
+}
 
-            if (type === 'delete') {
-                title.textContent = "Scrub Asset";
-                msg.textContent = "Permanently remove this listing from the database?";
-                btn.onclick = () => window.deleteListing(id);
-            } else if (type === 'block') {
-                title.textContent = "Blacklist User";
-                msg.textContent = "Prevent this seller from posting any further listings?";
-                btn.onclick = () => window.blockUser(id);
-            } else if (type === 'unblock') {
-                title.textContent = "Restore User";
-                msg.textContent = "Allow this user to broadcast assets again?";
-                btn.onclick = () => window.unblockUser(id);
-            }
+function fmtTime(iso) {
+  try { return new Date(iso).toLocaleString(undefined, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }); }
+  catch (e) { return iso; }
+}
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+function sumNextHours(hourly, n) {
+  if (!hourly || !hourly.precipitation) return 0;
+  const nowIdx = hourly.time.findIndex(t => new Date(t) >= new Date());
+  const start = nowIdx === -1 ? 0 : nowIdx;
+  return hourly.precipitation.slice(start, start + n).reduce((a, b) => a + b, 0);
+}
 
-            window.toggleModal('confirmModal', true);
-        };
+async function fetchWeather(loc) {
+  const res = await fetch(API.openMeteo(loc.lat, loc.lon));
+  if (!res.ok) throw new Error("weather fetch failed");
+  return res.json();
+}
+async function fetchQuakes(loc, days = 30, minMag = 2.0) {
+  const res = await fetch(API.usgsQuakes(loc.lat, loc.lon, 300, days, minMag));
+  if (!res.ok) throw new Error("quake fetch failed");
+  const data = await res.json();
+  return data.features || [];
+}
 
-        window.blockUser = async (userId) => {
-            try {
-                const blockRef = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', userId);
-                await setDoc(blockRef, { blockedAt: Date.now() });
-                window.toggleModal('confirmModal', false);
-                window.showToast("User Blacklisted");
-            } catch (err) {
-                window.showToast("Block Failed");
-            }
-        };
+/* =========================================================================
+   RISK ENGINE & LOCAL LOGGING
+   ========================================================================= */
+const DEFAULT_THRESHOLDS = {
+  rainWarn: 15, rainDanger: 40, rain3hDanger: 70,
+  quakeWarnMag: 3.5, quakeDangerMag: 4.5, quakeWindowHrs: 24
+};
+function loadThresholds() {
+  try { const raw = localStorage.getItem("hlews_thresholds"); if (raw) return Object.assign({}, DEFAULT_THRESHOLDS, JSON.parse(raw)); }
+  catch (e) {}
+  return Object.assign({}, DEFAULT_THRESHOLDS);
+}
+function saveThresholds(t) {
+  try { localStorage.setItem("hlews_thresholds", JSON.stringify(t)); } catch (e) {}
+}
 
-        window.unblockUser = async (userId) => {
-            try {
-                const blockRef = doc(db, 'artifacts', appId, 'public', 'data', 'blocked_users', userId);
-                await deleteDoc(blockRef);
-                window.toggleModal('confirmModal', false);
-                window.showToast("User Restored");
-            } catch (err) {
-                window.showToast("Restore Failed");
-            }
-        };
+function computeRisk(inputs, thresholds) {
+  const t = thresholds || loadThresholds();
+  const reasons = [];
+  let level = "ok";
+  if (inputs.rainRate >= t.rainDanger) {
+    level = "danger";
+    reasons.push(`Rain rate ${inputs.rainRate.toFixed(1)} mm/hr ≥ danger threshold ${t.rainDanger} mm/hr`);
+  } else if (inputs.rainRate >= t.rainWarn) {
+    if (level !== "danger") level = "warn";
+    reasons.push(`Rain rate ${inputs.rainRate.toFixed(1)} mm/hr ≥ watch threshold ${t.rainWarn} mm/hr`);
+  }
+  if (inputs.rain3h >= t.rain3hDanger) {
+    level = "danger";
+    reasons.push(`3h forecast total ${inputs.rain3h.toFixed(1)} mm ≥ danger threshold ${t.rain3hDanger} mm`);
+  }
+  if (inputs.maxRecentQuake != null) {
+    if (inputs.maxRecentQuake >= t.quakeDangerMag) {
+      level = "danger";
+      reasons.push(`M${inputs.maxRecentQuake.toFixed(1)} seismic event within ${t.quakeWindowHrs}h ≥ danger threshold M${t.quakeDangerMag}`);
+    } else if (inputs.maxRecentQuake >= t.quakeWarnMag) {
+      if (level !== "danger") level = "warn";
+      reasons.push(`M${inputs.maxRecentQuake.toFixed(1)} seismic event within ${t.quakeWindowHrs}h ≥ watch threshold M${t.quakeWarnMag}`);
+    }
+  }
+  if (reasons.length === 0) reasons.push("All monitored atmospheric and seismic signals within normal operational limits");
+  return { level, reasons };
+}
 
-        window.deleteListing = async (id) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'listings', id);
-                await deleteDoc(docRef);
-                window.toggleModal('confirmModal', false);
-                window.showToast("Listing scrubbed from DB");
-            } catch (err) {
-                console.error(err);
-                window.showToast("Scrub Failed");
-            }
-        };
+function logAlertEvaluation(entry) {
+  try {
+    const raw = localStorage.getItem("hlews_alert_log");
+    const log = raw ? JSON.parse(raw) : [];
+    log.unshift(entry);
+    localStorage.setItem("hlews_alert_log", JSON.stringify(log.slice(0, 50)));
+  } catch (e) {}
+}
+function getAlertLog() {
+  try { const raw = localStorage.getItem("hlews_alert_log"); return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
+}
+function clearAlertLog() {
+  try { localStorage.removeItem("hlews_alert_log"); } catch (e) {}
+}
 
-        window.openItemDetails = (id) => {
-            const item = items.find(i => i.id === id);
-            if(!item) return;
-            document.getElementById('detailsImg').src = item.images?.[0] || '';
-            document.getElementById('detailsName').textContent = item.name;
-            document.getElementById('detailsCategory').textContent = item.category;
-            document.getElementById('detailsPrice').textContent = `₹${item.price}`;
-            document.getElementById('detailsDesc').textContent = item.description;
-            document.getElementById('detailsEmailLink').href = `mailto:${item.email}`;
-            window.toggleModal('itemDetailsModal', true);
-        };
+/* =========================================================================
+   UI SHELL & VIEW ROUTING
+   ========================================================================= */
+const VIEW_META = {
+  dashboard:    { title: "Situation Dashboard", sub: "Real-time conditions for the selected station" },
+  radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map" },
+  alerts:       { title: "Alert Engine", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers" },
+  architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology" }
+};
 
-        window.handleNewListingClick = () => {
-            if (!window.isUserVerified) return window.showToast('Verify Identity via Email First');
-            window.toggleModal('sellingModal', true);
-        };
+let dashMap, dashMarker, radarMap, radarLayer, quakeLayerGroup;
+let radarFrames = [], currentFrame = 0, playTimer = null;
 
-        window.setFilter = (cat) => {
-            currentFilter = cat;
-            document.querySelectorAll('.cat-pill').forEach(b => b.classList.toggle('active', b.textContent.includes(cat) || (cat==='ALL' && b.textContent==='All Assets')));
-            updateUI();
-        };
+document.addEventListener("DOMContentLoaded", () => {
+  wireTabs();
+  wireClock();
+  wireLocationPicker();
+  initDashMap();
+  initRadarMap();
+  bindSliders();
+  renderLog();
 
-        onAuthStateChanged(auth, async (u) => {
-            user = u;
-            if (user) {
-                // Listen for Listings
-                const qListings = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-                onSnapshot(qListings, (snap) => {
-                    items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    updateUI();
-                });
+  const loc = getLocationById(getSelectedLocationId());
+  loadAll(loc);
+  setInterval(() => loadAll(getLocationById(getSelectedLocationId())), 5 * 60 * 1000);
+});
 
-                // Listen for Blocked Users
-                const qBlocked = collection(db, 'artifacts', appId, 'public', 'data', 'blocked_users');
-                onSnapshot(qBlocked, (snap) => {
-                    blockedUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    updateUI();
-                });
+function wireTabs() {
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.addEventListener("click", () => switchView(btn.dataset.view));
+  });
+}
+function switchView(name) {
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
+  document.getElementById("view-title").textContent = VIEW_META[name].title;
+  document.getElementById("view-sub").textContent = VIEW_META[name].sub;
+  if (name === "dashboard" && dashMap) setTimeout(() => dashMap.invalidateSize(), 80);
+  if (name === "radar" && radarMap) setTimeout(() => radarMap.invalidateSize(), 80);
+}
 
-                if (window.isUserVerified) checkProfile(user);
-            }
-        });
+function wireClock() {
+  const clockEl = document.getElementById("clock");
+  function tick() {
+    const now = new Date();
+    const utc = now.toUTCString().split(" ")[4];
+    clockEl.textContent = now.toLocaleDateString(undefined, { day: "2-digit", month: "short" }) +
+      "  " + now.toLocaleTimeString() + "  ·  " + utc + " UTC";
+  }
+  tick(); setInterval(tick, 1000);
+}
 
-        signInAnonymously(auth).catch(e => console.error("Auth Failure", e));
-    </script>
+function wireLocationPicker() {
+  const select = document.getElementById("loc-select");
+  LOCATIONS.forEach(loc => {
+    const opt = document.createElement("option");
+    opt.value = loc.id; opt.textContent = loc.name;
+    select.appendChild(opt);
+  });
+  select.value = getSelectedLocationId();
+  select.addEventListener("change", () => {
+    setSelectedLocationId(select.value);
+    loadAll(getLocationById(select.value));
+  });
+  document.getElementById("loc-refresh").addEventListener("click", () => {
+    loadAll(getLocationById(getSelectedLocationId()));
+  });
+}
+
+function loadAll(loc) {
+  loadDashboard(loc);
+  centerRadar(loc);
+  loadRadarQuakes(loc);
+  runEvaluation(loc);
+}
+
+/* =========================================================================
+   DASHBOARD CONTROLLER
+   ========================================================================= */
+function initDashMap() {
+  dashMap = L.map("map").setView([28, 82], 5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors", maxZoom: 18 }).addTo(dashMap);
+}
+
+async function loadDashboard(loc) {
+  document.getElementById("map-coords").textContent = `${loc.lat.toFixed(3)}, ${loc.lon.toFixed(3)} · ${loc.region}`;
+  dashMap.setView([loc.lat, loc.lon], 9);
+  if (dashMarker) dashMap.removeLayer(dashMarker);
+  dashMarker = L.circleMarker([loc.lat, loc.lon], { radius: 9, color: "#6fc4e8", fillColor: "#6fc4e8", fillOpacity: 0.5, weight: 2 })
+    .addTo(dashMap).bindPopup(`<b>${loc.name}</b><br>Station Active`).openPopup();
+
+  setDashBanner("warn", "Fetching live telemetry…", "Connecting to Open-Meteo and USGS Earthquake Catalog");
+  document.getElementById("quake-list").textContent = "Loading seismic catalog…";
+
+  const [weather, quakes] = await Promise.allSettled([fetchWeather(loc), fetchQuakes(loc, 30, 2.0)]);
+  const w = weather.status === "fulfilled" ? weather.value : null;
+  const q = quakes.status === "fulfilled" ? quakes.value : [];
+
+  if (w) renderWeather(w); else renderWeatherError();
+  renderDashQuakeList(q);
+  drawPrecipChart(w);
+
+  const rainRate = w ? (w.current.rain ?? w.current.precipitation ?? 0) : 0;
+  const rain3h = w ? sumNextHours(w.hourly, 3) : 0;
+  const maxQuake = q.length ? Math.max(...q.map(f => f.properties.mag)) : null;
+
+  const risk = computeRisk({ rainRate, rain3h, maxRecentQuake: maxQuake });
+  renderDashBanner(risk, loc);
+}
+
+function renderWeather(w) {
+  const c = w.current;
+  document.getElementById("m-temp").innerHTML = `${c.temperature_2m.toFixed(1)}<small>°C</small>`;
+  document.getElementById("m-cond").textContent = weatherLabel(c.weather_code);
+  const rate = c.rain ?? c.precipitation ?? 0;
+  document.getElementById("m-precip").innerHTML = `${rate.toFixed(1)}<small>mm/hr</small>`;
+  document.getElementById("m-humidity").innerHTML = `${c.relative_humidity_2m}<small>%</small>`;
+  document.getElementById("m-wind").textContent = `Wind ${c.wind_speed_10m.toFixed(0)} km/h`;
+  document.getElementById("m-pressure").innerHTML = `${c.surface_pressure.toFixed(0)}<small>hPa</small>`;
+  const soil = c.soil_moisture_0_to_7cm ? `${(c.soil_moisture_0_to_7cm * 100).toFixed(0)}%` : "Nominal";
+  document.getElementById("m-soil").textContent = `Soil Saturation: ${soil}`;
+}
+
+function renderWeatherError() {
+  ["m-temp", "m-precip", "m-humidity", "m-pressure"].forEach(id => document.getElementById(id).textContent = "—");
+  document.getElementById("m-cond").textContent = "Atmospheric feed unavailable";
+}
+
+function renderDashQuakeList(features) {
+  const el = document.getElementById("quake-list");
+  if (!features.length) { el.innerHTML = `<span class="small-dim">No M2.0+ events within 300km in the last 30 days.</span>`; return; }
+  el.innerHTML = features.slice(0, 6).map(f => {
+    const mag = f.properties.mag;
+    const cls = mag >= 4.5 ? "danger" : mag >= 3.5 ? "warn" : "ok";
+    return `<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line-soft);font-size:12px;">
+      <span class="chip ${cls}">M${mag.toFixed(1)}</span>
+      <span style="flex:1;color:var(--text-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.properties.place}</span>
+      <span class="mono small-dim">${timeAgo(f.properties.time)}</span>
+    </div>`;
+  }).join("");
+}
+
+function setDashBanner(level, title, sub) {
+  document.getElementById("dash-status-banner-slot").innerHTML = `
+    <div class="status-banner ${level}"><div class="sb-left"><div class="pulse-dot"></div>
+      <div><div class="sb-title">${title}</div><div class="sb-sub">${sub}</div></div></div></div>`;
+}
+
+function renderDashBanner(risk, loc) {
+  const titles = { ok: "Normal — no thresholds breached", warn: "Watch — elevated risk signal detected", danger: "Danger — automated trigger conditions met" };
+  const badge = { ok: "NORMAL", warn: "WATCH", danger: "DANGER" }[risk.level];
+  document.getElementById("dash-status-banner-slot").innerHTML = `
+    <div class="status-banner ${risk.level}">
+      <div class="sb-left"><div class="pulse-dot"></div>
+        <div><div class="sb-title">${titles[risk.level]} · ${loc.name}</div><div class="sb-sub">${risk.reasons[0]}</div></div>
+      </div>
+      <div class="status-badge">${badge}</div>
+    </div>`;
+}
+
+function drawPrecipChart(w) {
+  const svg = document.getElementById("precip-chart");
+  svg.innerHTML = "";
+  if (!w || !w.hourly) return;
+  const vals = w.hourly.precipitation.slice(0, 48);
+  const times = w.hourly.time.slice(0, 48);
+  const max = Math.max(1, ...vals);
+  const W = 640, H = 180, pad = 24;
+  const barW = (W - pad * 2) / vals.length;
+  const nowIdx = times.findIndex(t => new Date(t) >= new Date());
+  vals.forEach((v, i) => {
+    const h = (v / max) * (H - pad * 2);
+    const x = pad + i * barW;
+    const y = H - pad - h;
+    const isNow = i === nowIdx;
+    const color = v >= 8 ? "#e0503a" : v >= 3 ? "#e8a33d" : "#3d6f8a";
+    svg.insertAdjacentHTML("beforeend", `<rect x="${x}" y="${y}" width="${Math.max(1, barW - 1)}" height="${h}" fill="${isNow ? '#6fc4e8' : color}" rx="1"></rect>`);
+  });
+  svg.insertAdjacentHTML("beforeend", `<line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#25384f" stroke-width="1"></line>`);
+  for (let i = 0; i < vals.length; i += 12) {
+    const x = pad + i * barW;
+    const label = new Date(times[i]).toLocaleTimeString(undefined, { hour: "2-digit" });
+    svg.insertAdjacentHTML("beforeend", `<text x="${x}" y="${H - 6}" fill="#6d7f97" font-size="9" font-family="JetBrains Mono, monospace">${label}</text>`);
+  }
+}
+
+/* =========================================================================
+   RADAR & SEISMIC CONTROLLER
+   ========================================================================= */
+function initRadarMap() {
+  radarMap = L.map("map-radar").setView([28, 82], 5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors, radar &copy; RainViewer, USGS Earthquake Catalog", maxZoom: 18 }).addTo(radarMap);
+  quakeLayerGroup = L.layerGroup().addTo(radarMap);
+  loadRadarFrames();
+
+  document.getElementById("tog-radar").addEventListener("change", (e) => {
+    document.getElementById("tog-radar-label").classList.toggle("on", e.target.checked);
+    if (radarLayer) e.target.checked ? radarLayer.addTo(radarMap) : radarMap.removeLayer(radarLayer);
+  });
+  document.getElementById("tog-quake").addEventListener("change", (e) => {
+    document.getElementById("tog-quake-label").classList.toggle("on", e.target.checked);
+    if (quakeLayerGroup) e.target.checked ? quakeLayerGroup.addTo(radarMap) : radarMap.removeLayer(quakeLayerGroup);
+  });
+  document.getElementById("frame-slider").addEventListener("input", (e) => showFrame(parseInt(e.target.value, 10)));
+  document.getElementById("play-btn").addEventListener("click", togglePlay);
+}
+
+function centerRadar(loc) {
+  if (!radarMap) return;
+  radarMap.setView([loc.lat, loc.lon], 8);
+  L.circleMarker([loc.lat, loc.lon], { radius: 8, color: "#6fc4e8", fillColor: "#6fc4e8", fillOpacity: 0.4, weight: 2 })
+    .addTo(radarMap).bindPopup(`<b>${loc.name}</b>`);
+}
+
+async function loadRadarFrames() {
+  try {
+    const res = await fetch(API.rainviewer());
+    const data = await res.json();
+    radarFrames = [...(data.radar.past || []), ...(data.radar.nowcast || [])];
+    document.getElementById("frame-slider").max = radarFrames.length - 1;
+    currentFrame = (data.radar.past || []).length - 1;
+    document.getElementById("frame-slider").value = currentFrame;
+    showFrame(currentFrame, data.host);
+  } catch (e) {
+    document.getElementById("radar-frame-time").textContent = "radar mosaic syncing";
+  }
+}
+
+function showFrame(idx, hostOverride) {
+  if (!radarFrames.length) return;
+  currentFrame = idx;
+  const frame = radarFrames[idx];
+  const host = hostOverride || (radarLayer && radarLayer._hlewsHost) || "https://tilecache.rainviewer.com";
+  if (radarLayer) radarMap.removeLayer(radarLayer);
+  radarLayer = L.tileLayer(`${host}${frame.path}/256/{z}/{x}/{y}/4/1_1.png`, { opacity: 0.65, zIndex: 5 });
+  radarLayer._hlewsHost = host;
+  if (document.getElementById("tog-radar").checked) radarLayer.addTo(radarMap);
+  document.getElementById("frame-slider").value = idx;
+  document.getElementById("radar-frame-time").textContent = "frame: " + fmtTime(new Date(frame.time * 1000).toISOString());
+  document.getElementById("frame-label").textContent = new Date(frame.time * 1000).toLocaleTimeString();
+}
+
+function togglePlay() {
+  const btn = document.getElementById("play-btn");
+  if (playTimer) { clearInterval(playTimer); playTimer = null; btn.textContent = "▶ Play last hour"; return; }
+  btn.textContent = "⏸ Pause";
+  playTimer = setInterval(() => { let next = currentFrame + 1; if (next >= radarFrames.length) next = 0; showFrame(next); }, 700);
+}
+
+async function loadRadarQuakes(loc) {
+  document.getElementById("quake-table").innerHTML = `<span class="small-dim">Loading…</span>`;
+  if (quakeLayerGroup) quakeLayerGroup.clearLayers();
+  try {
+    const features = await fetchQuakes(loc, 30, 2.0);
+    renderQuakeMarkers(features);
+    renderQuakeTable(features);
+  } catch (e) {
+    document.getElementById("quake-table").innerHTML = `<span class="small-dim">Seismic feed unavailable.</span>`;
+  }
+}
+
+function renderQuakeMarkers(features) {
+  features.forEach(f => {
+    const [lon, lat, depth] = f.geometry.coordinates;
+    const mag = f.properties.mag;
+    const color = mag >= 4.5 ? "#e0503a" : mag >= 3.5 ? "#e8a33d" : "#4cc38a";
+    L.circleMarker([lat, lon], { radius: 4 + mag * 2, color, fillColor: color, fillOpacity: 0.35, weight: 1.5 })
+      .bindPopup(`<b>M${mag.toFixed(1)} Earthquake</b><br>${f.properties.place}<br>Focal Depth: ${depth ? depth.toFixed(1) + ' km' : 'N/A'}<br>${fmtTime(f.properties.time)}`)
+      .addTo(quakeLayerGroup);
+  });
+}
+
+function renderQuakeTable(features) {
+  const el = document.getElementById("quake-table");
+  if (!features.length) { el.innerHTML = `<span class="small-dim">No M2.0+ events within 300km in the last 30 days.</span>`; return; }
+  const rows = features.slice(0, 8).map(f => {
+    const mag = f.properties.mag;
+    const depth = f.geometry.coordinates[2];
+    const cls = mag >= 4.5 ? "danger" : mag >= 3.5 ? "warn" : "ok";
+    return `<tr>
+      <td><span class="chip ${cls}">M${mag.toFixed(1)}</span></td>
+      <td>${f.properties.place}</td>
+      <td class="mono">${depth ? depth.toFixed(0) + ' km' : '—'}</td>
+      <td class="mono">${timeAgo(f.properties.time)}</td>
+    </tr>`;
+  }).join("");
+  el.innerHTML = `<table><thead><tr><th>Mag</th><th>Location</th><th>Depth</th><th>When</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* =========================================================================
+   ALERT ENGINE CONTROLLER
+   ========================================================================= */
+const SLIDER_IDS = ["rainWarn", "rainDanger", "rain3hDanger", "quakeWarnMag", "quakeDangerMag"];
+const UNITS = { rainWarn: " mm/hr", rainDanger: " mm/hr", rain3hDanger: " mm", quakeWarnMag: " M", quakeDangerMag: " M" };
+
+function bindSliders() {
+  const t = loadThresholds();
+  SLIDER_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = t[id];
+    document.getElementById("v-" + id).textContent = t[id] + UNITS[id];
+    el.addEventListener("input", () => { document.getElementById("v-" + id).textContent = el.value + UNITS[id]; });
+  });
+  document.getElementById("save-thresholds").addEventListener("click", () => {
+    saveThresholds(readSliders());
+    runEvaluation(getLocationById(getSelectedLocationId()));
+  });
+  document.getElementById("reset-thresholds").addEventListener("click", () => {
+    saveThresholds(Object.assign({}, DEFAULT_THRESHOLDS));
+    bindSlidersValuesOnly();
+    runEvaluation(getLocationById(getSelectedLocationId()));
+  });
+  document.getElementById("clear-log").addEventListener("click", () => { clearAlertLog(); renderLog(); });
+}
+
+function bindSlidersValuesOnly() {
+  const t = loadThresholds();
+  SLIDER_IDS.forEach(id => {
+    document.getElementById(id).value = t[id];
+    document.getElementById("v-" + id).textContent = t[id] + UNITS[id];
+  });
+}
+
+function readSliders() {
+  const t = {};
+  SLIDER_IDS.forEach(id => t[id] = parseFloat(document.getElementById(id).value));
+  t.quakeWindowHrs = 24;
+  return t;
+}
+
+async function runEvaluation(loc) {
+  document.getElementById("in-station").textContent = loc.name;
+  setAlertBanner("warn", "Evaluating signals…", "Aggregating live Open-Meteo precipitation & USGS seismic events");
+  const thresholds = readSliders();
+
+  let rainRate = 0, rain3h = 0, maxQuake = null;
+  try {
+    const w = await fetchWeather(loc);
+    rainRate = w.current.rain ?? w.current.precipitation ?? 0;
+    rain3h = sumNextHours(w.hourly, 3);
+  } catch (e) {}
+  try {
+    const features = await fetchQuakes(loc, 1, 2.0);
+    if (features.length) maxQuake = Math.max(...features.map(f => f.properties.mag));
+  } catch (e) {}
+
+  document.getElementById("in-rain").textContent = rainRate.toFixed(1) + " mm/hr";
+  document.getElementById("in-rain3h").textContent = rain3h.toFixed(1) + " mm";
+  document.getElementById("in-quake").textContent = maxQuake != null ? "M" + maxQuake.toFixed(1) : "None (24h)";
+  document.getElementById("in-time").textContent = new Date().toLocaleTimeString();
+
+  const risk = computeRisk({ rainRate, rain3h, maxRecentQuake: maxQuake }, thresholds);
+  renderAlertBanner(risk, loc);
+  renderTriggerNote(risk);
+
+  logAlertEvaluation({ time: new Date().toISOString(), station: loc.name, level: risk.level, reason: risk.reasons[0], rainRate, rain3h, maxQuake });
+  renderLog();
+}
+
+function setAlertBanner(level, title, sub) {
+  document.getElementById("alert-status-banner-slot").innerHTML = `
+    <div class="status-banner ${level}"><div class="sb-left"><div class="pulse-dot"></div>
+      <div><div class="sb-title">${title}</div><div class="sb-sub">${sub}</div></div></div></div>`;
+}
+
+function renderAlertBanner(risk, loc) {
+  const titles = { ok: "Normal — All Parameters Nominal", warn: "Watch — Elevated Threshold Warning", danger: "Danger — Automated Trigger Threshold Exceeded" };
+  const badge = { ok: "NORMAL", warn: "WATCH", danger: "DANGER" }[risk.level];
+  document.getElementById("alert-status-banner-slot").innerHTML = `
+    <div class="status-banner ${risk.level}">
+      <div class="sb-left"><div class="pulse-dot"></div>
+        <div><div class="sb-title">${titles[risk.level]} · ${loc.name}</div><div class="sb-sub">${risk.reasons.join(" · ")}</div></div>
+      </div>
+      <div class="status-badge">${badge}</div>
+    </div>`;
+}
+
+function renderTriggerNote(risk) {
+  const el = document.getElementById("trigger-note");
+  if (risk.level === "danger") {
+    el.innerHTML = `<b style="color:var(--red)">Simulated siren trigger dispatched.</b> Automated early warning broadcast would push to downstream siren towers and disaster management cells for this catchment.`;
+  } else if (risk.level === "warn") {
+    el.innerHTML = `<b style="color:var(--amber)">Watch condition active.</b> Pre-alert state logged. Re-evaluating on next telemetry refresh cycle.`;
+  } else {
+    el.innerHTML = `All monitored atmospheric and seismic parameters are within nominal safety thresholds.`;
+  }
+}
+
+function renderLog() {
+  const log = getAlertLog();
+  const el = document.getElementById("log-table");
+  if (!log.length) { el.innerHTML = `<span class="small-dim">No evaluations yet this session.</span>`; return; }
+  const rows = log.map(e => `<tr>
+    <td class="mono">${fmtTime(e.time)}</td><td>${e.station}</td>
+    <td><span class="chip ${e.level}">${e.level.toUpperCase()}</span></td>
+    <td class="mono">${e.rainRate.toFixed(1)} mm/hr</td>
+    <td class="mono">${e.maxQuake != null ? "M" + e.maxQuake.toFixed(1) : "—"}</td>
+    <td>${e.reason}</td></tr>`).join("");
+  el.innerHTML = `<table><thead><tr><th>Time</th><th>Station</th><th>Level</th><th>Rain Rate</th><th>Max Quake</th><th>Reason</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+</script>
 </body>
 </html>
