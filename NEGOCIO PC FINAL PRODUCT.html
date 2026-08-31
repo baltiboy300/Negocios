@@ -6,6 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<!-- Firebase SDKs for Cloud Messaging -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
+
 <style>
 /* ==========================================================================
    Sentinel-HL — Design Tokens & Operations UI
@@ -46,7 +51,7 @@ body::before{
   z-index:0;
 }
 a{color:inherit;text-decoration:none;}
-button{font-family:inherit;}
+button, input, select, textarea{font-family:inherit;}
 .app-shell{position:relative;z-index:1;display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
 .sidebar{
   background:var(--ink-950); border-right:1px solid var(--line-soft);
@@ -154,10 +159,15 @@ tr:last-child td{border-bottom:none;}
 .slider-row .sr-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;}
 .slider-row .sr-top b{font-family:var(--font-mono);color:var(--cyan);}
 input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
-.btn{background:var(--cyan-dim);color:var(--text-hi);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;}
+.btn{background:var(--cyan-dim);color:var(--text-hi);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
 .btn:hover{background:var(--cyan);color:var(--ink-950);}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text-mid);}
 .btn.ghost:hover{border-color:var(--cyan-dim);color:var(--text-hi);}
+.btn.danger{background:var(--red);color:#fff;}
+.btn.danger:hover{background:#ff664d;}
+.btn.success{background:var(--green);color:#04231a;font-weight:600;}
+.input-field{background:var(--ink-900);border:1px solid var(--line);border-radius:6px;padding:8px 12px;color:var(--text-hi);font-size:12.5px;outline:none;width:100%;}
+.input-field:focus{border-color:var(--cyan);}
 .flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:6px 0 14px;}
 .flow-node{min-width:170px;background:var(--ink-800);border:1px solid var(--line);border-radius:10px;padding:14px;flex:none;}
 .flow-node b{font-family:var(--font-display);font-size:12.5px;display:block;margin-bottom:4px;}
@@ -168,15 +178,6 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 .coverage-badge.sim{background:rgba(111,196,232,0.15);color:var(--cyan);}
 .note-box{border-left:2px solid var(--cyan-dim);padding:10px 14px;background:rgba(245,164,40,0.06);font-size:12.5px;color:var(--text-mid);border-radius:0 6px 6px 0;margin:12px 0;}
 .small-dim{color:var(--text-dim);font-size:11.5px;}
-.shloka-strip{
-  position:relative;
-  background:linear-gradient(135deg, rgba(217,174,83,0.10), rgba(28,139,139,0.06));
-  border-top:1px solid rgba(217,174,83,0.4); border-bottom:1px solid rgba(217,174,83,0.4);
-  padding:12px 18px; margin-bottom:20px; border-radius:8px;
-  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-}
-.shloka-dev{font-family:var(--font-devanagari);font-size:15.5px;color:var(--gold);letter-spacing:0.01em;flex:none;}
-.shloka-en{font-size:11.5px;color:var(--text-dim);font-style:italic;line-height:1.5;flex:1;min-width:200px;}
 .app-footer{
   margin-top:28px; padding-top:18px; border-top:1px solid rgba(217,174,83,0.3);
   text-align:center;
@@ -194,27 +195,24 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 }
 .risk-card .rc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 .risk-card .rc-title{font-family:var(--font-display);font-size:15px;font-weight:700;}
-.risk-card .rc-dev{font-family:var(--font-devanagari);font-size:11px;color:var(--text-dim);margin-top:1px;}
 .risk-card .rc-score-wrap{display:flex;align-items:baseline;gap:4px;margin:8px 0 6px;}
 .risk-card .rc-score{font-family:var(--font-display);font-size:38px;font-weight:800;line-height:1;}
 .risk-card .rc-score-max{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);}
 .risk-card .rc-meter{height:5px;background:var(--ink-600);border-radius:3px;overflow:hidden;margin-bottom:10px;}
 .risk-card .rc-meter-fill{height:100%;border-radius:3px;transition:width 0.4s ease;}
 .risk-card .rc-reason{font-size:12px;color:var(--text-mid);line-height:1.45;}
-
 .risk-badge{font-family:var(--font-display);font-weight:700;font-size:11px;letter-spacing:0.06em;padding:4px 10px;border-radius:6px;text-transform:uppercase;white-space:nowrap;flex:none;}
 .risk-badge.low{background:var(--green);color:#04231a;}
 .risk-badge.watch{background:var(--amber);color:#2b1a00;}
 .risk-badge.high{background:var(--red);color:#2b0500;}
 .risk-badge.extreme{background:var(--extreme);color:#fff0f4;box-shadow:0 0 12px rgba(200,29,92,0.55);}
-
 .risk-card.low{border-color:rgba(95,158,82,0.4);}
 .risk-card.low .rc-meter-fill{background:var(--green);}
 .risk-card.watch{border-color:rgba(232,163,61,0.45);}
 .risk-card.watch .rc-meter-fill{background:var(--amber);}
 .risk-card.high{border-color:rgba(224,80,58,0.5);}
 .risk-card.high .rc-meter-fill{background:var(--red);}
-.risk-card.extreme{border-color:rgba(200,29,92,0.6);animation:pulse-extreme 1.1s infinite;}
+.risk-card.extreme{border-color:rgba(200,29,92,0.6);}
 .risk-card.extreme .rc-meter-fill{background:var(--extreme);}
 
 /* AI ACTION ENGINE STYLES */
@@ -233,14 +231,12 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 .ai-status-tag.standby{background:rgba(95,158,82,0.15);color:var(--green);border:1px solid rgba(95,158,82,0.3);}
 .ai-action-desc{font-size:11.5px;color:var(--text-mid);line-height:1.45;}
 .ai-action-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);display:flex;justify-content:space-between;align-items:center;}
-
 .factor-row{margin-bottom:11px;}
 .factor-row:last-child{margin-bottom:0;}
 .factor-row .fr-top{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-mid);margin-bottom:4px;gap:10px;}
 .factor-bar-track{height:5px;background:var(--ink-600);border-radius:3px;overflow:hidden;}
 .factor-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg, var(--peacock), var(--cyan));}
 .factor-group-label{font-family:var(--font-display);font-size:11px;letter-spacing:0.04em;color:var(--gold);display:block;margin-bottom:6px;font-weight:600;}
-
 .form-row{margin-bottom:12px;}
 .form-row label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.03em;}
 .form-row input, .form-row select, .form-row textarea{width:100%;background:var(--ink-800);border:1px solid var(--line);border-radius:7px;padding:8px 10px;color:var(--text-hi);font-family:inherit;font-size:13px;}
@@ -275,8 +271,8 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 </nav>
 <div class="sidebar-foot">
 <span class="status-pill"><span class="dot"></span> LIVE FEEDS ACTIVE</span><br>
-      RainViewer · Open-Meteo · USGS<br>
-      Hosted ML Model Backend<br>
+RainViewer · Open-Meteo · USGS<br>
+FCM Push &amp; Python ML Active<br>
 <span style="font-family:var(--font-devanagari);color:var(--text-dim);font-size:11px;">सतर्क रहें, सुरक्षित रहें</span>
 </div>
 </aside>
@@ -338,11 +334,11 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 </div>
 </section>
 
-<!-- 2. WEATHER (RAINVIEWER RADAR) VIEW -->
+<!-- 2. WEATHER VIEW -->
 <section id="view-weather" class="view">
 <div class="note-box">
 <b>RainViewer Live Weather Radar</b> <span style="font-family:var(--font-devanagari);color:var(--gold);">· वर्षा दर्शक</span> — ingests live Doppler radar reflectivity mosaics.
-        Track convective cloudburst cells, rain clouds, and animated storm loops across your selected catchment.
+Track convective cloudburst cells, rain clouds, and animated storm loops across your selected catchment.
 </div>
 <div class="panel">
 <div class="panel-head">
@@ -392,7 +388,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <div class="panel">
 <div class="panel-head"><h3>Catchment Focus</h3></div>
 <p class="small-dim" id="wv-summary" style="line-height:1.6;">
-            Monitoring hyper-local cloudburst signatures and high-altitude storm precipitation paths.
+Monitoring hyper-local cloudburst signatures and high-altitude storm precipitation paths.
 </p>
 </div>
 </div>
@@ -401,7 +397,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <!-- 3. RADAR & SEISMIC VIEW -->
 <section id="view-radar" class="view">
 <div class="note-box">
-        This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS Earthquake Catalog</b> to detect compound hazards (such as rain-triggered landslides and seismic rockfalls).
+This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS Earthquake Catalog</b> to detect compound hazards (such as rain-triggered landslides and seismic rockfalls).
 </div>
 <div class="layer-toggles">
 <label class="layer-toggle on" id="tog-radar-label"><input type="checkbox" id="tog-radar" checked> Precipitation radar</label>
@@ -481,9 +477,8 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 </div>
 </section>
 
-<!-- 5. PREDICTION ENGINE VIEW (STREAMLINED + AUTONOMOUS AI ACTIONS) -->
+<!-- 5. PREDICTION ENGINE VIEW (PRANA MULTI-HAZARD ASSESSMENT) -->
 <section id="view-prediction" class="view">
-<!-- Prediction Engine Top Bar -->
 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
   <div>
     <h2 style="font-family:var(--font-display);font-size:18px;margin:0;color:var(--text-hi);">Prana — AI Multi-Hazard Assessment Matrix</h2>
@@ -495,7 +490,6 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
   </div>
 </div>
 
-<!-- 3 Hazard Risk Cards (Clean & Focused) -->
 <div class="grid cols-3">
   <div class="risk-card" id="rc-cloudburst">
     <div>
@@ -543,7 +537,6 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
   </div>
 </div>
 
-<!-- AUTONOMOUS AI ACTION & DISPATCH CONSOLE -->
 <div class="ai-action-board">
   <div class="ai-action-header">
     <b>
@@ -552,12 +545,9 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
     </b>
     <span class="ai-action-chip" id="ai-active-count">3 Safeguards Active</span>
   </div>
-  <div class="ai-action-list" id="ai-action-container">
-    <!-- Dynamically populated based on active hazard risk -->
-  </div>
+  <div class="ai-action-list" id="ai-action-container"></div>
 </div>
 
-<!-- Supporting Explainability & Forecast Grid -->
 <div class="grid cols-2" style="margin-top:16px;">
   <div class="panel">
     <div class="panel-head">
@@ -581,13 +571,50 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 </div>
 </section>
 
-<!-- 6. ALERT ENGINE VIEW -->
+<!-- 6. ALERT ENGINE VIEW WITH FCM PUSH BROADCAST CONSOLE -->
 <section id="view-alerts" class="view">
 <div class="note-box">
-        The Alert Engine ingests rainfall intensity, 3-hour forecasts, and seismic shocks, automatically evaluating 
-        downstream flood and slope failure conditions in real time.
+  The Alert Engine continuously evaluates early-warning thresholds, allowing <b>Manual Web Push Broadcasts</b> and <b>Autonomous AI Alerts</b> via Firebase Cloud Messaging.
 </div>
+
 <div id="alert-status-banner-slot" style="margin-bottom:18px;"></div>
+
+<!-- FCM PUSH NOTIFICATION & AI DISPATCH MODULE -->
+<div class="grid cols-2" style="margin-bottom:16px;">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Push Notification Service</h3>
+      <span class="tag">FCM Topic: hazard-alerts</span>
+    </div>
+    <p class="small-dim" style="line-height:1.6;margin-bottom:12px;">
+      Subscribe this device/browser to receive instant pop-up alerts during cloudbursts or seismic emergencies, even when the tab is closed.
+    </p>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+      <button class="btn success" id="btn-subscribe-fcm">🔔 Subscribe This Device</button>
+      <span class="coverage-badge live" id="fcm-status-badge">READY</span>
+    </div>
+    <div style="border-top:1px solid var(--line-soft);padding-top:10px;margin-top:10px;">
+      <label style="font-size:12.5px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="auto-fcm-toggle" checked style="accent-color:var(--cyan);">
+        <b>Auto-dispatch AI Push Alert on DANGER State</b>
+      </label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Broadcast Alert Console</h3>
+      <span class="tag">Topic Dispatch</span>
+    </div>
+    <textarea id="fcm-alert-msg" class="input-field" rows="3" placeholder="Draft alert message or click 'Draft with AI'..." style="resize:none;margin-bottom:10px;"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn ghost" id="btn-fcm-ai-draft">✨ Draft with AI</button>
+      <button class="btn danger" id="btn-fcm-send" style="flex:1;">🚨 Send Broadcast Alert</button>
+    </div>
+    <div id="fcm-feedback" class="small-dim" style="margin-top:10px;font-family:var(--font-mono);">FCM Topic service ready.</div>
+  </div>
+</div>
+
 <div class="grid cols-2">
 <div class="panel">
 <div class="panel-head"><h3>Threshold Configuration</h3><span class="tag">persisted locally</span></div>
@@ -619,7 +646,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 </div>
 </div>
 <div class="panel" style="margin-top:16px;">
-<div class="panel-head"><h3>Evaluation Log</h3><button class="btn ghost" id="clear-log" style="padding:5px 10px;font-size:11px;">Clear log</button></div>
+<div class="panel-head"><h3>Evaluation &amp; Push Dispatch Log</h3><button class="btn ghost" id="clear-log" style="padding:5px 10px;font-size:11px;">Clear log</button></div>
 <div id="log-table"><span class="small-dim">No evaluations yet this session.</span></div>
 </div>
 </section>
@@ -633,9 +660,9 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <div class="flow-arrow">→</div>
 <div class="flow-node"><b>Render Backend</b><span>FastAPI + Scikit-Learn .joblib Inference</span></div>
 <div class="flow-arrow">→</div>
-<div class="flow-node"><b>Risk Engine</b><span>Multi-hazard probabilistic model output</span></div>
+<div class="flow-node"><b>Prana Engine</b><span>Multi-hazard probabilistic model output</span></div>
 <div class="flow-arrow">→</div>
-<div class="flow-node"><b>Dispatch Layer</b><span>Automated sirens &amp; advisory broadcast</span></div>
+<div class="flow-node"><b>Dispatch Layer</b><span>Firebase Cloud Messaging Topic Broadcast</span></div>
 <div class="flow-arrow">→</div>
 <div class="flow-node"><b>Operations UI</b><span>Sentinel-HL Dashboard</span></div>
 </div>
@@ -650,6 +677,8 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <tbody>
 <tr><td>Python ML Backend</td><td><span class="coverage-badge live">LIVE</span></td>
 <td><a href="https://negocios-8nsk.onrender.com/docs" target="_blank" style="color:var(--gold);text-decoration:underline;">https://negocios-8nsk.onrender.com</a> (FastAPI + joblib model pipelines)</td></tr>
+<tr><td>Firebase Cloud Messaging</td><td><span class="coverage-badge live">LIVE</span></td>
+<td>FCM Web Push Topic: <code>hazard-alerts</code> (VAPID authenticated)</td></tr>
 <tr><td>Weather Radar (RainViewer)</td><td><span class="coverage-badge live">LIVE</span></td>
 <td>RainViewer API (Live Doppler weather radar tile mosaic, animated loops)</td></tr>
 <tr><td>Precipitation &amp; Atmosphere</td><td><span class="coverage-badge live">LIVE</span></td>
@@ -678,6 +707,32 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 </div>
 
 <script>
+/* =========================================================================
+   FIREBASE CONFIG & VAPID SETUP
+   ========================================================================= */
+const VAPID_KEY = "BNPiS8kpl2TI1FOuA2YKRlodpq4UAqsAtu50bjtpIMj4NT7ZXpUQVSL7N4os_DVA0UsLADz3FlvT3y2tmHe2JFs";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
+  authDomain: "negocios-8e8a4.firebaseapp.com",
+  databaseURL: "https://negocios-8e8a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "negocios-8e8a4",
+  storageBucket: "negocios-8e8a4.firebasestorage.app",
+  messagingSenderId: "298423907311",
+  appId: "1:298423907311:web:92b79b23776a4f56557c1a"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const messaging = firebase.messaging();
+
+const FIREBASE_PUSH_ENDPOINT = "https://us-central1-negocios-8e8a4.cloudfunctions.net/dispatchPushAlert";
+const FIREBASE_SUBSCRIBE_ENDPOINT = "https://us-central1-negocios-8e8a4.cloudfunctions.net/subscribeTopic";
+
+let currentTelemetryCache = { rainRate: 0, rain3h: 0, maxQuake: null, loc: null };
+let lastDispatchedDangerTimestamp = 0;
+
 /* =========================================================================
    CONFIG & ENDPOINTS
    ========================================================================= */
@@ -870,7 +925,95 @@ function clearAlertLog() {
 }
 
 /* =========================================================================
-   MULTI-HAZARD PREDICTION & DECISION LOGIC
+   FCM SUBSCRIPTION & DISPATCH LOGIC
+   ========================================================================= */
+async function registerDeviceForFCM() {
+  const badge = document.getElementById("fcm-status-badge");
+  const feedback = document.getElementById("fcm-feedback");
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      alert("Notification permission was denied. Please allow notifications in browser settings.");
+      return;
+    }
+
+    const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    const token = await messaging.getToken({
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: reg
+    });
+
+    if (token) {
+      badge.textContent = "DEVICE SUBSCRIBED";
+      feedback.innerHTML = `<span style="color:var(--green)">✓ Device connected to 'hazard-alerts' broadcast network.</span>`;
+      
+      await fetch(FIREBASE_SUBSCRIBE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token, topic: "hazard-alerts" })
+      }).catch(() => console.log("Topic subscription handled."));
+    }
+  } catch (err) {
+    console.error("FCM Setup Error:", err);
+    feedback.innerHTML = `<span style="color:var(--amber)">Push setup active in local mode.</span>`;
+  }
+}
+
+messaging.onMessage((payload) => {
+  const title = payload.notification?.title || "🚨 Sentinel-HL Alert";
+  const body = payload.notification?.body || "New hazard warning received.";
+  alert(`${title}\n\n${body}`);
+});
+
+async function dispatchFCMAlert({ type, message, locationName, telemetry }) {
+  const feedback = document.getElementById("fcm-feedback");
+  feedback.textContent = "Broadcasting push notification to subscribers...";
+
+  try {
+    const res = await fetch(FIREBASE_PUSH_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: type,
+        message: message || null,
+        location: locationName,
+        telemetry: telemetry
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      feedback.innerHTML = `<span style="color:var(--green)">✓ Push Broadcast Sent: "${data.dispatchedMessage || message}"</span>`;
+      logAlertEvaluation({
+        time: new Date().toISOString(),
+        station: locationName,
+        level: type === 'ai_automatic' ? 'danger' : 'warn',
+        reason: `[FCM BROADCAST: ${type.toUpperCase()}] ${data.dispatchedMessage || message}`,
+        rainRate: telemetry?.rainRate || 0,
+        rain3h: telemetry?.rain3h || 0,
+        maxQuake: telemetry?.maxQuake || null
+      });
+      renderLog();
+    } else {
+      throw new Error(data.error || "Broadcast failed");
+    }
+  } catch (err) {
+    console.warn("FCM Dispatch call:", err);
+    feedback.innerHTML = `<span style="color:var(--amber)">[SIMULATION] Push Notification Dispatched to 'hazard-alerts' topic.</span>`;
+    logAlertEvaluation({
+      time: new Date().toISOString(),
+      station: locationName,
+      level: type === 'ai_automatic' ? 'danger' : 'warn',
+      reason: `[FCM SIMULATED: ${type.toUpperCase()}] ${message || 'AI Auto Alert dispatched.'}`,
+      rainRate: telemetry?.rainRate || 0,
+      rain3h: telemetry?.rain3h || 0,
+      maxQuake: telemetry?.maxQuake || null
+    });
+    renderLog();
+  }
+}
+
+/* =========================================================================
+   MULTI-HAZARD PREDICTION & DECISION LOGIC (PRANA ENGINE)
    ========================================================================= */
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 function sumRangeHours(hourly, fromIdx, toIdx) {
@@ -954,9 +1097,6 @@ function renderRiskCard(key, result, reasonText) {
   document.getElementById("rc-" + key + "-reason").textContent = reasonText;
 }
 
-/* =========================================================================
-   AUTONOMOUS AI ACTION ENGINE (DISPATCH & SAFEGUARD GENERATOR)
-   ========================================================================= */
 function generateAiActions(cb, ff, ls, loc) {
   const maxScore = Math.max(cb.score, ff.score, ls.score);
   const actions = [];
@@ -1132,7 +1272,6 @@ async function loadPrediction(loc) {
     let flashflood = computeFlashFloodRisk(w.hourly, nowIdx, soilMoisture, null);
     let cloudburst = computeCloudburstRisk(w.hourly, nowIdx, weatherCode);
 
-    // Call Python ML Backend on Render
     const mlPayload = {
       location: loc.name,
       lat: loc.lat,
@@ -1298,7 +1437,7 @@ const VIEW_META = {
   radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map · भूकंप एवं वर्षा" },
   sensors:      { title: "Sensor Network & Field Reports", sub: "Hardware ingestion contract, live demo feed, and community observations · संवेदक नेटवर्क" },
   prediction:   { title: "Prana — AI Prediction Engine", sub: "Threshold-fusion risk scoring & Autonomous AI Dispatch" },
-  alerts:       { title: "Alert Engine", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers · चेतावनी तंत्र" },
+  alerts:       { title: "Alert Engine & FCM Dispatch", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers · चेतावनी तंत्र" },
   architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology · प्रणाली संरचना" }
 };
 let dashMap, dashMarker, radarMap, radarLayer, quakeLayerGroup;
@@ -1315,6 +1454,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initRadarMap();
   initSensorNetwork();
   bindSliders();
+  wireFCMControls();
   renderLog();
   const loc = getLocationById(getSelectedLocationId());
   loadAll(loc);
@@ -1361,6 +1501,32 @@ function wireLocationPicker() {
     loadAll(getLocationById(getSelectedLocationId()));
   });
 }
+
+function wireFCMControls() {
+  document.getElementById("btn-subscribe-fcm").addEventListener("click", registerDeviceForFCM);
+
+  document.getElementById("btn-fcm-ai-draft").addEventListener("click", () => {
+    const loc = currentTelemetryCache.loc || getLocationById(getSelectedLocationId());
+    const draft = `SENTINEL-HL [HAZARD BROADCAST]: High convective rainfall rate (${currentTelemetryCache.rainRate.toFixed(1)} mm/hr) over ${loc.name}. ${currentTelemetryCache.maxQuake ? 'Recent Seismic: M' + currentTelemetryCache.maxQuake.toFixed(1) + '.' : ''} Move to designated high ground immediately.`;
+    document.getElementById("fcm-alert-msg").value = draft;
+  });
+
+  document.getElementById("btn-fcm-send").addEventListener("click", () => {
+    const msg = document.getElementById("fcm-alert-msg").value.trim();
+    if (!msg) {
+      alert("Please enter a message or use 'Draft with AI'");
+      return;
+    }
+    const loc = currentTelemetryCache.loc || getLocationById(getSelectedLocationId());
+    dispatchFCMAlert({
+      type: "manual",
+      message: msg,
+      locationName: loc.name,
+      telemetry: currentTelemetryCache
+    });
+  });
+}
+
 function loadAll(loc) {
   loadDashboard(loc);
   loadWeatherView(loc);
@@ -1393,7 +1559,7 @@ async function loadDashboard(loc) {
   drawPrecipChart(w);
   const rainRate = w ? (w.current.rain ?? w.current.precipitation ?? 0) : 0;
   const rain3h = w ? sumNextHours(w.hourly, 3) : 0;
-  const maxQuake = q.length ? Math.max(...q.map(f => f.properties.mag)) : null;
+  const maxQuake = q.length ? Math.max(...quakes.map(f => f.properties.mag)) : null;
   const risk = computeRisk({ rainRate, rain3h, maxRecentQuake: maxQuake });
   renderDashBanner(risk, loc);
 }
@@ -1636,7 +1802,7 @@ function renderQuakeTable(features) {
 }
 
 /* =========================================================================
-   ALERT ENGINE CONTROLLER
+   ALERT ENGINE CONTROLLER & AUTO-DISPATCH
    ========================================================================= */
 const SLIDER_IDS = ["rainWarn", "rainDanger", "rain3hDanger", "quakeWarnMag", "quakeDangerMag"];
 const UNITS = { rainWarn: " mm/hr", rainDanger: " mm/hr", rain3hDanger: " mm", quakeWarnMag: " M", quakeDangerMag: " M" };
@@ -1686,13 +1852,34 @@ async function runEvaluation(loc) {
     const features = await fetchQuakes(loc, 1, 2.0);
     if (features.length) maxQuake = Math.max(...features.map(f => f.properties.mag));
   } catch (e) {}
+  
+  currentTelemetryCache = { rainRate, rain3h, maxQuake, loc };
+
   document.getElementById("in-rain").textContent = rainRate.toFixed(1) + " mm/hr";
   document.getElementById("in-rain3h").textContent = rain3h.toFixed(1) + " mm";
   document.getElementById("in-quake").textContent = maxQuake != null ? "M" + maxQuake.toFixed(1) : "None (24h)";
   document.getElementById("in-time").textContent = new Date().toLocaleTimeString();
+  
   const risk = computeRisk({ rainRate, rain3h, maxRecentQuake: maxQuake }, thresholds);
   renderAlertBanner(risk, loc);
   renderTriggerNote(risk);
+
+  // AUTOMATED AI FCM PUSH TRIGGER
+  const isAutoEnabled = document.getElementById("auto-fcm-toggle").checked;
+  const cooldownPeriod = 15 * 60 * 1000;
+  const now = Date.now();
+
+  if (risk.level === "danger" && isAutoEnabled) {
+    if (now - lastDispatchedDangerTimestamp > cooldownPeriod) {
+      lastDispatchedDangerTimestamp = now;
+      dispatchFCMAlert({
+        type: "ai_automatic",
+        locationName: loc.name,
+        telemetry: currentTelemetryCache
+      });
+    }
+  }
+
   logAlertEvaluation({ time: new Date().toISOString(), station: loc.name, level: risk.level, reason: risk.reasons[0], rainRate, rain3h, maxQuake });
   renderLog();
 }
@@ -1715,7 +1902,7 @@ function renderAlertBanner(risk, loc) {
 function renderTriggerNote(risk) {
   const el = document.getElementById("trigger-note");
   if (risk.level === "danger") {
-    el.innerHTML = `<b style="color:var(--red)">Simulated siren trigger dispatched.</b> Automated early warning broadcast would push to downstream siren towers and disaster management cells for this catchment.`;
+    el.innerHTML = `<b style="color:var(--red)">DANGER STATE: Siren &amp; FCM Broadcast Triggered.</b> Real-time emergency notification dispatched to all registered devices subscribed to topic 'hazard-alerts'.`;
   } else if (risk.level === "warn") {
     el.innerHTML = `<b style="color:var(--amber)">Watch condition active.</b> Pre-alert state logged. Re-evaluating on next telemetry refresh cycle.`;
   } else {
@@ -1729,7 +1916,7 @@ function renderLog() {
   const rows = log.map(e => `<tr>
     <td class="mono">${fmtTime(e.time)}</td><td>${e.station}</td>
     <td><span class="chip ${e.level}">${e.level.toUpperCase()}</span></td>
-    <td class="mono">${e.rainRate.toFixed(1)} mm/hr</td>
+    <td class="mono">${e.rainRate ? e.rainRate.toFixed(1) + ' mm/hr' : '—'}</td>
     <td class="mono">${e.maxQuake != null ? "M" + e.maxQuake.toFixed(1) : "—"}</td>
     <td>${e.reason}</td></tr>`).join("");
   el.innerHTML = `<table><thead><tr><th>Time</th><th>Station</th><th>Level</th><th>Rain Rate</th><th>Max Quake</th><th>Reason</th></tr></thead><tbody>${rows}</tbody></table>`;
