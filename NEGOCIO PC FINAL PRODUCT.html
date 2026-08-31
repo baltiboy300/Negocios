@@ -574,7 +574,7 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 <!-- 6. ALERT ENGINE VIEW WITH FCM PUSH BROADCAST CONSOLE -->
 <section id="view-alerts" class="view">
 <div class="note-box">
-  The Alert Engine continuously evaluates early-warning thresholds, allowing <b>Manual Web Push Broadcasts</b> and <b>Autonomous AI Alerts</b> via Firebase Cloud Messaging.
+  The Alert Engine continuously evaluates early-warning thresholds, allowing <b>Manual Web Push Broadcasts</b> and <b>Autonomous AI Alerts</b> via Firebase Cloud Messaging connected through your Render backend.
 </div>
 
 <div id="alert-status-banner-slot" style="margin-bottom:18px;"></div>
@@ -591,7 +591,7 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
     </p>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
       <button class="btn success" id="btn-subscribe-fcm">🔔 Subscribe This Device</button>
-      <span class="coverage-badge live" id="fcm-status-badge">READY</span>
+      <span class="coverage-badge sim" id="fcm-status-badge">NOT SUBSCRIBED</span>
     </div>
     <div style="border-top:1px solid var(--line-soft);padding-top:10px;margin-top:10px;">
       <label style="font-size:12.5px;display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -658,7 +658,7 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 <div class="flow">
 <div class="flow-node"><b>Sensing Layer</b><span>RainViewer Doppler, Open-Meteo AWS, USGS Catalog</span></div>
 <div class="flow-arrow">→</div>
-<div class="flow-node"><b>Render Backend</b><span>FastAPI + Scikit-Learn .joblib Inference</span></div>
+<div class="flow-node"><b>Render Backend</b><span>FastAPI + Scikit-Learn .joblib + Firebase Admin</span></div>
 <div class="flow-arrow">→</div>
 <div class="flow-node"><b>Prana Engine</b><span>Multi-hazard probabilistic model output</span></div>
 <div class="flow-arrow">→</div>
@@ -676,7 +676,7 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 <thead><tr><th>Component</th><th>Status</th><th>Endpoint &amp; Implementation Details</th></tr></thead>
 <tbody>
 <tr><td>Python ML Backend</td><td><span class="coverage-badge live">LIVE</span></td>
-<td><a href="https://negocios-8nsk.onrender.com/docs" target="_blank" style="color:var(--gold);text-decoration:underline;">https://negocios-8nsk.onrender.com</a> (FastAPI + joblib model pipelines)</td></tr>
+<td><a href="https://negocios-8nsk.onrender.com/docs" target="_blank" style="color:var(--gold);text-decoration:underline;">https://negocios-8nsk.onrender.com</a> (FastAPI + joblib model pipelines + FCM Dispatch)</td></tr>
 <tr><td>Firebase Cloud Messaging</td><td><span class="coverage-badge live">LIVE</span></td>
 <td>FCM Web Push Topic: <code>hazard-alerts</code> (VAPID authenticated)</td></tr>
 <tr><td>Weather Radar (RainViewer)</td><td><span class="coverage-badge live">LIVE</span></td>
@@ -727,8 +727,10 @@ if (!firebase.apps.length) {
 }
 const messaging = firebase.messaging();
 
-const FIREBASE_PUSH_ENDPOINT = "https://us-central1-negocios-8e8a4.cloudfunctions.net/dispatchPushAlert";
-const FIREBASE_SUBSCRIBE_ENDPOINT = "https://us-central1-negocios-8e8a4.cloudfunctions.net/subscribeTopic";
+// Connected to your live Python FastAPI backend on Render
+const PYTHON_BACKEND_URL = "https://negocios-8nsk.onrender.com";
+const FIREBASE_PUSH_ENDPOINT = `${PYTHON_BACKEND_URL}/dispatch-push`;
+const FIREBASE_SUBSCRIBE_ENDPOINT = `${PYTHON_BACKEND_URL}/subscribe-topic`;
 
 let currentTelemetryCache = { rainRate: 0, rain3h: 0, maxQuake: null, loc: null };
 let lastDispatchedDangerTimestamp = 0;
@@ -736,8 +738,6 @@ let lastDispatchedDangerTimestamp = 0;
 /* =========================================================================
    CONFIG & ENDPOINTS
    ========================================================================= */
-const PYTHON_BACKEND_URL = "https://negocios-8nsk.onrender.com";
-
 const LOCATIONS = [
   { id: "kedarnath",  name: "Kedarnath, Uttarakhand",     lat: 30.7346, lon: 79.0669, region: "Western Himalaya" },
   { id: "uttarkashi", name: "Dharali / Uttarkashi, UK",    lat: 30.7900, lon: 78.4600, region: "Western Himalaya" },
@@ -930,10 +930,13 @@ function clearAlertLog() {
 async function registerDeviceForFCM() {
   const badge = document.getElementById("fcm-status-badge");
   const feedback = document.getElementById("fcm-feedback");
+  feedback.textContent = "Connecting device to FCM & Backend...";
+
   try {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      alert("Notification permission was denied. Please allow notifications in browser settings.");
+      alert("Notification permission was denied. Please allow notifications in your browser settings.");
+      feedback.textContent = "Notification permission denied.";
       return;
     }
 
@@ -944,18 +947,35 @@ async function registerDeviceForFCM() {
     });
 
     if (token) {
+      localStorage.setItem("hlews_fcm_token", token);
       badge.textContent = "DEVICE SUBSCRIBED";
-      feedback.innerHTML = `<span style="color:var(--green)">✓ Device connected to 'hazard-alerts' broadcast network.</span>`;
+      badge.className = "coverage-badge live";
+      feedback.innerHTML = `<span style="color:var(--green)">✓ Device registered & subscribed to 'hazard-alerts' network.</span>`;
       
-      await fetch(FIREBASE_SUBSCRIBE_ENDPOINT, {
+      const res = await fetch(FIREBASE_SUBSCRIBE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: token, topic: "hazard-alerts" })
-      }).catch(() => console.log("Topic subscription handled."));
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        console.warn("Backend topic registration notice:", data);
+      }
     }
   } catch (err) {
     console.error("FCM Setup Error:", err);
-    feedback.innerHTML = `<span style="color:var(--amber)">Push setup active in local mode.</span>`;
+    feedback.innerHTML = `<span style="color:var(--red)">Registration failed: ${err.message}</span>`;
+  }
+}
+
+function checkExistingFCMSubscription() {
+  const savedToken = localStorage.getItem("hlews_fcm_token");
+  if (savedToken && Notification.permission === "granted") {
+    const badge = document.getElementById("fcm-status-badge");
+    if (badge) {
+      badge.textContent = "DEVICE SUBSCRIBED";
+      badge.className = "coverage-badge live";
+    }
   }
 }
 
@@ -967,7 +987,7 @@ messaging.onMessage((payload) => {
 
 async function dispatchFCMAlert({ type, message, locationName, telemetry }) {
   const feedback = document.getElementById("fcm-feedback");
-  feedback.textContent = "Broadcasting push notification to subscribers...";
+  feedback.textContent = "Broadcasting push notification to subscribers via Python backend...";
 
   try {
     const res = await fetch(FIREBASE_PUSH_ENDPOINT, {
@@ -994,21 +1014,11 @@ async function dispatchFCMAlert({ type, message, locationName, telemetry }) {
       });
       renderLog();
     } else {
-      throw new Error(data.error || "Broadcast failed");
+      throw new Error(data.detail || data.error || "Broadcast request failed");
     }
   } catch (err) {
-    console.warn("FCM Dispatch call:", err);
-    feedback.innerHTML = `<span style="color:var(--amber)">[SIMULATION] Push Notification Dispatched to 'hazard-alerts' topic.</span>`;
-    logAlertEvaluation({
-      time: new Date().toISOString(),
-      station: locationName,
-      level: type === 'ai_automatic' ? 'danger' : 'warn',
-      reason: `[FCM SIMULATED: ${type.toUpperCase()}] ${message || 'AI Auto Alert dispatched.'}`,
-      rainRate: telemetry?.rainRate || 0,
-      rain3h: telemetry?.rain3h || 0,
-      maxQuake: telemetry?.maxQuake || null
-    });
-    renderLog();
+    console.error("FCM Dispatch call failed:", err);
+    feedback.innerHTML = `<span style="color:var(--red)">Dispatch Failed: ${err.message}. Check backend logs.</span>`;
   }
 }
 
@@ -1455,6 +1465,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSensorNetwork();
   bindSliders();
   wireFCMControls();
+  checkExistingFCMSubscription();
   renderLog();
   const loc = getLocationById(getSelectedLocationId());
   loadAll(loc);
