@@ -1,10 +1,28 @@
+import os
+from typing import Optional
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Optional
+
+import firebase_admin
+from firebase_admin import credentials, messaging
 
 from . import data_sources, sensors, risk_engine
 from .locations import SITES, SITES_BY_ID
+
+# ---------------------------------------------------------------------------
+# Firebase Admin SDK Initialization
+# ---------------------------------------------------------------------------
+if not firebase_admin._apps:
+    # Looks for 'firebase-key.json' in the same directory as main.py
+    key_path = os.path.join(os.path.dirname(__file__), "firebase-key.json")
+    if os.path.exists(key_path):
+        cred = credentials.Certificate(key_path)
+        firebase_admin.initialize_app(cred)
+    else:
+        # Fallback to default environment credentials if key file is omitted
+        firebase_admin.initialize_app()
 
 app = FastAPI(
     title="Himalaya Multi-Hazard Early Warning API",
@@ -21,6 +39,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -52,8 +71,15 @@ async def get_risk(site_id: str):
 @app.get("/risk")
 async def get_risk_by_coords(lat: float, lon: float, name: str = "custom_point"):
     """Assess risk for any arbitrary point, not just the preset sites."""
-    site = {"id": f"custom_{lat}_{lon}", "name": name, "lat": lat, "lon": lon,
-            "country": "unknown", "state_or_province": "", "notes": "ad-hoc point"}
+    site = {
+        "id": f"custom_{lat}_{lon}",
+        "name": name,
+        "lat": lat,
+        "lon": lon,
+        "country": "unknown",
+        "state_or_province": "",
+        "notes": "ad-hoc point"
+    }
     return await risk_engine.assess_site(site)
 
 
@@ -64,10 +90,54 @@ async def get_radar():
 
 
 # ---------------------------------------------------------------------------
-# Sensor ingest -- real endpoint, ready for real hardware. Any device that
-# can POST JSON (an actual X-band radar controller, an ultrasonic weather
-# station's data logger, etc.) can push here and the risk engine will use
-# real data instead of the simulator automatically.
+# Firebase Cloud Messaging (FCM) Push Endpoints
+# ---------------------------------------------------------------------------
+
+class SubscribePayload(BaseModel):
+    token: str
+    topic: str = "hazard-alerts"
+
+
+class AlertPayload(BaseModel):
+    type: str = "manual"
+    message: Optional[str] = None
+    location: Optional[str] = None
+    telemetry: Optional[dict] = None
+
+
+@app.post("/subscribe-topic")
+async def subscribe_topic(data: SubscribePayload):
+    """Subscribes a client device's FCM registration token to a broadcast topic."""
+    try:
+        response = messaging.subscribe_to_topic([data.token], data.topic)
+        return {"success": True, "subscribedCount": response.success_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"FCM Subscription Error: {str(e)}")
+
+
+@app.post("/dispatch-push")
+async def dispatch_push(data: AlertPayload):
+    """Broadcasts a live emergency push alert to all devices registered on the topic."""
+    try:
+        alert_text = data.message or "Hazard threshold breached in your monitored sector."
+        location_name = data.location or "Catchment Sector"
+
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=f"🚨 SENTINEL-HL ALERT · {location_name}",
+                body=alert_text,
+            ),
+            topic="hazard-alerts"
+        )
+
+        response = messaging.send(message)
+        return {"success": True, "dispatchedMessage": alert_text, "fcm_id": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"FCM Dispatch Error: {str(e)}")
+
+
+# ---------------------------------------------------------------------------
+# Sensor ingest
 # ---------------------------------------------------------------------------
 
 class SensorIngest(BaseModel):
@@ -87,7 +157,7 @@ def ingest(sensor_type: str, body: SensorIngest):
 
 
 # ---------------------------------------------------------------------------
-# Citizen reports -- fully real, working feature.
+# Citizen reports
 # ---------------------------------------------------------------------------
 
 class CitizenReportIn(BaseModel):
