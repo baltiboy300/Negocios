@@ -150,7 +150,7 @@ tr:last-child td{border-bottom:none;}
 .chip.danger{background:rgba(224,80,58,0.18);color:var(--red);}
 .map-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-soft);}
 .map-wrap .leaflet-container{background:var(--ink-900);}
-#map,#map-weather,#map-radar,#map-uav{height:440px;width:100%;}
+#map,#map-weather,#map-radar{height:440px;width:100%;}
 .layer-toggles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
 .layer-toggle{display:flex;align-items:center;gap:7px;background:var(--ink-800);border:1px solid var(--line);border-radius:20px;padding:6px 12px 6px 8px;font-size:12px;cursor:pointer;color:var(--text-mid);}
 .layer-toggle input{accent-color:var(--cyan);}
@@ -185,32 +185,6 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 .app-footer .footer-dev{font-family:var(--font-devanagari);font-size:14px;color:var(--gold);margin-bottom:6px;}
 .app-footer .footer-en{font-size:11px;color:var(--text-dim);font-style:italic;}
 .app-footer .footer-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);opacity:0.7;margin-top:8px;letter-spacing:0.04em;}
-
-/* SUB-TAB BAR */
-.subtab-bar{
-  display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--line-soft); padding-bottom:8px;
-}
-.subtab-btn{
-  background:var(--ink-800); border:1px solid var(--line); color:var(--text-mid);
-  padding:6px 14px; border-radius:6px; font-size:12.5px; cursor:pointer; font-weight:500;
-  transition:all 0.15s ease;
-}
-.subtab-btn:hover{color:var(--text-hi);border-color:var(--cyan-dim);}
-.subtab-btn.active{background:var(--cyan-dim);color:var(--text-hi);border-color:var(--cyan);}
-.subtab-content{display:none;}
-.subtab-content.active{display:block;}
-
-/* MATH BREAKDOWN CARDS */
-.math-card{
-  background:var(--ink-950); border:1px solid var(--line); border-radius:var(--radius);
-  padding:16px 18px; margin-bottom:14px;
-}
-.math-card h4{margin:0 0 8px; font-family:var(--font-display); font-size:14px; color:var(--gold);}
-.math-eq{
-  font-family:var(--font-mono); background:var(--ink-900); border:1px solid var(--line-soft);
-  padding:8px 12px; border-radius:6px; color:var(--text-hi); font-size:12px; margin:8px 0; overflow-x:auto;
-}
-.math-step{font-size:12px; color:var(--text-mid); line-height:1.6; margin-top:6px;}
 
 /* PREDICTION ENGINE MISSION CONTROL STYLING */
 .risk-card{
@@ -290,7 +264,6 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <button class="nav-btn active" data-view="dashboard"><span class="dot"></span><span class="nav-label">Dashboard<span class="dev">सारांश</span></span></button>
 <button class="nav-btn" data-view="weather"><span class="dot"></span><span class="nav-label">Weather Radar<span class="dev">मौसम</span></span></button>
 <button class="nav-btn" data-view="radar"><span class="dot"></span><span class="nav-label">Radar &amp; Seismic<span class="dev">भूकंप राडार</span></span></button>
-<button class="nav-btn" data-view="uav"><span class="dot"></span><span class="nav-label">UAV Telemetry<span class="dev">ड्रोन गश्ती</span></span></button>
 <button class="nav-btn" data-view="sensors"><span class="dot"></span><span class="nav-label">Sensor Network<span class="dev">संवेदक नेटवर्क</span></span></button>
 <button class="nav-btn" data-view="prediction"><span class="dot"></span><span class="nav-label">Prana Engine<span class="dev">प्राण</span></span></button>
 <button class="nav-btn" data-view="alerts"><span class="dot"></span><span class="nav-label">Alert Engine<span class="dev">चेतावनी</span></span></button>
@@ -299,7 +272,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <div class="sidebar-foot">
 <span class="status-pill"><span class="dot"></span> LIVE FEEDS ACTIVE</span><br>
 RainViewer · Open-Meteo · USGS<br>
-UAV Edge Stream &amp; ML Active<br>
+FCM Push &amp; Python ML Active<br>
 <span style="font-family:var(--font-devanagari);color:var(--text-dim);font-size:11px;">सतर्क रहें, सुरक्षित रहें</span>
 </div>
 </aside>
@@ -455,50 +428,7 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 </div>
 </section>
 
-<!-- 4. UAV LIVE TRACKING VIEW (NEW TAB) -->
-<section id="view-uav" class="view">
-<div class="note-box">
-<b>Sentinel-HL Autonomous Weather UAV Array</b> — Live edge aerial reconnaissance. Real-time atmospheric sounding, boundary layer lapse rate, and convective cloud tracking directly across valley corridors.
-</div>
-<div class="grid cols-4" style="margin-bottom:16px;">
-<div class="metric-card">
-  <div class="label">UAV Call Sign</div>
-  <div class="value" style="font-size:22px;color:var(--cyan);">GARUDA-01</div>
-  <div class="meta">Status: <span class="chip ok" id="uav-status-chip">IN FLIGHT</span></div>
-</div>
-<div class="metric-card">
-  <div class="label">Altitude (MSL)</div>
-  <div class="value" id="uav-alt">3,420<small>m</small></div>
-  <div class="meta" id="uav-speed">Ground Speed: 42 km/h</div>
-</div>
-<div class="metric-card">
-  <div class="label">Sounding Lapse Rate</div>
-  <div class="value" id="uav-lapse">-5.8<small>°C/km</small></div>
-  <div class="meta" id="uav-lapse-status">Profile: Neutral</div>
-</div>
-<div class="metric-card">
-  <div class="label">Battery &amp; Telemetry Link</div>
-  <div class="value" id="uav-batt">84<small>%</small></div>
-  <div class="meta">Telemetry: 900MHz LoRa (Active)</div>
-</div>
-</div>
-<div class="panel">
-<div class="panel-head">
-  <h3>Live UAV Flight Vector &amp; Catchment Sounding</h3>
-  <span class="tag" id="uav-gps-tag">GPS Fix: 3D Lock (12 Sats)</span>
-</div>
-<div class="map-wrap"><div id="map-uav"></div></div>
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap;">
-  <div style="display:flex;gap:10px;">
-    <button class="btn" id="uav-recon-btn">🔄 Reroute Catchment Sweep</button>
-    <button class="btn ghost" id="uav-rtl-btn">🏠 Return To Base (RTL)</button>
-  </div>
-  <div class="mono small-dim" id="uav-telemetry-str">Lat: 0.0000 · Lon: 0.0000 · Heading: 045°</div>
-</div>
-</div>
-</section>
-
-<!-- 5. SENSOR NETWORK VIEW -->
+<!-- 4. SENSOR NETWORK VIEW -->
 <section id="view-sensors" class="view">
 <div class="note-box">
 <b>Scope note:</b> Live API integration enabled with your hosted Python ML server. The demo simulated feed and hardware contract allow exercising local edge sensor signals.
@@ -547,9 +477,9 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 </div>
 </section>
 
-<!-- 6. PREDICTION ENGINE VIEW (PRANA MULTI-HAZARD WITH SUB-TABS) -->
+<!-- 5. PREDICTION ENGINE VIEW (PRANA MULTI-HAZARD ASSESSMENT) -->
 <section id="view-prediction" class="view">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
   <div>
     <h2 style="font-family:var(--font-display);font-size:18px;margin:0;color:var(--text-hi);">Prana — AI Multi-Hazard Assessment Matrix</h2>
     <div class="small-dim" id="prediction-status">Connecting to hosted Python model API…</div>
@@ -560,139 +490,88 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
   </div>
 </div>
 
-<!-- SUB-TAB BAR -->
-<div class="subtab-bar">
-  <button class="subtab-btn active" data-subtab="matrix">Risk Assessment Matrix</button>
-  <button class="subtab-btn" data-subtab="math">Calculation Engine &amp; Mathematical Proofs</button>
-</div>
-
-<!-- SUBTAB 1: RISK ASSESSMENT MATRIX -->
-<div id="subtab-matrix" class="subtab-content active">
-  <div class="grid cols-3">
-    <div class="risk-card" id="rc-cloudburst">
-      <div>
-        <div class="rc-head">
-          <div><div class="rc-title">Cloudburst</div></div>
-          <span class="risk-badge" id="rc-cloudburst-badge">–</span>
-        </div>
-        <div class="rc-score-wrap">
-          <span class="rc-score" id="rc-cloudburst-score">–</span>
-          <span class="rc-score-max">/ 100</span>
-        </div>
-        <div class="rc-meter"><div class="rc-meter-fill" id="rc-cloudburst-meter" style="width:0%;"></div></div>
+<div class="grid cols-3">
+  <div class="risk-card" id="rc-cloudburst">
+    <div>
+      <div class="rc-head">
+        <div><div class="rc-title">Cloudburst</div></div>
+        <span class="risk-badge" id="rc-cloudburst-badge">–</span>
       </div>
-      <div class="rc-reason" id="rc-cloudburst-reason">Evaluating convective satellite &amp; radar telemetry…</div>
-    </div>
-
-    <div class="risk-card" id="rc-flashflood">
-      <div>
-        <div class="rc-head">
-          <div><div class="rc-title">Flash Flood</div></div>
-          <span class="risk-badge" id="rc-flashflood-badge">–</span>
-        </div>
-        <div class="rc-score-wrap">
-          <span class="rc-score" id="rc-flashflood-score">–</span>
-          <span class="rc-score-max">/ 100</span>
-        </div>
-        <div class="rc-meter"><div class="rc-meter-fill" id="rc-flashflood-meter" style="width:0%;"></div></div>
+      <div class="rc-score-wrap">
+        <span class="rc-score" id="rc-cloudburst-score">–</span>
+        <span class="rc-score-max">/ 100</span>
       </div>
-      <div class="rc-reason" id="rc-flashflood-reason">Analyzing antecedent soil saturation &amp; GloFAS routing…</div>
+      <div class="rc-meter"><div class="rc-meter-fill" id="rc-cloudburst-meter" style="width:0%;"></div></div>
     </div>
-
-    <div class="risk-card" id="rc-landslide">
-      <div>
-        <div class="rc-head">
-          <div><div class="rc-title">Landslide</div></div>
-          <span class="risk-badge" id="rc-landslide-badge">–</span>
-        </div>
-        <div class="rc-score-wrap">
-          <span class="rc-score" id="rc-landslide-score">–</span>
-          <span class="rc-score-max">/ 100</span>
-        </div>
-        <div class="rc-meter"><div class="rc-meter-fill" id="rc-landslide-meter" style="width:0%;"></div></div>
-      </div>
-      <div class="rc-reason" id="rc-landslide-reason">Evaluating rainfall intensity duration &amp; seismic shock…</div>
-    </div>
+    <div class="rc-reason" id="rc-cloudburst-reason">Evaluating convective satellite &amp; radar telemetry…</div>
   </div>
 
-  <div class="ai-action-board">
-    <div class="ai-action-header">
-      <b>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cyan);"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        Prana Autonomous Response Engine — Active Operations
-      </b>
-      <span class="ai-action-chip" id="ai-active-count">3 Safeguards Active</span>
+  <div class="risk-card" id="rc-flashflood">
+    <div>
+      <div class="rc-head">
+        <div><div class="rc-title">Flash Flood</div></div>
+        <span class="risk-badge" id="rc-flashflood-badge">–</span>
+      </div>
+      <div class="rc-score-wrap">
+        <span class="rc-score" id="rc-flashflood-score">–</span>
+        <span class="rc-score-max">/ 100</span>
+      </div>
+      <div class="rc-meter"><div class="rc-meter-fill" id="rc-flashflood-meter" style="width:0%;"></div></div>
     </div>
-    <div class="ai-action-list" id="ai-action-container"></div>
+    <div class="rc-reason" id="rc-flashflood-reason">Analyzing antecedent soil saturation &amp; GloFAS routing…</div>
   </div>
 
-  <div class="grid cols-2" style="margin-top:16px;">
-    <div class="panel">
-      <div class="panel-head">
-        <h3>Multi-Signal Explainability Breakdown</h3>
-        <span class="tag">telemetry weight</span>
+  <div class="risk-card" id="rc-landslide">
+    <div>
+      <div class="rc-head">
+        <div><div class="rc-title">Landslide</div></div>
+        <span class="risk-badge" id="rc-landslide-badge">–</span>
       </div>
-      <div id="factor-breakdown"><span class="small-dim">Loading…</span></div>
+      <div class="rc-score-wrap">
+        <span class="rc-score" id="rc-landslide-score">–</span>
+        <span class="rc-score-max">/ 100</span>
+      </div>
+      <div class="rc-meter"><div class="rc-meter-fill" id="rc-landslide-meter" style="width:0%;"></div></div>
     </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <h3>6-Hour Precipitation Trajectory &amp; Runoff</h3>
-        <span class="tag">hourly mm</span>
-      </div>
-      <svg id="trajectory-chart" viewBox="0 0 400 130" style="width:100%;height:130px;"></svg>
-      <div class="small-dim" id="trajectory-summary" style="margin-top:6px;"></div>
-      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);" class="small-dim" id="ai-ensemble-summary">
-        Connecting to Prana 64-member AI Ensemble…
-      </div>
-    </div>
+    <div class="rc-reason" id="rc-landslide-reason">Evaluating rainfall intensity duration &amp; seismic shock…</div>
   </div>
 </div>
 
-<!-- SUBTAB 2: MATHEMATICAL CALCULATION ENGINE (NEW SUB-TAB) -->
-<div id="subtab-math" class="subtab-content">
-  <div class="note-box">
-    <b>Deterministic Equation Transparency:</b> Sentinel-HL pairs empirical physics formulas (Caine Intensity-Duration, Saturation Hydro-Routing, Convective Cloudburst Scaling) with Scikit-learn inference trees. Below is the active mathematical derivation calculated on live telemetry.
+<div class="ai-action-board">
+  <div class="ai-action-header">
+    <b>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cyan);"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      Prana Autonomous Response Engine — Active Operations
+    </b>
+    <span class="ai-action-chip" id="ai-active-count">3 Safeguards Active</span>
+  </div>
+  <div class="ai-action-list" id="ai-action-container"></div>
+</div>
+
+<div class="grid cols-2" style="margin-top:16px;">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Multi-Signal Explainability Breakdown</h3>
+      <span class="tag">telemetry weight</span>
+    </div>
+    <div id="factor-breakdown"><span class="small-dim">Loading…</span></div>
   </div>
 
-  <!-- 1. LANDSLIDE PROOF -->
-  <div class="math-card">
-    <h4>1. Landslide Risk Proof — Caine Intensity-Duration &amp; Antecedent Soil Moisture</h4>
-    <div class="math-eq">
-      I_c(D) = 14.82 \times D^{-0.39} \quad \text{mm/hr} \\
-      \text{Risk}_{\text{Landslide}} = \min\Big(100,\; \max_{D \in \{1,3,6,12,24\}}\left(\frac{I_{\text{obs}}(D)}{I_c(D)}\right) \times 55 + B_{\text{antecedent}} + B_{\text{seismic}}\Big)
+  <div class="panel">
+    <div class="panel-head">
+      <h3>6-Hour Precipitation Trajectory &amp; Runoff</h3>
+      <span class="tag">hourly mm</span>
     </div>
-    <div class="math-step" id="math-landslide-steps">
-      Evaluating live telemetry inputs for Caine curve...
-    </div>
-  </div>
-
-  <!-- 2. FLASH FLOOD PROOF -->
-  <div class="math-card">
-    <h4>2. Flash Flood Risk Proof — Effective Saturation Threshold &amp; Hydro-Routing</h4>
-    <div class="math-eq">
-      T_{\text{eff}} = T_{\text{base}} \times \left(1 - 0.40 \times \min\left(1, \frac{\theta}{\theta_{\text{sat}}}\right)\right), \quad T_{\text{base}} = 50\text{ mm},\; \theta_{\text{sat}} = 0.45\text{ m}^3/\text{m}^3 \\
-      \text{Risk}_{\text{Flash Flood}} = \min\Big(100,\; \left(\frac{P_{3h}}{T_{\text{eff}}}\right) \times 60 + B_{24h} + B_{\text{hydro}}\Big)
-    </div>
-    <div class="math-step" id="math-flashflood-steps">
-      Evaluating live 3-hour precipitation vs volumetric soil water content...
-    </div>
-  </div>
-
-  <!-- 3. CLOUDBURST PROOF -->
-  <div class="math-card">
-    <h4>3. Cloudburst Risk Proof — Convective Precipitation Rate Scaling</h4>
-    <div class="math-eq">
-      \text{Risk}_{\text{Cloudburst}} = \min\Big(100,\; \left(\frac{\max(P_{t-1}, P_t, P_{t+1})}{100\text{ mm/hr}}\right) \times 85 + B_{\text{convective}}\Big)
-    </div>
-    <div class="math-step" id="math-cloudburst-steps">
-      Evaluating convective thunderstorm codes and maximum single-hour deluge rate...
+    <svg id="trajectory-chart" viewBox="0 0 400 130" style="width:100%;height:130px;"></svg>
+    <div class="small-dim" id="trajectory-summary" style="margin-top:6px;"></div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);" class="small-dim" id="ai-ensemble-summary">
+      Connecting to Prana 64-member AI Ensemble…
     </div>
   </div>
 </div>
 </section>
 
-<!-- 7. ALERT ENGINE VIEW WITH FCM PUSH BROADCAST CONSOLE -->
+<!-- 6. ALERT ENGINE VIEW WITH FCM PUSH BROADCAST CONSOLE -->
 <section id="view-alerts" class="view">
 <div class="note-box">
   The Alert Engine continuously evaluates early-warning thresholds, allowing <b>Manual Web Push Broadcasts</b> and <b>Autonomous AI Alerts</b> via Firebase Cloud Messaging connected through your Render backend.
@@ -772,12 +651,12 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 </div>
 </section>
 
-<!-- 8. ARCHITECTURE VIEW -->
+<!-- 7. ARCHITECTURE VIEW -->
 <section id="view-architecture" class="view">
 <div class="panel">
 <div class="panel-head"><h3>Data Pipeline Architecture</h3></div>
 <div class="flow">
-<div class="flow-node"><b>Sensing Layer</b><span>UAV Soundings, RainViewer, Open-Meteo, USGS</span></div>
+<div class="flow-node"><b>Sensing Layer</b><span>RainViewer Doppler, Open-Meteo AWS, USGS Catalog</span></div>
 <div class="flow-arrow">→</div>
 <div class="flow-node"><b>Render Backend</b><span>FastAPI + Scikit-Learn .joblib + Firebase Admin</span></div>
 <div class="flow-arrow">→</div>
@@ -798,8 +677,6 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 <tbody>
 <tr><td>Python ML Backend</td><td><span class="coverage-badge live">LIVE</span></td>
 <td><a href="https://negocios-8nsk.onrender.com/docs" target="_blank" style="color:var(--gold);text-decoration:underline;">https://negocios-8nsk.onrender.com</a> (FastAPI + joblib model pipelines + FCM Dispatch)</td></tr>
-<tr><td>Weather UAV Edge Array</td><td><span class="coverage-badge live">LIVE</span></td>
-<td>Garuda-01 Autonomous Sounding &amp; Valley Profiling Drone Stream</td></tr>
 <tr><td>Firebase Cloud Messaging</td><td><span class="coverage-badge live">LIVE</span></td>
 <td>FCM Web Push Topic: <code>hazard-alerts</code> (VAPID authenticated)</td></tr>
 <tr><td>Weather Radar (RainViewer)</td><td><span class="coverage-badge live">LIVE</span></td>
@@ -850,6 +727,7 @@ if (!firebase.apps.length) {
 }
 const messaging = firebase.messaging();
 
+// Connected to your live Python FastAPI backend on Render
 const PYTHON_BACKEND_URL = "https://negocios-8nsk.onrender.com";
 const FIREBASE_PUSH_ENDPOINT = `${PYTHON_BACKEND_URL}/dispatch-push`;
 const FIREBASE_SUBSCRIBE_ENDPOINT = `${PYTHON_BACKEND_URL}/subscribe-topic`;
@@ -1334,46 +1212,6 @@ function generateAiActions(cb, ff, ls, loc) {
   document.getElementById("ai-active-count").textContent = `${actions.length} Protocol Safeguards Armed`;
 }
 
-function renderMathematicalProofs(cb, ff, ls) {
-  // 1. Landslide math proof
-  const lsDiv = document.getElementById("math-landslide-steps");
-  lsDiv.innerHTML = `
-    <b>Step 1: Critical Intensity Threshold ($D = ${ls.worstD}$ hours):</b><br>
-    $I_c(${ls.worstD}) = 14.82 \\times (${ls.worstD})^{-0.39} = ${ls.threshold.toFixed(2)}$ mm/hr.<br><br>
-    <b>Step 2: Peak Observed Window Rate:</b><br>
-    $I_{\\text{obs}}(${ls.worstD}) = ${ls.worstIntensity.toFixed(2)}$ mm/hr $\\implies \\text{Ratio} = \\frac{${ls.worstIntensity.toFixed(2)}}{${ls.threshold.toFixed(2)}} = ${(ls.maxRatio).toFixed(3)}$ (${\\text{scaled weight: } + (ls.maxRatio * 55).toFixed(1)}$ pts).<br><br>
-    <b>Step 3: Compounding Geological &amp; Seismic Bonuses:</b><br>
-    • 72h Antecedent Rain: <b>${ls.antecedent72h.toFixed(1)} mm</b> $\\implies +${ls.antecedentBonus}$ pts.<br>
-    • Max Seismic Event: $\\implies +${ls.seismicBonus}$ pts.<br><br>
-    <b>Final Derived Landslide Probability:</b> $\\mathbf{${Math.round(ls.score)} / 100}$ [Tier: <span class="chip ${ls.tier}">${ls.tier.toUpperCase()}</span>]
-  `;
-
-  // 2. Flash flood math proof
-  const ffDiv = document.getElementById("math-flashflood-steps");
-  ffDiv.innerHTML = `
-    <b>Step 1: Soil Moisture Saturation Degradation:</b><br>
-    $\\theta = ${(ff.saturationRatio * 0.45).toFixed(3)}$ m$^3$/m$^3$ (${\\text{Saturation Ratio: } (ff.saturationRatio * 100).toFixed(1)}\\%$).<br>
-    $T_{\\text{eff}} = 50 \\times (1 - 0.40 \\times ${(ff.saturationRatio).toFixed(2)}) = \\mathbf{${ff.effectiveThreshold.toFixed(1)}}$ mm.<br><br>
-    <b>Step 2: Cumulative Runoff &amp; Infiltration Ratio:</b><br>
-    $P_{3h} = ${ff.rain3h.toFixed(1)}$ mm $\\implies \\text{Ratio} = \\frac{${ff.rain3h.toFixed(1)}}{${ff.effectiveThreshold.toFixed(1)}} = ${(ff.ratio).toFixed(3)}$ (${\\text{scaled weight: } + (ff.ratio * 60).toFixed(1)}$ pts).<br><br>
-    <b>Step 3: Antecedent &amp; River Basin Modifiers:</b><br>
-    • 24h Catchment Volume: <b>${ff.past24h.toFixed(1)} mm</b> $\\implies +${ff.antecedentBonus}$ pts.<br>
-    • GloFAS River Flow Rate Surge: $\\implies +${ff.hydroBonus}$ pts.<br><br>
-    <b>Final Derived Flash Flood Probability:</b> $\\mathbf{${Math.round(ff.score)} / 100}$ [Tier: <span class="chip ${ff.tier}">${ff.tier.toUpperCase()}</span>]
-  `;
-
-  // 3. Cloudburst math proof
-  const cbDiv = document.getElementById("math-cloudburst-steps");
-  cbDiv.innerHTML = `
-    <b>Step 1: Peak Deluge Window:</b><br>
-    $P_{\\text{peak}} = \\mathbf{${cb.peakRate.toFixed(1)}}$ mm/hr vs IMD Cloudburst Standard ($100$ mm/hr).<br>
-    $\\text{Ratio} = \\frac{${cb.peakRate.toFixed(1)}}{100} = ${(cb.ratio).toFixed(3)}$ (${\\text{scaled weight: } + (cb.ratio * 85).toFixed(1)}$ pts).<br><br>
-    <b>Step 2: Convective Instability &amp; Lightning Offset:</b><br>
-    • Convective Cloud Signature: $\\implies +${cb.convectiveBonus}$ pts.<br><br>
-    <b>Final Derived Cloudburst Probability:</b> $\\mathbf{${Math.round(cb.score)} / 100}$ [Tier: <span class="chip ${cb.tier}">${cb.tier.toUpperCase()}</span>]
-  `;
-}
-
 function factorRow(label, valueLabel, pct) {
   pct = clamp(pct, 3, 100);
   return `<div class="factor-row"><div class="fr-top"><span>${label}</span><span class="mono">${valueLabel}</span></div>
@@ -1488,7 +1326,6 @@ async function loadPrediction(loc) {
 
     generateAiActions(cloudburst, flashflood, landslide, loc);
     renderFactorBreakdown(cloudburst, flashflood, landslide);
-    renderMathematicalProofs(cloudburst, flashflood, landslide);
     renderTrajectory(w.hourly, nowIdx);
 
     if (aiRes.status === "fulfilled" && aiRes.value && aiRes.value.hourly) {
@@ -1499,72 +1336,6 @@ async function loadPrediction(loc) {
   } catch (e) {
     statusEl.textContent = "Prediction engine: telemetry calculation error.";
   }
-}
-
-/* =========================================================================
-   UAV FLIGHT CONTROLLER & SIMULATION
-   ========================================================================= */
-let uavMap, uavMarker, uavFlightPath, uavAngle = 0, uavTimer = null;
-const UAV_PATH_RADIUS = 0.04;
-
-function initUavMap() {
-  uavMap = L.map("map-uav").setView([28, 82], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors", maxZoom: 18 }).addTo(uavMap);
-
-  const droneIcon = L.divIcon({
-    className: "drone-marker",
-    html: `<div style="width:28px;height:28px;border-radius:50%;background:rgba(245,164,40,0.25);border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px var(--cyan);"><span style="font-size:14px;">🛸</span></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14]
-  });
-
-  uavMarker = L.marker([28, 82], { icon: droneIcon }).addTo(uavMap);
-  uavFlightPath = L.polyline([], { color: '#f5a428', weight: 2, dashArray: '4, 6', opacity: 0.8 }).addTo(uavMap);
-
-  document.getElementById("uav-recon-btn").addEventListener("click", () => {
-    alert("Re-calculating adaptive catchment flight pattern based on latest convective radar reflectivity!");
-  });
-  document.getElementById("uav-rtl-btn").addEventListener("click", () => {
-    alert("RTL Commanded: UAV returning to primary weather station pad.");
-  });
-}
-
-function startUavFlightLoop(loc) {
-  if (!uavMap) return;
-  uavMap.setView([loc.lat, loc.lon], 12);
-
-  if (uavTimer) clearInterval(uavTimer);
-
-  const breadcrumbs = [];
-  uavTimer = setInterval(() => {
-    uavAngle += 0.05;
-    // Circular orbital sounding sweep around station
-    const currentLat = loc.lat + Math.sin(uavAngle) * UAV_PATH_RADIUS;
-    const currentLon = loc.lon + Math.cos(uavAngle) * (UAV_PATH_RADIUS * 1.2);
-
-    uavMarker.setLatLng([currentLat, currentLon]);
-    breadcrumbs.push([currentLat, currentLon]);
-    if (breadcrumbs.length > 40) breadcrumbs.shift();
-    uavFlightPath.setLatLngs(breadcrumbs);
-
-    const alt = Math.round(3400 + Math.sin(uavAngle * 2) * 150);
-    const lapse = (-5.5 - Math.abs(Math.sin(uavAngle)) * 2).toFixed(1);
-    const speed = Math.round(40 + Math.cos(uavAngle) * 6);
-
-    document.getElementById("uav-alt").innerHTML = `${alt.toLocaleString()}<small>m</small>`;
-    document.getElementById("uav-lapse").innerHTML = `${lapse}<small>°C/km</small>`;
-    document.getElementById("uav-speed").textContent = `Ground Speed: ${speed} km/h`;
-    document.getElementById("uav-telemetry-str").textContent = `Lat: ${currentLat.toFixed(4)} · Lon: ${currentLon.toFixed(4)} · Altitude: ${alt}m`;
-
-    const lapseEl = document.getElementById("uav-lapse-status");
-    if (lapse < -6.5) {
-      lapseEl.textContent = "Profile: Unstable (Convective Risk)";
-      lapseEl.style.color = "var(--red)";
-    } else {
-      lapseEl.textContent = "Profile: Neutral / Stable";
-      lapseEl.style.color = "var(--text-dim)";
-    }
-  }, 350);
 }
 
 /* =========================================================================
@@ -1674,7 +1445,6 @@ const VIEW_META = {
   dashboard:    { title: "Situation Dashboard", sub: "Real-time conditions for the selected station · स्थिति सारांश" },
   weather:      { title: "RainViewer Weather Radar", sub: "Live Doppler radar mosaic and convective precipitation tracking · वर्षा दर्शक" },
   radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map · भूकंप एवं वर्षा" },
-  uav:          { title: "Weather UAV Telemetry", sub: "Live atmospheric sounding, boundary layer lapse rate, and flight mapping · ड्रोन गश्ती" },
   sensors:      { title: "Sensor Network & Field Reports", sub: "Hardware ingestion contract, live demo feed, and community observations · संवेदक नेटवर्क" },
   prediction:   { title: "Prana — AI Prediction Engine", sub: "Threshold-fusion risk scoring & Autonomous AI Dispatch" },
   alerts:       { title: "Alert Engine & FCM Dispatch", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers · चेतावनी तंत्र" },
@@ -1687,13 +1457,11 @@ let weatherFrames = [], weatherFrameIdx = 0, weatherPlayTimer = null, rainviewer
 
 document.addEventListener("DOMContentLoaded", () => {
   wireTabs();
-  wireSubtabs();
   wireClock();
   wireLocationPicker();
   initDashMap();
   initWeatherMap();
   initRadarMap();
-  initUavMap();
   initSensorNetwork();
   bindSliders();
   wireFCMControls();
@@ -1709,16 +1477,6 @@ function wireTabs() {
     btn.addEventListener("click", () => switchView(btn.dataset.view));
   });
 }
-function wireSubtabs() {
-  document.querySelectorAll(".subtab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".subtab-content").forEach(c => c.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById("subtab-" + btn.dataset.subtab).classList.add("active");
-    });
-  });
-}
 function switchView(name) {
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === name));
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
@@ -1727,7 +1485,6 @@ function switchView(name) {
   if (name === "dashboard" && dashMap) setTimeout(() => dashMap.invalidateSize(), 80);
   if (name === "weather" && weatherMap) setTimeout(() => weatherMap.invalidateSize(), 80);
   if (name === "radar" && radarMap) setTimeout(() => radarMap.invalidateSize(), 80);
-  if (name === "uav" && uavMap) setTimeout(() => uavMap.invalidateSize(), 80);
 }
 function wireClock() {
   const clockEl = document.getElementById("clock");
@@ -1788,7 +1545,6 @@ function loadAll(loc) {
   loadRadarQuakes(loc);
   loadPrediction(loc);
   runEvaluation(loc);
-  startUavFlightLoop(loc);
 }
 
 /* =========================================================================
@@ -2119,6 +1875,7 @@ async function runEvaluation(loc) {
   renderAlertBanner(risk, loc);
   renderTriggerNote(risk);
 
+  // AUTOMATED AI FCM PUSH TRIGGER
   const isAutoEnabled = document.getElementById("auto-fcm-toggle").checked;
   const cooldownPeriod = 15 * 60 * 1000;
   const now = Date.now();
