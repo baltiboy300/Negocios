@@ -1,4 +1,5 @@
 import os
+import json
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
@@ -15,12 +16,26 @@ from .locations import SITES, SITES_BY_ID
 # Firebase Admin SDK Initialization
 # ---------------------------------------------------------------------------
 if not firebase_admin._apps:
-    key_path = os.path.join(os.path.dirname(__file__), "firebase-key.json")
-    if os.path.exists(key_path):
-        cred = credentials.Certificate(key_path)
-        firebase_admin.initialize_app(cred)
+    env_creds = os.getenv("FIREBASE_CREDENTIALS")
+    if env_creds:
+        try:
+            cred_dict = json.loads(env_creds)
+            # Ensure private key newline characters are formatted properly
+            if "private_key" in cred_dict:
+                cred_dict["private_key"] = cred_dict["private_key"].replace("\\n", "\n")
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred)
+        except Exception as e:
+            print("Error initializing from FIREBASE_CREDENTIALS env:", e)
+            firebase_admin.initialize_app(options={'projectId': 'negocios-8e8a4'})
     else:
-        firebase_admin.initialize_app(options={'projectId': 'negocios-8e8a4'})
+        # Fallback to local file if present
+        key_path = os.path.join(os.path.dirname(__file__), "firebase-key.json")
+        if os.path.exists(key_path):
+            cred = credentials.Certificate(key_path)
+            firebase_admin.initialize_app(cred)
+        else:
+            firebase_admin.initialize_app(options={'projectId': 'negocios-8e8a4'})
 
 app = FastAPI(
     title="Himalaya Multi-Hazard Early Warning API",
@@ -100,7 +115,6 @@ class PredictPayload(BaseModel):
 async def predict_hazard(data: PredictPayload):
     """Evaluates multi-hazard risk using ML models / risk engine."""
     try:
-        # Build ad-hoc site dict
         site = {
             "id": f"station_{data.lat}_{data.lon}",
             "name": data.location,
@@ -110,11 +124,7 @@ async def predict_hazard(data: PredictPayload):
             "state_or_province": "",
             "notes": "realtime telemetry"
         }
-        
-        # Assess via internal risk engine
         assessment = await risk_engine.assess_site(site)
-        
-        # Format response expected by the frontend
         return {
             "status": "success",
             "location": data.location,
@@ -135,7 +145,6 @@ async def predict_hazard(data: PredictPayload):
             "raw_assessment": assessment
         }
     except Exception as e:
-        # Fallback heuristic calculation if assessment encounters an error
         cb_score = min(100, int((data.rain_current / 100.0) * 85 + (15 if data.rain_current > 50 else 0)))
         ff_score = min(100, int((data.rain_3h / 50.0) * 60 + (data.soil_moisture * 30)))
         ls_score = min(100, int((data.rain_72h / 120.0) * 50 + (data.max_quake_magnitude * 10)))
