@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sentinel-HL · Hyper-Local Early Warning System</title>
+<title>Tārakaḥ · Hyper-Local Early Warning System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -276,6 +276,22 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 .uav-mini .label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
 .uav-mini .value{font-family:var(--font-mono);font-size:15px;color:var(--text-hi);margin-top:5px;}
 .uav-route{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);line-height:1.6;margin-top:10px;}
+
+.siren-panel{margin-top:16px;}
+.siren-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.siren-status{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--text-mid);}
+.siren-dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(95,158,82,.55);}
+.siren-dot.alert{background:var(--red);box-shadow:0 0 12px rgba(224,80,58,.8);animation:pulse-r 1s infinite;}
+.siren-dot.watch{background:var(--amber);box-shadow:0 0 10px rgba(232,163,61,.75);animation:pulse-a 1.6s infinite;}
+.siren-map-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.siren-zone-label{font-family:var(--font-mono);font-size:10px;color:var(--text-hi);background:rgba(12,10,19,.88);padding:3px 6px;border:1px solid var(--line);border-radius:4px;white-space:nowrap;}
+.siren-signal-log{max-height:190px;overflow:auto;}
+.siren-signal-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:11.5px;}
+.siren-signal-item:last-child{border-bottom:none;}
+.siren-signal-item .sig-title{color:var(--text-hi);}
+.siren-signal-item .sig-meta{font-family:var(--font-mono);font-size:9.5px;color:var(--text-dim);text-align:right;}
+.drone-marker{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(12,10,19,.94);border:1px solid rgba(245,164,40,.8);box-shadow:0 0 14px rgba(245,164,40,.35);}
+.drone-marker svg{width:22px;height:22px;}
 ::-webkit-scrollbar{height:8px;width:8px;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
 </style>
@@ -286,7 +302,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <aside class="sidebar">
 <div class="brand">
 <div class="brand-mark"></div>
-<div class="brand-text"><b>SENTINEL-HL</b><span>HYPER-LOCAL EWS</span><span class="dev-tagline">आपदा पूर्व चेतावनी</span></div>
+<div class="brand-text"><b>TĀRAKAḤ</b><span>HYPER-LOCAL EWS</span><span class="dev-tagline">आपदा पूर्व चेतावनी</span></div>
 </div>
 <nav class="nav">
 <button class="nav-btn active" data-view="dashboard"><span class="dot"></span><span class="nav-label">Dashboard<span class="dev">सारांश</span></span></button>
@@ -619,14 +635,14 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 </div>
 </section>
 
-<!-- 6. UAV NAVIGATION VIEW -->
+<!-- 6. UAV NAVIGATION & AUTONOMOUS SIREN GRID VIEW -->
 <section id="view-uav" class="view">
   <div class="uav-status" id="uav-status">
     <div class="uav-status-left">
       <div class="uav-indicator" id="uav-indicator"></div>
       <div>
         <div class="uav-status-title" id="uav-status-title">UAV navigation initializing…</div>
-        <div class="uav-status-sub" id="uav-status-sub">Reading live weather for the selected operating area.</div>
+        <div class="uav-status-sub" id="uav-status-sub">Reading live weather and Prana risk for the selected operating area.</div>
       </div>
     </div>
     <span class="chip sim" id="uav-weather-badge">WEATHER CHECKING</span>
@@ -642,6 +658,40 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
     </div>
     <div class="uav-route" id="uav-route">Route: waiting for live telemetry.</div>
   </div>
+
+  <div class="grid cols-2 siren-panel">
+    <div class="panel">
+      <div class="siren-toolbar">
+        <div>
+          <div class="panel-head" style="margin-bottom:4px;"><h3>Autonomous Valley Siren Network</h3><span class="tag">Prana controlled</span></div>
+          <div class="small-dim" id="siren-summary">Siren zones are simulated around hazard-sensitive terrain and remain on standby until Prana crosses a trigger level.</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div class="siren-status"><span class="siren-dot" id="siren-dot"></span><span id="siren-state">STANDBY</span></div>
+          <button class="btn success" id="btn-siren-arm">🔊 Arm Siren Audio</button>
+        </div>
+      </div>
+      <div class="siren-map-legend">
+        <span class="chip danger">ACTIVE</span>
+        <span class="chip warn">WATCH / ARMED</span>
+        <span class="chip ok">STANDBY</span>
+        <span class="chip sim">SIMULATED HAZARD ZONE</span>
+      </div>
+      <div class="small-dim" id="siren-audio-note" style="margin-top:8px;">Audio is browser-gated. Map-based siren signals can still be dispatched autonomously.</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Prediction → Siren Dispatch</h3><span class="tag">automatic</span></div>
+      <table><tbody>
+        <tr><td>Cloudburst Score</td><td class="mono" id="siren-cb-score">—</td></tr>
+        <tr><td>Flash Flood Score</td><td class="mono" id="siren-ff-score">—</td></tr>
+        <tr><td>Landslide Score</td><td class="mono" id="siren-ls-score">—</td></tr>
+        <tr><td>Highest Risk</td><td class="mono" id="siren-max-score">—</td></tr>
+        <tr><td>Signal Decision</td><td class="mono" id="siren-decision">Waiting for Prana</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
   <div class="grid cols-2" style="margin-top:16px;">
     <div class="panel">
       <div class="panel-head"><h3>Flight Decision Logic</h3><span class="tag">weather gated</span></div>
@@ -653,7 +703,9 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
 STOP / STATIONARY when any bad-weather condition is true.
 
 Bad-weather codes:
-65, 67, 75, 82, 95, 96, 99</div>
+65, 67, 75, 82, 95, 96, 99
+
+UAV simulation interval: 7 seconds per waypoint</div>
     </div>
     <div class="panel">
       <div class="panel-head"><h3>Mission Telemetry</h3><span class="tag">live loop</span></div>
@@ -664,6 +716,11 @@ Bad-weather codes:
         <tr><td>Last Weather Sync</td><td class="mono" id="uav-sync">—</td></tr>
       </tbody></table>
     </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px;">
+    <div class="panel-head"><h3>Autonomous Siren Signal Log</h3><span class="tag">AI decisions</span></div>
+    <div class="siren-signal-log" id="siren-signal-log"><span class="small-dim">No siren decisions yet.</span></div>
   </div>
 </section>
 
@@ -797,7 +854,7 @@ Bad-weather codes:
 <footer class="app-footer">
 <div class="footer-dev">सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः । सर्वे भद्राणि पश्यन्तु मा कश्चिद्दुःखभाग्भवेत् ॥</div>
 <div class="footer-en">"May all be happy, may all be free from illness. May all see auspiciousness, may none suffer." — Śānti Mantra, Bṛhadāraṇyaka Upaniṣad</div>
-<div class="footer-meta">SENTINEL-HL · BUILT FOR HIMALAYAN &amp; WESTERN GHATS HILL COMMUNITIES · लोकहित</div>
+<div class="footer-meta">TĀRAKAḤ · BUILT FOR HIMALAYAN &amp; WESTERN GHATS HILL COMMUNITIES · लोकहित</div>
 </footer>
 </main>
 </div>
@@ -1469,6 +1526,7 @@ async function loadPrediction(loc) {
     renderRiskCard("landslide", landslide, `Peak ${landslide.worstD}h intensity ${landslide.worstIntensity.toFixed(1)} mm/hr vs Caine curve`);
 
     generateAiActions(cloudburst, flashflood, landslide, loc);
+    updateSirenSystem(cloudburst, flashflood, landslide, loc);
     renderFactorBreakdown(cloudburst, flashflood, landslide);
     renderTrajectory(w.hourly, nowIdx);
 
@@ -1591,7 +1649,7 @@ const VIEW_META = {
   radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map · भूकंप एवं वर्षा" },
   sensors:      { title: "Sensor Network & Field Reports", sub: "Hardware ingestion contract, live demo feed, and community observations · संवेदक नेटवर्क" },
   prediction:   { title: "Prana — AI Prediction Engine", sub: "Threshold-fusion risk scoring & Autonomous AI Dispatch" },
-  uav:          { title: "UAV Navigation Simulator", sub: "Live weather-gated UAV movement over the selected operating area" },
+  uav:          { title: "UAV Navigation &amp; Siren Grid", sub: "Live weather-gated UAV movement and autonomous valley siren simulation" },
   alerts:       { title: "Alert Engine & FCM Dispatch", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers · चेतावनी तंत्र" },
   architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology · प्रणाली संरचना" }
 };
@@ -1600,6 +1658,7 @@ let weatherMap, weatherLayer, weatherMarker;
 let radarFrames = [], currentFrame = 0, playTimer = null;
 let weatherFrames = [], weatherFrameIdx = 0, weatherPlayTimer = null, rainviewerHost = "https://tilecache.rainviewer.com";
 let uavMap, uavMarker, uavRouteLine, uavTimer = null, uavWeatherTimer = null;
+let sirenLayerGroup = null, sirenZones = [], sirenAudioContext = null, sirenAudioArmed = false, lastSirenState = "standby", sirenSignalLog = [];
 let uavState = { loc: null, weather: null, moving: true, idx: 0, heading: 0, path: [] };
 let lastPranaTrace = null;
 
@@ -1612,6 +1671,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initRadarMap();
   initSensorNetwork();
   initUavMap();
+  document.getElementById("btn-siren-arm").addEventListener("click", armSirenAudio);
   bindSliders();
   wireFCMControls();
   checkExistingFCMSubscription();
@@ -1668,7 +1728,7 @@ function wireFCMControls() {
 
   document.getElementById("btn-fcm-ai-draft").addEventListener("click", () => {
     const loc = currentTelemetryCache.loc || getLocationById(getSelectedLocationId());
-    const draft = `SENTINEL-HL [HAZARD BROADCAST]: High convective rainfall rate (${currentTelemetryCache.rainRate.toFixed(1)} mm/hr) over ${loc.name}. ${currentTelemetryCache.maxQuake ? 'Recent Seismic: M' + currentTelemetryCache.maxQuake.toFixed(1) + '.' : ''} Move to designated high ground immediately.`;
+    const draft = `TĀRAKAḤ [HAZARD BROADCAST]: High convective rainfall rate (${currentTelemetryCache.rainRate.toFixed(1)} mm/hr) over ${loc.name}. ${currentTelemetryCache.maxQuake ? 'Recent Seismic: M' + currentTelemetryCache.maxQuake.toFixed(1) + '.' : ''} Move to designated high ground immediately.`;
     document.getElementById("fcm-alert-msg").value = draft;
   });
 
@@ -1689,9 +1749,19 @@ function wireFCMControls() {
 }
 
 
+function droneIcon() {
+  return L.divIcon({
+    className: "",
+    html: `<div class="drone-marker" title="Tārakaḥ UAV"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10l2 3-2 3H7l-2-3 2-3Z"/><path d="M5 10H2v4h4M19 10h3v4h-4M9 9V6m6 3V6M8 18h8"/></svg></div>`,
+    iconSize: [34,34],
+    iconAnchor: [17,17],
+    popupAnchor: [0,-18]
+  });
+}
 function initUavMap() {
   uavMap = L.map("map-uav").setView([28, 82], 7);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors", maxZoom: 18 }).addTo(uavMap);
+  sirenLayerGroup = L.layerGroup().addTo(uavMap);
 }
 function buildUavPath(loc) {
   const dLat = 0.018;
@@ -1746,9 +1816,9 @@ function renderUavRoute(loc) {
   uavState.idx = 0;
   uavRouteLine = L.polyline(uavState.path, { color: "#f5a428", weight: 2, opacity: 0.7, dashArray: "6 6" }).addTo(uavMap);
   uavMap.setView([loc.lat, loc.lon], 12);
-  document.getElementById("uav-route").textContent = `Route: ${uavState.path.length} waypoints around ${loc.name}. UAV advances one waypoint per simulation tick while weather is safe.`;
+  document.getElementById("uav-route").textContent = `Route: ${uavState.path.length} waypoints around ${loc.name}. UAV advances one waypoint every 7 seconds while weather is safe.`;
   if (uavMarker) uavMap.removeLayer(uavMarker);
-  uavMarker = L.marker(uavState.path[0]).addTo(uavMap).bindPopup(`<b>Sentinel UAV</b><br>${loc.name}`);
+  uavMarker = L.marker(uavState.path[0], { icon: droneIcon(), zIndexOffset: 1000 }).addTo(uavMap).bindPopup(`<b>Tārakaḥ UAV</b><br>${loc.name}`);
   updateUavMarker();
 }
 function updateUavMarker() {
@@ -1768,13 +1838,14 @@ function startUavSimulation() {
     if (!uavState.path.length || !uavState.moving) return;
     uavState.idx = (uavState.idx + 1) % uavState.path.length;
     updateUavMarker();
-  }, 1600);
+  }, 7000);
 }
 async function loadUavNav(loc) {
   if (!uavMap) return;
   uavState.loc = loc;
   document.getElementById("uav-map-label").textContent = `${loc.name} · ${loc.region}`;
   renderUavRoute(loc);
+  renderSirenZones(loc);
   try {
     const w = await fetchWeather(loc);
     applyUavWeather(w, loc);
@@ -1793,6 +1864,105 @@ async function loadUavNav(loc) {
   }, 30000);
   startUavSimulation();
 }
+function buildSirenZones(loc) {
+  return [
+    { id:"glacier", name:"Glacier Outflow Valley", type:"GLACIER", lat:loc.lat+0.030, lon:loc.lon+0.012, radius:2300, hazard:"Cloudburst / glacial-outburst exposure" },
+    { id:"lake", name:"Alpine Lake / Reservoir", type:"LAKE", lat:loc.lat-0.018, lon:loc.lon+0.034, radius:1800, hazard:"Lake surge / rapid inflow exposure" },
+    { id:"slide", name:"Landslide-Prone Corridor", type:"LANDSLIDE", lat:loc.lat+0.006, lon:loc.lon-0.030, radius:2100, hazard:"Rainfall-triggered slope failure" },
+    { id:"valley", name:"Valley Settlement Ring", type:"VALLEY", lat:loc.lat-0.028, lon:loc.lon-0.006, radius:2600, hazard:"Downstream life-safety catchment" }
+  ];
+}
+function renderSirenZones(loc) {
+  if (!sirenLayerGroup) return;
+  sirenLayerGroup.clearLayers();
+  sirenZones = buildSirenZones(loc);
+  sirenZones.forEach(z => {
+    const circle = L.circle([z.lat, z.lon], { radius:z.radius, color:"#5f9e52", fillColor:"#5f9e52", fillOpacity:0.08, weight:1.5, dashArray:"5 5" }).addTo(sirenLayerGroup);
+    circle.bindPopup(`<b>${z.name}</b><br>${z.hazard}<br><span style="color:#7c7096">SIMULATED SIREN COVERAGE ZONE</span>`);
+    L.marker([z.lat, z.lon], { icon:L.divIcon({ className:"", html:`<span class="siren-zone-label">SIREN · ${z.type}</span>`, iconSize:[90,22], iconAnchor:[45,11] }) }).addTo(sirenLayerGroup);
+  });
+}
+function zoneStateForRisk(zone, cb, ff, ls) {
+  if (zone.id === "glacier") return cb;
+  if (zone.id === "lake") return ff;
+  if (zone.id === "slide") return ls;
+  return Math.max(cb, ff, ls);
+}
+function pushSirenLog(level, message) {
+  sirenSignalLog.unshift({ time:new Date().toLocaleTimeString(), level, message });
+  sirenSignalLog = sirenSignalLog.slice(0, 24);
+  const el=document.getElementById("siren-signal-log");
+  el.innerHTML=sirenSignalLog.map(x=>`<div class="siren-signal-item"><div><div class="sig-title"><span class="chip ${x.level === 'danger' ? 'danger' : x.level === 'watch' ? 'warn' : 'ok'}">${x.level.toUpperCase()}</span> ${x.message}</div></div><div class="sig-meta">${x.time}</div></div>`).join("");
+}
+function getSirenDecision(cb, ff, ls) {
+  const max = Math.max(cb.score,ff.score,ls.score);
+  if (max >= 80) return { level:"danger", state:"ACTIVE — AUTONOMOUS SIGNAL", color:"#e0503a", text:"Immediate siren signal to highest-risk zones" };
+  if (max >= 55) return { level:"watch", state:"ARMED — ELEVATED RISK", color:"#e8a33d", text:"Siren zones armed for rapid escalation" };
+  if (max >= 30) return { level:"watch", state:"WATCH — PREPARED", color:"#e8a33d", text:"Siren network pre-armed and monitoring" };
+  return { level:"standby", state:"STANDBY — NOMINAL", color:"#5f9e52", text:"No autonomous siren dispatch" };
+}
+function paintSirenZones(cb, ff, ls) {
+  sirenZones.forEach(z=>{
+    const score=Math.max(0,Math.min(100,zoneStateForRisk(z,cb.score,ff.score,ls.score)));
+    let color="#5f9e52", opacity=0.08, dash="5 5";
+    if(score>=80){color="#e0503a";opacity=0.22;dash=null;}
+    else if(score>=30){color="#e8a33d";opacity=0.14;dash="3 4";}
+    sirenLayerGroup.eachLayer(layer=>{
+      if(layer instanceof L.Circle && Math.abs(layer.getLatLng().lat-z.lat)<1e-8 && Math.abs(layer.getLatLng().lng-z.lon)<1e-8){
+        layer.setStyle({color,fillColor:color,fillOpacity:opacity,dashArray:dash,weight:score>=80?3:1.5});
+      }
+    });
+  });
+}
+function updateSirenSystem(cb, ff, ls, loc) {
+  const decision=getSirenDecision(cb,ff,ls);
+  const max=Math.max(cb.score,ff.score,ls.score);
+  document.getElementById("siren-cb-score").textContent=cb.score.toFixed(1);
+  document.getElementById("siren-ff-score").textContent=ff.score.toFixed(1);
+  document.getElementById("siren-ls-score").textContent=ls.score.toFixed(1);
+  document.getElementById("siren-max-score").textContent=`${max.toFixed(1)} / 100`;
+  document.getElementById("siren-decision").textContent=decision.text;
+  document.getElementById("siren-state").textContent=decision.state;
+  const dot=document.getElementById("siren-dot");
+  dot.className="siren-dot"+(decision.level==="danger"?" alert":decision.level==="watch"?" watch":"");
+  document.getElementById("siren-summary").textContent=`Prana evaluated ${loc.name}: max hazard score ${max.toFixed(1)}/100. ${decision.text}.`;
+  paintSirenZones(cb,ff,ls);
+  const transition=lastSirenState!==decision.level;
+  if(transition || decision.level==="danger") pushSirenLog(decision.level, `${decision.state} · ${decision.text}`);
+  if(decision.level==="danger" && lastSirenState!=="danger") triggerSirenAudio(max,loc);
+  lastSirenState=decision.level;
+}
+function armSirenAudio() {
+  try {
+    if(!sirenAudioContext) sirenAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+    if(sirenAudioContext.state==="suspended") sirenAudioContext.resume();
+    sirenAudioArmed=true;
+    document.getElementById("btn-siren-arm").textContent="🔊 Siren Audio Armed";
+    document.getElementById("siren-audio-note").textContent="Audio armed. Prana can now trigger the simulated siren automatically on a danger transition.";
+  } catch(e) {
+    document.getElementById("siren-audio-note").textContent="Audio could not be armed in this browser; autonomous map signals remain active.";
+  }
+}
+function triggerSirenAudio(score,loc) {
+  if(!sirenAudioArmed || !sirenAudioContext) {
+    document.getElementById("siren-audio-note").textContent=`Autonomous siren signal issued for ${loc.name}; audio awaits browser audio permission.`;
+    return;
+  }
+  const ctx=sirenAudioContext;
+  const now=ctx.currentTime;
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.type="sawtooth";
+  osc.frequency.setValueAtTime(460,now);
+  osc.frequency.linearRampToValueAtTime(820,now+1.0);
+  osc.frequency.linearRampToValueAtTime(460,now+2.0);
+  gain.gain.setValueAtTime(0.0001,now);
+  gain.gain.exponentialRampToValueAtTime(0.14,now+0.08);
+  gain.gain.exponentialRampToValueAtTime(0.0001,now+2.8);
+  osc.connect(gain); gain.connect(ctx.destination); osc.start(now); osc.stop(now+2.8);
+  document.getElementById("siren-audio-note").textContent=`Autonomous siren audio emitted for ${loc.name} · trigger score ${score.toFixed(1)}/100.`;
+}
+
 function loadAll(loc) {
   loadDashboard(loc);
   loadWeatherView(loc);
