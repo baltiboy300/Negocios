@@ -248,6 +248,34 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 .feed-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:12px;}
 .feed-item:last-child{border-bottom:none;}
 .src-chip{font-family:var(--font-mono);font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(217,174,83,0.15);color:var(--gold);white-space:nowrap;flex:none;}
+ .prana-trace{background:var(--ink-950);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:16px;}
+.prana-trace-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.prana-trace-head b{font-family:var(--font-display);font-size:14px;color:var(--text-hi);letter-spacing:.03em;}
+.prana-trace-note{font-size:11px;color:var(--text-dim);line-height:1.5;}
+.trace-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media (max-width:1100px){.trace-grid{grid-template-columns:1fr;}}
+.trace-card{background:var(--ink-800);border:1px solid var(--line-soft);border-radius:8px;padding:12px;}
+.trace-card h4{font-family:var(--font-display);font-size:12px;margin:0 0 8px;color:var(--text-hi);text-transform:uppercase;letter-spacing:.04em;}
+.trace-step{padding:7px 0;border-bottom:1px solid var(--line-soft);font-family:var(--font-mono);font-size:10.5px;color:var(--text-mid);line-height:1.5;white-space:pre-wrap;}
+.trace-step:last-child{border-bottom:none;}
+.trace-step strong{color:var(--gold);}
+.raw-io{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+@media (max-width:900px){.raw-io{grid-template-columns:1fr;}}
+.raw-box{min-width:0;}
+.raw-box .raw-title{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;letter-spacing:.05em;}
+.raw-box pre{margin:0;max-height:260px;overflow:auto;background:var(--ink-900);border:1px solid var(--line-soft);border-radius:8px;padding:10px;font-family:var(--font-mono);font-size:10px;line-height:1.5;color:var(--text-mid);white-space:pre-wrap;word-break:break-word;}
+.uav-status{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--ink-950);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;}
+.uav-status-left{display:flex;align-items:center;gap:10px;}
+.uav-indicator{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(95,158,82,.6);}
+.uav-indicator.stationary{background:var(--red);box-shadow:0 0 8px rgba(224,80,58,.65);}
+.uav-status-title{font-family:var(--font-display);font-size:15px;font-weight:700;}
+.uav-status-sub{font-size:11.5px;color:var(--text-mid);margin-top:2px;}
+.uav-telemetry{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+@media (max-width:900px){.uav-telemetry{grid-template-columns:repeat(2,1fr);}}
+.uav-mini{background:var(--ink-800);border:1px solid var(--line-soft);border-radius:8px;padding:12px;}
+.uav-mini .label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
+.uav-mini .value{font-family:var(--font-mono);font-size:15px;color:var(--text-hi);margin-top:5px;}
+.uav-route{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);line-height:1.6;margin-top:10px;}
 ::-webkit-scrollbar{height:8px;width:8px;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
 </style>
@@ -266,6 +294,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);height:4px;}
 <button class="nav-btn" data-view="radar"><span class="dot"></span><span class="nav-label">Radar &amp; Seismic<span class="dev">भूकंप राडार</span></span></button>
 <button class="nav-btn" data-view="sensors"><span class="dot"></span><span class="nav-label">Sensor Network<span class="dev">संवेदक नेटवर्क</span></span></button>
 <button class="nav-btn" data-view="prediction"><span class="dot"></span><span class="nav-label">Prana Engine<span class="dev">प्राण</span></span></button>
+<button class="nav-btn" data-view="uav"><span class="dot"></span><span class="nav-label">UAV Nav<span class="dev">मानवरहित नेविगेशन</span></span></button>
 <button class="nav-btn" data-view="alerts"><span class="dot"></span><span class="nav-label">Alert Engine<span class="dev">चेतावनी</span></span></button>
 <button class="nav-btn" data-view="architecture"><span class="dot"></span><span class="nav-label">System Architecture<span class="dev">संरचना</span></span></button>
 </nav>
@@ -569,6 +598,73 @@ This monitor overlays <b>RainViewer</b> radar telemetry and the official <b>USGS
     </div>
   </div>
 </div>
+
+<div class="prana-trace">
+  <div class="prana-trace-head">
+    <div>
+      <b>Prana Calculation Trace — Actual Engine Execution</b>
+      <div class="prana-trace-note">Rendered from the same formulas and telemetry used by the displayed browser-side Prana calculations. The hosted /predict request and response are shown below; model-internal weights/trees cannot be displayed unless the backend returns them.</div>
+    </div>
+    <span class="ai-action-chip" id="prana-trace-source">TRACE: WAITING</span>
+  </div>
+  <div class="trace-grid">
+    <div class="trace-card"><h4>Cloudburst</h4><div id="trace-cloudburst"><span class="small-dim">Waiting for engine run…</span></div></div>
+    <div class="trace-card"><h4>Flash Flood</h4><div id="trace-flashflood"><span class="small-dim">Waiting for engine run…</span></div></div>
+    <div class="trace-card"><h4>Landslide</h4><div id="trace-landslide"><span class="small-dim">Waiting for engine run…</span></div></div>
+  </div>
+  <div class="raw-io">
+    <div class="raw-box"><div class="raw-title">Actual ML input sent to FastAPI /predict</div><pre id="prana-ml-input">Waiting…</pre></div>
+    <div class="raw-box"><div class="raw-title">Actual ML response returned by /predict</div><pre id="prana-ml-output">Waiting…</pre></div>
+  </div>
+</div>
+</section>
+
+<!-- 6. UAV NAVIGATION VIEW -->
+<section id="view-uav" class="view">
+  <div class="uav-status" id="uav-status">
+    <div class="uav-status-left">
+      <div class="uav-indicator" id="uav-indicator"></div>
+      <div>
+        <div class="uav-status-title" id="uav-status-title">UAV navigation initializing…</div>
+        <div class="uav-status-sub" id="uav-status-sub">Reading live weather for the selected operating area.</div>
+      </div>
+    </div>
+    <span class="chip sim" id="uav-weather-badge">WEATHER CHECKING</span>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h3>UAV Area Navigation Simulator</h3><span class="tag" id="uav-map-label">selected station area</span></div>
+    <div class="map-wrap"><div id="map-uav" style="height:500px;width:100%;"></div></div>
+    <div class="uav-telemetry">
+      <div class="uav-mini"><div class="label">UAV State</div><div class="value" id="uav-state">INITIALIZING</div></div>
+      <div class="uav-mini"><div class="label">Weather</div><div class="value" id="uav-weather">—</div></div>
+      <div class="uav-mini"><div class="label">Wind</div><div class="value" id="uav-wind">—</div></div>
+      <div class="uav-mini"><div class="label">Rain Rate</div><div class="value" id="uav-rain">—</div></div>
+    </div>
+    <div class="uav-route" id="uav-route">Route: waiting for live telemetry.</div>
+  </div>
+  <div class="grid cols-2" style="margin-top:16px;">
+    <div class="panel">
+      <div class="panel-head"><h3>Flight Decision Logic</h3><span class="tag">weather gated</span></div>
+      <div class="code-block">MOVE when all are true:
+• rain is below 5 mm/hr
+• wind is below 35 km/h
+• weather code is not a severe-weather code
+
+STOP / STATIONARY when any bad-weather condition is true.
+
+Bad-weather codes:
+65, 67, 75, 82, 95, 96, 99</div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Mission Telemetry</h3><span class="tag">live loop</span></div>
+      <table><tbody>
+        <tr><td>Operating Area</td><td class="mono" id="uav-area">—</td></tr>
+        <tr><td>Position</td><td class="mono" id="uav-position">—</td></tr>
+        <tr><td>Heading</td><td class="mono" id="uav-heading">—</td></tr>
+        <tr><td>Last Weather Sync</td><td class="mono" id="uav-sync">—</td></tr>
+      </tbody></table>
+    </div>
+  </div>
 </section>
 
 <!-- 6. ALERT ENGINE VIEW WITH FCM PUSH BROADCAST CONSOLE -->
@@ -1234,6 +1330,51 @@ function renderFactorBreakdown(cb, ff, ls) {
   document.getElementById("factor-breakdown").innerHTML = html;
 }
 
+
+function fmtTraceNum(v, digits = 2) {
+  return Number.isFinite(v) ? Number(v).toFixed(digits) : "n/a";
+}
+function traceStep(label, value) {
+  return `<div class="trace-step"><strong>${label}</strong> ${value}</div>`;
+}
+function renderPranaTrace(w, nowIdx, weatherCode, soilMoisture, maxQuakeRecent, cloudburst, flashflood, landslide, mlPayload, backendResponse, engineSourceNote) {
+  const cb = [];
+  const next0 = w.hourly.precipitation[nowIdx] || 0;
+  const next1 = w.hourly.precipitation[nowIdx + 1] || 0;
+  const past1 = w.hourly.precipitation[nowIdx - 1] || 0;
+  cb.push(traceStep("01", `peakRate = max(${fmtTraceNum(next0,1)}, ${fmtTraceNum(next1,1)}, ${fmtTraceNum(past1,1)}) = ${fmtTraceNum(cloudburst.peakRate,1)} mm/hr`));
+  cb.push(traceStep("02", `ratio = ${fmtTraceNum(cloudburst.peakRate,1)} / 100 = ${fmtTraceNum(cloudburst.ratio,3)}`));
+  cb.push(traceStep("03", `convectiveBonus = ${cloudburst.convectiveBonus} because weather_code=${weatherCode}`));
+  cb.push(traceStep("04", `score = clamp(${fmtTraceNum(cloudburst.ratio,3)} × 85 + ${cloudburst.convectiveBonus}, 0, 100) = ${fmtTraceNum(cloudburst.score,1)}`));
+  cb.push(traceStep("05", `tier = ${cloudburst.tier.toUpperCase()}`));
+
+  const ff = [];
+  const past3 = sumRangeHours(w.hourly, nowIdx - 3, nowIdx);
+  const forecast3 = sumRangeHours(w.hourly, nowIdx, nowIdx + 3);
+  ff.push(traceStep("01", `rain3h = max(past ${fmtTraceNum(past3,1)} mm, forecast ${fmtTraceNum(forecast3,1)} mm) = ${fmtTraceNum(flashflood.rain3h,1)} mm`));
+  ff.push(traceStep("02", `saturationRatio = clamp(${fmtTraceNum(soilMoisture || 0,3)} / 0.45, 0, 1) = ${fmtTraceNum(flashflood.saturationRatio,3)}`));
+  ff.push(traceStep("03", `effectiveThreshold = 50 × (1 − 0.4 × ${fmtTraceNum(flashflood.saturationRatio,3)}) = ${fmtTraceNum(flashflood.effectiveThreshold,1)} mm`));
+  ff.push(traceStep("04", `ratio = ${fmtTraceNum(flashflood.rain3h,1)} / ${fmtTraceNum(flashflood.effectiveThreshold,1)} = ${fmtTraceNum(flashflood.ratio,3)}`));
+  ff.push(traceStep("05", `score = clamp(${fmtTraceNum(flashflood.ratio,3)} × 60 + ${flashflood.antecedentBonus} + ${flashflood.hydroBonus}, 0, 100) = ${fmtTraceNum(flashflood.score,1)}`));
+  ff.push(traceStep("06", `tier = ${flashflood.tier.toUpperCase()}`));
+
+  const ls = [];
+  ls.push(traceStep("01", `Caine threshold(D) = 14.82 × D^(-0.39)`));
+  ls.push(traceStep("02", `worst window = ${landslide.worstD}h; intensity = ${fmtTraceNum(landslide.worstIntensity,2)} mm/hr`));
+  ls.push(traceStep("03", `threshold(${landslide.worstD}) = ${fmtTraceNum(landslide.threshold,2)} mm/hr`));
+  ls.push(traceStep("04", `maxRatio = ${fmtTraceNum(landslide.maxRatio,3)}`));
+  ls.push(traceStep("05", `72h antecedent = ${fmtTraceNum(landslide.antecedent72h,1)} mm; bonus = ${landslide.antecedentBonus}`));
+  ls.push(traceStep("06", `seismic max = ${maxQuakeRecent == null ? "none" : "M" + Number(maxQuakeRecent).toFixed(1)}; bonus = ${landslide.seismicBonus}`));
+  ls.push(traceStep("07", `score = clamp(${fmtTraceNum(landslide.maxRatio,3)} × 55 + ${landslide.antecedentBonus} + ${landslide.seismicBonus}, 0, 100) = ${fmtTraceNum(landslide.score,1)}`));
+  ls.push(traceStep("08", `tier = ${landslide.tier.toUpperCase()}`));
+
+  document.getElementById("trace-cloudburst").innerHTML = cb.join("");
+  document.getElementById("trace-flashflood").innerHTML = ff.join("");
+  document.getElementById("trace-landslide").innerHTML = ls.join("");
+  document.getElementById("prana-ml-input").textContent = JSON.stringify(mlPayload, null, 2);
+  document.getElementById("prana-ml-output").textContent = backendResponse ? JSON.stringify(backendResponse, null, 2) : "No successful /predict response. Displayed scores remain from the local Prana engine.";
+  document.getElementById("prana-trace-source").textContent = `TRACE: ${engineSourceNote.toUpperCase()}`;
+}
 function renderTrajectory(hourly, idx) {
   const svg = document.getElementById("trajectory-chart");
   svg.innerHTML = "";
@@ -1319,6 +1460,9 @@ async function loadPrediction(loc) {
       document.getElementById("ai-model-badge").className = "chip warn";
       document.getElementById("ai-model-badge").textContent = "Render ML: Standby / Local Mode";
     }
+
+    lastPranaTrace = { w, nowIdx, weatherCode, soilMoisture, maxQuakeRecent, cloudburst, flashflood, landslide, mlPayload, backendResponse, engineSourceNote };
+    renderPranaTrace(w, nowIdx, weatherCode, soilMoisture, maxQuakeRecent, cloudburst, flashflood, landslide, mlPayload, backendResponse, engineSourceNote);
 
     renderRiskCard("cloudburst", cloudburst, `Peak rate ${cloudburst.peakRate.toFixed(0)} mm/hr vs IMD 100mm threshold`);
     renderRiskCard("flashflood", flashflood, `3h rain ${flashflood.rain3h.toFixed(0)} mm vs saturation-adjusted threshold`);
@@ -1447,6 +1591,7 @@ const VIEW_META = {
   radar:        { title: "Radar & Seismic Monitor", sub: "Precipitation mosaic and USGS earthquake catalog layered on map · भूकंप एवं वर्षा" },
   sensors:      { title: "Sensor Network & Field Reports", sub: "Hardware ingestion contract, live demo feed, and community observations · संवेदक नेटवर्क" },
   prediction:   { title: "Prana — AI Prediction Engine", sub: "Threshold-fusion risk scoring & Autonomous AI Dispatch" },
+  uav:          { title: "UAV Navigation Simulator", sub: "Live weather-gated UAV movement over the selected operating area" },
   alerts:       { title: "Alert Engine & FCM Dispatch", sub: "Rule-based fusion of rainfall + seismic telemetry into automated triggers · चेतावनी तंत्र" },
   architecture: { title: "System Architecture", sub: "Active live API integrations and data flow topology · प्रणाली संरचना" }
 };
@@ -1454,6 +1599,9 @@ let dashMap, dashMarker, radarMap, radarLayer, quakeLayerGroup;
 let weatherMap, weatherLayer, weatherMarker;
 let radarFrames = [], currentFrame = 0, playTimer = null;
 let weatherFrames = [], weatherFrameIdx = 0, weatherPlayTimer = null, rainviewerHost = "https://tilecache.rainviewer.com";
+let uavMap, uavMarker, uavRouteLine, uavTimer = null, uavWeatherTimer = null;
+let uavState = { loc: null, weather: null, moving: true, idx: 0, heading: 0, path: [] };
+let lastPranaTrace = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   wireTabs();
@@ -1463,6 +1611,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initWeatherMap();
   initRadarMap();
   initSensorNetwork();
+  initUavMap();
   bindSliders();
   wireFCMControls();
   checkExistingFCMSubscription();
@@ -1485,6 +1634,7 @@ function switchView(name) {
   if (name === "dashboard" && dashMap) setTimeout(() => dashMap.invalidateSize(), 80);
   if (name === "weather" && weatherMap) setTimeout(() => weatherMap.invalidateSize(), 80);
   if (name === "radar" && radarMap) setTimeout(() => radarMap.invalidateSize(), 80);
+  if (name === "uav" && uavMap) setTimeout(() => uavMap.invalidateSize(), 80);
 }
 function wireClock() {
   const clockEl = document.getElementById("clock");
@@ -1538,12 +1688,118 @@ function wireFCMControls() {
   });
 }
 
+
+function initUavMap() {
+  uavMap = L.map("map-uav").setView([28, 82], 7);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors", maxZoom: 18 }).addTo(uavMap);
+}
+function buildUavPath(loc) {
+  const dLat = 0.018;
+  const dLon = 0.022;
+  return [
+    [loc.lat, loc.lon],
+    [loc.lat + dLat, loc.lon + dLon],
+    [loc.lat + dLat * 1.8, loc.lon + dLon * 0.35],
+    [loc.lat + dLat * 1.1, loc.lon - dLon * 0.8],
+    [loc.lat - dLat * 0.35, loc.lon - dLon * 1.1],
+    [loc.lat - dLat * 1.05, loc.lon - dLon * 0.25],
+    [loc.lat - dLat * 0.45, loc.lon + dLon * 0.95],
+    [loc.lat, loc.lon]
+  ];
+}
+function isUavBadWeather(weather) {
+  if (!weather || !weather.current) return { bad: true, reason: "Weather feed unavailable — UAV held stationary" };
+  const c = weather.current;
+  const rain = c.rain ?? c.precipitation ?? 0;
+  const wind = c.wind_speed_10m ?? 0;
+  const code = c.weather_code;
+  const severeCodes = [65, 67, 75, 82, 95, 96, 99];
+  if (rain >= 5) return { bad: true, reason: `Rain ${rain.toFixed(1)} mm/hr ≥ 5 mm/hr flight limit` };
+  if (wind >= 35) return { bad: true, reason: `Wind ${wind.toFixed(0)} km/h ≥ 35 km/h flight limit` };
+  if (severeCodes.includes(code)) return { bad: true, reason: `${weatherLabel(code)} is outside flight envelope` };
+  return { bad: false, reason: "Weather within configured UAV flight envelope" };
+}
+function applyUavWeather(weather, loc) {
+  uavState.weather = weather;
+  const c = weather && weather.current ? weather.current : {};
+  const gate = isUavBadWeather(weather);
+  uavState.moving = !gate.bad;
+  document.getElementById("uav-area").textContent = loc.name;
+  document.getElementById("uav-weather").textContent = weather ? weatherLabel(c.weather_code) : "Unavailable";
+  const wind = Number(c.wind_speed_10m);
+  const rain = Number(c.rain ?? c.precipitation);
+  document.getElementById("uav-wind").textContent = Number.isFinite(wind) ? `${wind.toFixed(0)} km/h` : "—";
+  document.getElementById("uav-rain").textContent = Number.isFinite(rain) ? `${rain.toFixed(1)} mm/hr` : "—";
+  document.getElementById("uav-sync").textContent = new Date().toLocaleTimeString();
+  document.getElementById("uav-weather-badge").textContent = gate.bad ? "BAD WEATHER — HOLD" : "FLIGHT WEATHER OK";
+  document.getElementById("uav-weather-badge").className = "chip " + (gate.bad ? "danger" : "ok");
+  document.getElementById("uav-indicator").classList.toggle("stationary", gate.bad);
+  document.getElementById("uav-status-title").textContent = gate.bad ? "UAV STATIONARY — FLIGHT HOLD" : "UAV IN MOTION — PATROL ACTIVE";
+  document.getElementById("uav-status-sub").textContent = gate.reason;
+  document.getElementById("uav-state").textContent = gate.bad ? "STATIONARY" : "MOVING";
+  updateUavMarker();
+}
+function renderUavRoute(loc) {
+  if (!uavMap) return;
+  if (uavRouteLine) uavMap.removeLayer(uavRouteLine);
+  uavState.path = buildUavPath(loc);
+  uavState.idx = 0;
+  uavRouteLine = L.polyline(uavState.path, { color: "#f5a428", weight: 2, opacity: 0.7, dashArray: "6 6" }).addTo(uavMap);
+  uavMap.setView([loc.lat, loc.lon], 12);
+  document.getElementById("uav-route").textContent = `Route: ${uavState.path.length} waypoints around ${loc.name}. UAV advances one waypoint per simulation tick while weather is safe.`;
+  if (uavMarker) uavMap.removeLayer(uavMarker);
+  uavMarker = L.marker(uavState.path[0]).addTo(uavMap).bindPopup(`<b>Sentinel UAV</b><br>${loc.name}`);
+  updateUavMarker();
+}
+function updateUavMarker() {
+  if (!uavMarker || !uavState.path.length) return;
+  const point = uavState.path[uavState.idx];
+  const next = uavState.path[(uavState.idx + 1) % uavState.path.length];
+  const latDiff = next[0] - point[0];
+  const lonDiff = next[1] - point[1];
+  uavState.heading = (Math.atan2(lonDiff, latDiff) * 180 / Math.PI + 360) % 360;
+  if (uavState.moving) uavMarker.setLatLng(point);
+  document.getElementById("uav-position").textContent = `${point[0].toFixed(5)}, ${point[1].toFixed(5)}`;
+  document.getElementById("uav-heading").textContent = `${uavState.heading.toFixed(0)}°`;
+}
+function startUavSimulation() {
+  if (uavTimer) clearInterval(uavTimer);
+  uavTimer = setInterval(() => {
+    if (!uavState.path.length || !uavState.moving) return;
+    uavState.idx = (uavState.idx + 1) % uavState.path.length;
+    updateUavMarker();
+  }, 1600);
+}
+async function loadUavNav(loc) {
+  if (!uavMap) return;
+  uavState.loc = loc;
+  document.getElementById("uav-map-label").textContent = `${loc.name} · ${loc.region}`;
+  renderUavRoute(loc);
+  try {
+    const w = await fetchWeather(loc);
+    applyUavWeather(w, loc);
+  } catch (e) {
+    applyUavWeather(null, loc);
+  }
+  if (uavWeatherTimer) clearInterval(uavWeatherTimer);
+  uavWeatherTimer = setInterval(async () => {
+    if (!uavState.loc) return;
+    try {
+      const w = await fetchWeather(uavState.loc);
+      applyUavWeather(w, uavState.loc);
+    } catch (e) {
+      applyUavWeather(null, uavState.loc);
+    }
+  }, 30000);
+  startUavSimulation();
+}
 function loadAll(loc) {
   loadDashboard(loc);
   loadWeatherView(loc);
   centerRadar(loc);
   loadRadarQuakes(loc);
   loadPrediction(loc);
+  loadUavNav(loc);
   runEvaluation(loc);
 }
 
