@@ -2,452 +2,730 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NEGOCIO - Mobile Version</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --pixel-font: 'Press Start 2P', cursive;
-            --bg-beige: #f5f5dc;
-            --accent-pink: #e2a9be;
-            --deep-rose: #b07d8e;
-            --text-main: #4a4a4a;
-            --border-color: #d1d1bc;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #e8e8d0;
-            color: var(--text-main);
-            overflow: hidden;
-            font-family: var(--pixel-font);
-            image-rendering: pixelated;
-            touch-action: manipulation;
-            -webkit-text-size-adjust: 100%;
-        }
-
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.03) 50%, transparent 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        #c64-container, #dashboard, #app-window {
-            position: fixed;
-            inset: 0;
-            background-color: var(--bg-beige);
-            border: 16px solid var(--border-color);
-            outline: 3px solid white;
-            outline-offset: -10px;
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            box-sizing: border-box;
-            transition: opacity 0.4s ease-in-out;
-        }
-
-        @media (max-width: 640px) {
-            #c64-container, #dashboard, #app-window {
-                border-width: 8px;
-                outline-width: 2px;
-                outline-offset: -5px;
-                padding: 16px;
-            }
-
-            .system-text {
-                font-size: 0.55rem !important;
-                line-height: 2.2 !important;
-            }
-
-            .enter-btn {
-                padding: 14px 24px !important;
-                font-size: 0.75rem !important;
-                width: 100%;
-                max-width: 260px;
-            }
-
-            .negocio-box {
-                font-size: 0.6rem !important;
-                letter-spacing: 3px !important;
-                padding: 6px 16px !important;
-            }
-
-            .donkey-container {
-                width: 64px !important;
-                height: 64px !important;
-            }
-        }
-
-        .system-text {
-            font-size: 0.75rem;
-            line-height: 2.5;
-            text-transform: uppercase;
-            color: var(--deep-rose);
-            word-break: break-word;
-        }
-
-        .command-line {
-            display: flex;
-            align-items: center;
-            margin-top: 20px;
-            color: var(--text-main);
-            flex-wrap: wrap;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: var(--accent-pink);
-            animation: blink 0.8s infinite steps(2);
-            vertical-align: middle;
-            margin-left: 5px;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
-        #dashboard, #app-window {
-            display: none;
-            opacity: 0;
-            z-index: 10;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #dashboard.visible, #app-window.visible {
-            display: flex;
-            opacity: 1;
-        }
-
-        .enter-btn {
-            background: white;
-            border: 4px solid var(--accent-pink);
-            color: var(--deep-rose);
-            padding: 16px 40px;
-            font-family: var(--pixel-font);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            box-shadow: 4px 4px 0px var(--accent-pink);
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .enter-btn:active {
-            transform: translate(2px, 2px);
-            box-shadow: none;
-        }
-
-        .negocio-box {
-            border: 2px solid var(--deep-rose);
-            padding: 8px 24px;
-            margin-bottom: 20px;
-            color: var(--deep-rose);
-            font-size: 0.7rem;
-            background: rgba(255,255,255,0.5);
-            letter-spacing: 4px;
-        }
-
-        .donkey-container {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
-
-        .window-header {
-            border-bottom: 2px solid var(--accent-pink);
-            width: 100%;
-            padding: 8px 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 0.55rem;
-        }
-
-        #start-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-beige);
-            color: var(--deep-rose);
-            cursor: pointer;
-            text-align: center;
-            padding: 20px;
-            font-size: 0.8rem;
-            -webkit-tap-highlight-color: transparent;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f8f5">
+<title>FoodCheck India</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f8f5;color:#17221d;font-family:Arial, sans-serif}
+header{height:68px;border-bottom:1px solid #e7eae4;display:flex;align-items:center;justify-content:space-between;padding:0 7%;background:white}
+.brand{font-weight:800;font-size:20px}
+.brand span{color:#19734e}
+.tag{font-size:12px;color:#718078;background:#eef2ed;padding:8px 12px;border-radius:20px}
+main{width:min(680px,calc(100% - 32px));margin:45px auto}
+.eyebrow{color:#19734e;font-size:12px;font-weight:bold;letter-spacing:1.5px}
+h1{font-size:clamp(32px,6vw,44px);letter-spacing:-1.5px;line-height:1.1;margin:12px 0}
+.sub{color:#66736b;line-height:1.6;font-size:15px;margin-bottom:28px}
+.panel{background:white;border:1px solid #e7ebe5;border-radius:18px;padding:22px;box-shadow:0 10px 30px #20382a08}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{cursor:pointer;border:0;border-radius:11px;padding:14px;font-weight:bold;font-size:14px}
+.primary{background:#176b4b;color:white}
+.secondary{background:#edf3ee;color:#1c4e38}
+.inputrow{display:flex;gap:8px;margin-top:14px}
+input,textarea{width:100%;min-width:0;padding:13px;border:1px solid #dfe6df;border-radius:10px;background:#fbfcfa;font:inherit}
+#barcodeRow{display:none}
+#camera{display:none;margin-top:16px;position:relative;background:#111;border-radius:12px;overflow:hidden}
+video{width:100%;max-height:320px;object-fit:cover;display:block}
+#stopCamera{position:absolute;right:10px;top:10px;background:white}
+#status{font-size:13px;color:#65736a;margin-top:15px;line-height:1.5}
+#result{display:none;margin-top:20px}
+.product{display:flex;gap:15px;align-items:center;padding-bottom:17px;border-bottom:1px solid #eee}
+.product img{width:75px;height:75px;object-fit:contain;background:#f4f6f2;border-radius:10px}
+.product h2{font-size:19px;margin:0 0 6px}
+.muted{font-size:12px;color:#758078;line-height:1.6}
+.score{margin:17px 0;padding:15px;background:#f2f6f1;border-radius:12px;display:flex;justify-content:space-between;gap:10px}
+.score span{font-size:12px;color:#68766e}
+.sectiontitle{font-size:14px;font-weight:bold;margin:20px 0 10px}
+.flag{padding:13px;border:1px solid #e8ece7;border-radius:11px;margin:8px 0}
+.flagtop{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.flag b{font-size:13px}
+.flag p{font-size:12px;color:#68756d;line-height:1.5;margin:7px 0 0}
+.pill{font-size:10px;font-weight:bold;padding:5px 8px;border-radius:20px;background:#f4f0e5;color:#8a6524;white-space:nowrap}
+.red{background:#f9e9e6;color:#a43c2f}
+.green{background:#e8f3eb;color:#27714b}
+.nutrients{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.nut{background:#f7f9f6;padding:12px;border-radius:9px}
+.nut span{display:block;color:#7a867e;font-size:11px}
+.nut b{font-size:15px}
+.manual{margin-top:20px}
+.manual summary{cursor:pointer;font-size:13px;font-weight:bold;color:#315e46}
+textarea{margin-top:12px;min-height:90px;resize:vertical}
+.foot{font-size:11px;color:#859087;line-height:1.7;margin-top:18px}
+#history{display:none;margin-top:20px}
+.historyitem{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee;font-size:13px;gap:10px}
+@media(max-width:500px){
+header{padding:0 17px}
+main{margin:30px auto}
+.panel{padding:17px}
+.actions{grid-template-columns:1fr}
+.inputrow{flex-direction:column}
+}
+</style>
 </head>
-
 <body>
 
-    <div class="scanlines"></div>
+<header>
+<div class="brand">FoodCheck <span>India</span></div>
+<div class="tag">Know what you eat</div>
+</header>
+
+<main>
+<div class="eyebrow">FOOD TRANSPARENCY</div>
+<h1>Scan the label.<br>Understand the ingredients.</h1>
+<p class="sub">Discover what's inside your packaged food. Check ingredients, additives and nutritional information using real product records.</p>
+
+<section class="panel">
+
+<div class="actions">
+<button class="primary" id="scanBtn">▣ Scan Product</button>
+<button class="secondary" id="manualBtn">Enter Barcode</button>
+</div>
+
+<div id="camera">
+<video id="video" playsinline muted></video>
+<button id="stopCamera">Close</button>
+</div>
+
+<div class="inputrow" id="barcodeRow">
+<input id="barcodeInput" placeholder="Enter product barcode" inputmode="numeric">
+<button class="secondary" id="lookupBtn">Check</button>
+</div>
+
+<div id="status">Ready to scan. Point your camera at a product barcode.</div>
+
+<details class="manual">
+<summary>Manually analyse an ingredient label</summary>
+<textarea id="ingredientInput" placeholder="Paste ingredients printed on the package..."></textarea>
+<button class="secondary" id="analyseText" style="width:100%;margin-top:10px">Analyse Ingredients</button>
+<p class="muted">Manual analysis only checks the text supplied. It cannot verify the product or ingredient quantities.</p>
+</details>
+
+<div id="result"></div>
+
+</section>
+
+<section class="panel" id="history">
+<div class="sectiontitle">Recent Scans</div>
+<div id="historyList"></div>
+</section>
+
+<p class="foot">
+Product information is retrieved from Open Food Facts, a community-maintained database. Product records may be incomplete or outdated. This tool is an educational screening aid, not a laboratory test, medical diagnosis or FSSAI certification. Ingredient presence alone does not establish that a food causes cancer. Always verify the physical package and current official regulations.
+</p>
+</main>
+
+<script type="module">
+
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+query,
+orderBy,
+limit,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+import {
+getAuth,
+signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
+authDomain: "negocios-8e8a4.firebaseapp.com",
+databaseURL: "https://negocios-8e8a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "negocios-8e8a4",
+storageBucket: "negocios-8e8a4.firebasestorage.app",
+messagingSenderId: "298423907311",
+appId: "1:298423907311:web:92b79b23776a4f56557c1a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+let stream = null;
+let scanLoop = false;
+
+const $ = id => document.getElementById(id);
+
+const ingredientChecks = [
+
+{
+terms:["partially hydrogenated","vanaspati"],
+name:"Partially Hydrogenated Oils",
+level:"High Concern",
+tone:"red",
+detail:"These can contain industrial trans fats, which increase cardiovascular risk. This is not a cancer finding."
+},
+
+{
+terms:["sodium nitrite","ins 250","e250"],
+name:"Sodium Nitrite (INS 250)",
+level:"Context Matters",
+tone:"amber",
+detail:"Used in some cured meats. Nitrite can participate in nitrosamine formation under certain conditions. Actual risk depends on food type, processing and exposure."
+},
+
+{
+terms:["sodium nitrate","ins 251","e251","potassium nitrate","ins 252"],
+name:"Nitrate Salts",
+level:"Context Matters",
+tone:"amber",
+detail:"Health assessment depends on source, quantity and dietary context. Ingredient presence alone cannot establish exposure."
+},
+
+{
+terms:["aspartame","ins 951","e951"],
+name:"Aspartame (INS 951)",
+level:"Evidence Is Nuanced",
+tone:"amber",
+detail:"IARC classified aspartame as possibly carcinogenic (Group 2B), based on limited evidence. JECFA retained its acceptable daily intake. Hazard classification does not measure the risk from one serving."
+},
+
+{
+terms:["monosodium glutamate","msg","ins 621","e621"],
+name:"MSG (INS 621)",
+level:"Not a Cancer Warning",
+tone:"green",
+detail:"MSG is a flavour enhancer. Its presence is not evidence that the product causes cancer."
+},
+
+{
+terms:["sodium benzoate","ins 211","e211"],
+name:"Sodium Benzoate (INS 211)",
+level:"Context Matters",
+tone:"amber",
+detail:"A preservative permitted in specified categories and limits. Under certain conditions with ascorbic acid, benzene formation can be a concern. This label cannot establish that it occurred."
+},
 
-    <div id="start-overlay">
-        <p>[ TAP ANYWHERE TO INITIALIZE ]</p>
-    </div>
+{
+terms:["potassium bromate","ins 924","e924"],
+name:"Potassium Bromate",
+level:"Needs Verification",
+tone:"red",
+detail:"This additive has raised toxicological concerns. Verify the product against current FSSAI rules. This scan cannot establish its actual concentration or regulatory compliance."
+},
 
-    <div id="c64-container">
+{
+terms:["red 40","allura red","ins 129","e129","sunset yellow","ins 110","e110","tartrazine","ins 102","e102"],
+name:"Synthetic Food Colours",
+level:"Check Permitted Use",
+tone:"amber",
+detail:"Some synthetic colours have category-specific permitted uses and limits. This is not a cancer diagnosis."
+}
 
-        <div class="system-text">
-            ** SYSTEM LOADED **<br>
-            STATION: BEIGE_CORE_01<br>
-            STATUS: SECURE
-        </div>
+];
 
-        <div class="command-line">
-            <span id="typed-command"></span>
-            <span class="cursor"></span>
-        </div>
+function analyseIngredients(text){
 
-    </div>
+const normalized = (text || "").toLowerCase().replace(/[()[\],;]/g," ");
 
-    <div id="dashboard">
+return ingredientChecks.filter(item =>
+item.terms.some(term => normalized.includes(term))
+);
 
-        <header class="mb-8 text-center flex flex-col items-center">
+}
 
-            <div class="donkey-container">
-                <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
-                    <rect x="5" y="7" width="8" height="5" fill="#a0a0a0"/>
-                    <rect x="13" y="6" width="1" height="3" fill="#a0a0a0"/>
-                    <rect x="4" y="4" width="3" height="4" fill="#a0a0a0"/>
-                    <rect x="2" y="5" width="2" height="3" fill="#a0a0a0"/>
-                    <rect x="5" y="12" width="1" height="3" fill="#a0a0a0"/>
-                    <rect x="7" y="12" width="1" height="3" fill="#a0a0a0"/>
-                    <rect x="10" y="12" width="1" height="3" fill="#a0a0a0"/>
-                    <rect x="12" y="12" width="1" height="3" fill="#a0a0a0"/>
-                </svg>
-            </div>
+function safe(value){
 
-            <div class="negocio-box">NEGOCIO</div>
+return String(value ?? "").replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+}[c]));
 
-            <p class="text-[0.6rem] uppercase tracking-[0.15em] text-[#b07d8e]">
-                Welcome, Authorized User
-            </p>
+}
 
-        </header>
+function nutrientFlags(p){
 
-        <button class="enter-btn" id="enter-button">
-            ENTER
-        </button>
+const n = p.nutriments || {};
+const flags = [];
 
-    </div>
+const sugar = Number(n.sugars_100g);
+const salt = Number(n.salt_100g);
+const fat = Number(n["saturated-fat_100g"]);
 
-    <div id="app-window">
+if(Number.isFinite(sugar) && sugar >= 22.5){
 
-        <div class="window-header">
-            <span>MOBILE // MAIN_VIEW</span>
+flags.push({
+name:"High Sugars",
+level:"High per 100 g",
+tone:"amber",
+detail:`${sugar} g sugar per 100 g. This is a screening threshold, not an Indian legal verdict.`
+});
 
-            <button
-                onclick="backToMain()"
-                style="cursor:pointer;color:var(--deep-rose);background:none;border:none;font-family:var(--pixel-font);font-size:0.55rem;">
-                [ ESC ]
-            </button>
-        </div>
+}
 
-        <div class="text-center">
+if(Number.isFinite(salt) && salt >= 1.5){
 
-            <p class="text-xs text-[#b07d8e]">
-                MOBILE VERSION ACTIVE
-            </p>
+flags.push({
+name:"High Salt",
+level:"High per 100 g",
+tone:"amber",
+detail:`${salt} g salt per 100 g. Frequent high salt intake can increase blood pressure.`
+});
 
-            <p class="text-[0.5rem] mt-4 opacity-60">
-                DEVICE READY
-            </p>
+}
 
-            <p class="text-[0.5rem] mt-6 opacity-60">
-                WELCOME TO NEGOCIO
-            </p>
+if(Number.isFinite(fat) && fat >= 5){
 
-        </div>
+flags.push({
+name:"High Saturated Fat",
+level:"High per 100 g",
+tone:"amber",
+detail:`${fat} g saturated fat per 100 g. Consider serving size and overall diet.`
+});
 
-    </div>
+}
 
-    <script>
-        let audioCtx = null;
-        let bgMusic = null;
-        window.sequenceStarted = false;
+return flags;
 
-        function initializeAudio() {
-            if (!audioCtx) {
-                const AudioContextClass =
-                    window.AudioContext || window.webkitAudioContext;
+}
 
-                if (AudioContextClass) {
-                    audioCtx = new AudioContextClass();
-                }
-            }
-        }
+function renderFlags(flags,empty){
 
-        function playC64Key() {
-            if (!audioCtx || audioCtx.state === 'suspended') return;
+if(!flags.length){
 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+return `<p class="muted">${safe(empty)}</p>`;
 
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(80, now);
+}
 
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+return flags.map(f=>`
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+<div class="flag">
 
-            osc.start(now);
-            osc.stop(now + 0.08);
-        }
+<div class="flagtop">
+<b>${safe(f.name)}</b>
+<span class="pill ${f.tone==="red"?"red":f.tone==="green"?"green":""}">
+${safe(f.level)}
+</span>
+</div>
 
-        function playBootSound() {
-            if (!audioCtx || audioCtx.state === 'suspended') return;
+<p>${safe(f.detail)}</p>
 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+</div>
 
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, now);
-            osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+`).join("");
 
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+}
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+function renderNutrition(p){
 
-            osc.start(now);
-            osc.stop(now + 0.3);
-        }
+const n=p.nutriments||{};
 
-        function playIntroMusic() {
-            bgMusic = new Audio(
-                'https://www.soundjay.com/buttons/beep-01a.mp3'
-            );
+const rows=[
+["Energy",n["energy-kcal_100g"],"kcal"],
+["Sugar",n.sugars_100g,"g"],
+["Salt",n.salt_100g,"g"],
+["Saturated Fat",n["saturated-fat_100g"],"g"],
+["Protein",n.proteins_100g,"g"],
+["Fibre",n.fiber_100g,"g"]
+];
 
-            bgMusic.volume = 0.3;
+const valid=rows.filter(r=>r[1]!==undefined&&r[1]!==null&&r[1]!=="");
 
-            bgMusic.play().catch(() => {
-                console.log("Audio playback blocked by browser.");
-            });
+if(!valid.length){
 
-            setTimeout(fadeMusic, 15000);
-        }
+return `<p class="muted">Nutrition data unavailable.</p>`;
 
-        function fadeMusic() {
-            if (!bgMusic) return;
+}
 
-            const fadeInterval = setInterval(() => {
-                if (bgMusic.volume > 0.02) {
-                    bgMusic.volume -= 0.02;
-                } else {
-                    bgMusic.pause();
-                    clearInterval(fadeInterval);
-                }
-            }, 150);
-        }
+return `<div class="nutrients">`+
+valid.map(r=>`
+<div class="nut">
+<span>${r[0]} per 100 g</span>
+<b>${safe(r[1])} ${r[2]}</b>
+</div>
+`).join("")+
+`</div>`;
 
-        async function runSequence() {
+}
 
-            if (window.sequenceStarted) return;
+function showProduct(p,barcode){
 
-            window.sequenceStarted = true;
+const ingredients=p.ingredients_text||p.ingredients_text_en||"";
 
-            initializeAudio();
+const flags=analyseIngredients(ingredients);
+const nflags=nutrientFlags(p);
+const all=[...flags,...nflags];
 
-            if (audioCtx && audioCtx.state === 'suspended') {
-                await audioCtx.resume();
-            }
+const image=p.image_front_small_url||p.image_url||"";
 
-            const overlay = document.getElementById('start-overlay');
+const score=all.some(x=>x.tone==="red")
+?"Review Carefully"
+:all.length
+?"Some Points to Check"
+:"No Listed Flags Found";
 
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
+$("result").style.display="block";
 
-            const command = "BOOT SEQUENCE";
-            const display = document.getElementById('typed-command');
+$("result").innerHTML=`
 
-            playIntroMusic();
+<div class="product">
 
-            await new Promise(resolve => setTimeout(resolve, 400));
+${image?`<img src="${safe(image)}" alt="Product image" loading="lazy">`:""}
 
-            for (let char of command) {
-                display.innerText += char;
-                playC64Key();
+<div>
+<h2>${safe(p.product_name||p.product_name_en||"Unnamed Product")}</h2>
+<div class="muted">${safe(p.brands||"Brand unavailable")}</div>
+<div class="muted">Barcode: ${safe(barcode)}</div>
+<div class="muted">Source: Open Food Facts</div>
+</div>
 
-                await new Promise(resolve => setTimeout(resolve, 80));
-            }
+</div>
 
-            await new Promise(resolve => setTimeout(resolve, 400));
+<div class="score">
+<div>
+<strong>${score}</strong>
+<br>
+<span>Ingredient and nutrition screening</span>
+</div>
+<span>${all.length} findings</span>
+</div>
 
-            playBootSound();
+<div class="sectiontitle">Ingredient Review</div>
 
-            document.getElementById('c64-container').style.opacity = '0';
+${renderFlags(flags,ingredients
+?"No markers from this screening list were found. This does not mean every ingredient is risk-free."
+:"Ingredient information is missing from the database.")}
 
-            setTimeout(() => {
-                document.getElementById('c64-container').style.display = 'none';
+<div class="sectiontitle">Nutrition Review</div>
 
-                document.getElementById('dashboard').classList.add('visible');
+${renderFlags(nflags,"No high sugar, salt or saturated-fat threshold flags from available data.")}
 
-            }, 400);
-        }
+${renderNutrition(p)}
 
-        function enterMobileVersion() {
+<div class="sectiontitle">Recorded Ingredients</div>
 
-            playBootSound();
+<p class="muted">${ingredients?safe(ingredients):"Ingredient data unavailable."}</p>
 
-            document.getElementById('dashboard').classList.remove('visible');
+<p class="foot">
+Database records may be incomplete or intended for another market or pack size. Verify the ingredients on your Indian package. This is not a laboratory test or product-specific safety certification.
+</p>
 
-            document.getElementById('app-window').classList.add('visible');
+`;
 
-        }
+saveScan({
 
-        function backToMain() {
+barcode,
+productName:p.product_name||p.product_name_en||"Unnamed Product",
+findingCount:all.length,
+source:"Open Food Facts"
 
-            playC64Key();
+});
 
-            document.getElementById('app-window').classList.remove('visible');
+}
 
-            document.getElementById('dashboard').classList.add('visible');
+function showManual(text){
 
-        }
+const flags=analyseIngredients(text);
 
-        const startOverlay = document.getElementById('start-overlay');
+$("result").style.display="block";
 
-        startOverlay.addEventListener('click', runSequence);
+$("result").innerHTML=`
 
-        startOverlay.addEventListener('touchstart', runSequence, {
-            passive: true
-        });
+<div class="sectiontitle">Ingredient Analysis</div>
 
-        document.getElementById('enter-button').addEventListener(
-            'click',
-            enterMobileVersion
-        );
+<div class="score">
+<strong>${flags.length} markers found</strong>
+<span>Text screening only</span>
+</div>
 
-    </script>
+${renderFlags(flags,"No markers from this limited screening list were found. This does not mean the food is risk-free.")}
 
+<p class="foot">
+This is not a verified product result. Product identity, quantities and regulatory compliance have not been checked.
+</p>
+
+`;
+
+}
+
+async function lookup(barcode){
+
+const code=barcode.trim();
+
+if(!/^\d{8,14}$/.test(code)){
+
+$("status").textContent="Enter a valid 8–14 digit barcode.";
+return;
+
+}
+
+$("status").textContent="Searching actual product database...";
+
+$("result").style.display="none";
+
+try{
+
+const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=code,product_name,product_name_en,brands,countries,ingredients_text,ingredients_text_en,nutriments,image_front_small_url,image_url`;
+
+const response=await fetch(url);
+
+if(!response.ok){
+
+throw new Error("Product database unavailable. Try again.");
+
+}
+
+const data=await response.json();
+
+if(data.status!==1||!data.product){
+
+$("status").textContent="Product not found. Try another barcode or paste the ingredients manually.";
+return;
+
+}
+
+$("status").textContent="Real product record retrieved.";
+
+showProduct(data.product,code);
+
+}catch(error){
+
+$("status").textContent=error.message||"Unable to retrieve product data.";
+
+}
+
+}
+
+async function saveScan(item){
+
+if(!currentUser)return;
+
+try{
+
+await addDoc(collection(db,"users",currentUser.uid,"scans"),{
+
+...item,
+createdAt:serverTimestamp()
+
+});
+
+loadHistory();
+
+}catch(error){
+
+console.error("Unable to save scan:",error);
+
+}
+
+}
+
+async function loadHistory(){
+
+if(!currentUser)return;
+
+try{
+
+const q=query(
+collection(db,"users",currentUser.uid,"scans"),
+orderBy("createdAt","desc"),
+limit(5)
+);
+
+const snapshot=await getDocs(q);
+
+if(snapshot.empty)return;
+
+$("history").style.display="block";
+
+$("historyList").innerHTML=snapshot.docs.map(doc=>{
+
+const x=doc.data();
+
+return `
+<div class="historyitem">
+<b>${safe(x.productName)}</b>
+<span>${safe(x.barcode)}</span>
+</div>
+`;
+
+}).join("");
+
+}catch(error){
+
+console.warn("History unavailable",error);
+
+}
+
+}
+
+async function startCamera(){
+
+if(!navigator.mediaDevices?.getUserMedia){
+
+$("status").textContent="Camera unavailable. Enter barcode manually.";
+$("barcodeRow").style.display="flex";
+return;
+
+}
+
+try{
+
+stream=await navigator.mediaDevices.getUserMedia({
+
+video:{facingMode:{ideal:"environment"}},
+audio:false
+
+});
+
+$("video").srcObject=stream;
+
+$("camera").style.display="block";
+
+await $("video").play();
+
+if(!("BarcodeDetector" in window)){
+
+$("status").textContent="Barcode scanning is unsupported in this browser. Enter the barcode manually.";
+
+$("barcodeRow").style.display="flex";
+
+return;
+
+}
+
+let detector;
+
+try{
+
+detector=new BarcodeDetector({
+
+formats:["ean_13","ean_8","upc_a","upc_e"]
+
+});
+
+}catch{
+
+detector=new BarcodeDetector();
+
+}
+
+scanLoop=true;
+
+$("status").textContent="Point the camera at the barcode.";
+
+const scan=async()=>{
+
+if(!scanLoop)return;
+
+try{
+
+const codes=await detector.detect($("video"));
+
+if(codes.length){
+
+stopCamera();
+
+$("barcodeInput").value=codes[0].rawValue;
+
+lookup(codes[0].rawValue);
+
+return;
+
+}
+
+}catch(error){
+
+console.warn(error);
+
+}
+
+requestAnimationFrame(scan);
+
+};
+
+requestAnimationFrame(scan);
+
+}catch(error){
+
+$("status").textContent="Camera permission denied or unavailable. Enter the barcode manually.";
+
+$("barcodeRow").style.display="flex";
+
+}
+
+}
+
+function stopCamera(){
+
+scanLoop=false;
+
+if(stream){
+
+stream.getTracks().forEach(track=>track.stop());
+
+stream=null;
+
+}
+
+$("camera").style.display="none";
+
+}
+
+$("scanBtn").onclick=startCamera;
+
+$("stopCamera").onclick=stopCamera;
+
+$("manualBtn").onclick=()=>{
+
+$("barcodeRow").style.display=
+
+$("barcodeRow").style.display==="flex"?"none":"flex";
+
+};
+
+$("lookupBtn").onclick=()=>lookup($("barcodeInput").value);
+
+$("barcodeInput").addEventListener("keydown",e=>{
+
+if(e.key==="Enter")lookup($("barcodeInput").value);
+
+});
+
+$("analyseText").onclick=()=>{
+
+const text=$("ingredientInput").value.trim();
+
+if(!text){
+
+$("status").textContent="Paste an ingredient list first.";
+return;
+
+}
+
+showManual(text);
+
+$("status").textContent="Text analysis complete. Not a verified product result.";
+
+};
+
+try{
+
+const credential=await signInAnonymously(auth);
+
+currentUser=credential.user;
+
+loadHistory();
+
+}catch(error){
+
+console.error("Firebase authentication unavailable:",error);
+
+$("status").textContent="Product scanning works. Enable Firebase Anonymous Authentication to save scan history.";
+
+}
+
+</script>
 </body>
 </html>
