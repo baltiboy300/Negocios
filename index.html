@@ -39,7 +39,7 @@
             z-index: 100;
         }
 
-        #c64-container, #dashboard, #app-window {
+        #c64-container, #dashboard {
             position: fixed;
             inset: 0;
             background-color: var(--bg-beige);
@@ -54,14 +54,14 @@
         }
 
         @media (max-width: 640px) {
-            #c64-container, #dashboard, #app-window {
+            #c64-container, #dashboard {
                 border-width: 8px;
                 outline-width: 2px;
                 outline-offset: -5px;
                 padding: 16px;
             }
             .system-text { font-size: 0.55rem !important; line-height: 2.2 !important; }
-            .enter-btn { padding: 14px 24px !important; font-size: 0.75rem !important; width: 100%; max-width: 260px; }
+            .enter-btn { padding: 14px 24px !important; font-size: 0.75rem !important; width: 100%; max-width: 260px; display: inline-block; text-decoration: none; text-align: center; }
             .negocio-box { font-size: 0.6rem !important; letter-spacing: 3px !important; padding: 6px 16px !important; }
             .donkey-container { width: 64px !important; height: 64px !important; }
         }
@@ -94,8 +94,8 @@
 
         @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 
-        #dashboard, #app-window { display: none; opacity: 0; z-index: 10; align-items: center; justify-content: center; }
-        #dashboard.visible, #app-window.visible { display: flex; opacity: 1; }
+        #dashboard { display: none; opacity: 0; z-index: 10; align-items: center; justify-content: center; }
+        #dashboard.visible { display: flex; opacity: 1; }
 
         .enter-btn {
             background: white;
@@ -109,6 +109,9 @@
             text-transform: uppercase;
             box-shadow: 4px 4px 0px var(--accent-pink);
             -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
         .enter-btn:active {
@@ -131,17 +134,6 @@
             height: 80px;
             margin-bottom: 15px;
             opacity: 0.8;
-        }
-
-        .window-header {
-            border-bottom: 2px solid var(--accent-pink);
-            width: 100%;
-            padding: 8px 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 0.55rem;
         }
 
         #start-overlay {
@@ -198,18 +190,8 @@
             <div class="negocio-box">NEGOCIO</div>
             <p class="text-[0.6rem] uppercase tracking-[0.15em] text-[#b07d8e]">Welcome, Authorized User</p>
         </header>
-        <button class="enter-btn" id="enter-button">ENTER</button>
-    </div>
-
-    <div id="app-window">
-        <div class="window-header">
-            <span>TERMINAL // MAIN_VIEW</span>
-            <button onclick="backToMain()" style="cursor: pointer; color: var(--deep-rose); background:none; border:none; font-family:var(--pixel-font); font-size:0.55rem;">[ ESC ]</button>
-        </div>
-        <div class="text-center">
-            <p class="text-xs text-[#b07d8e]">REDIRECTING...</p>
-            <p class="text-[0.5rem] mt-4 opacity-60">ANALYZING DEVICE ARCHITECTURE</p>
-        </div>
+        <!-- Directly using an anchor tag to completely satisfy iOS Safari navigation rules -->
+        <a href="#" id="enter-button" class="enter-btn">ENTER</a>
     </div>
 
     <script>
@@ -251,9 +233,7 @@
         function playIntroMusic() {
             bgMusic = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3'); 
             bgMusic.volume = 0.3;
-            bgMusic.play().catch((err) => {
-                console.log("Audio playback deferred or blocked by browser policy.");
-            });
+            bgMusic.play().catch(() => {});
             setTimeout(() => fadeMusic(), 15000);
         }
 
@@ -270,10 +250,8 @@
         }
 
         async function runSequence(e) {
-            if (e) {
-                if (audioCtx.state === 'suspended') {
-                    await audioCtx.resume();
-                }
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
             }
 
             if (window.sequenceStarted) return;
@@ -303,43 +281,22 @@
             }, 400);
         }
 
-        function detectAndRedirect(e) {
-            if (e) {
-                e.stopPropagation();
-                e.preventDefault();
+        // Dynamically assign the correct link href based on device on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+            const enterBtn = document.getElementById('enter-button');
+
+            if (isMobile) {
+                enterBtn.setAttribute('href', 'NEGOCIO MOBILE final product.html');
+            } else {
+                enterBtn.setAttribute('href', 'NEGOCIO PC FINAL PRODUCT.html');
             }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            playBootSound();
-            document.getElementById('dashboard').classList.remove('visible');
-            document.getElementById('app-window').classList.add('visible');
-
-            setTimeout(() => {
-                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-
-                // Safely handles exact filenames with spaces and uppercase letters using encodeURIComponent
-                if (isMobile) {
-                    window.open('NEGOCIO MOBILE final product.html', '_self');
-                } else {
-                    window.open('NEGOCIO PC FINAL PRODUCT.html', '_self');
-                }
-            }, 1200);
-        }
-
-        function backToMain() {
-            playC64Key();
-            document.getElementById('app-window').classList.remove('visible');
-            document.getElementById('dashboard').classList.add('visible');
-        }
+        });
 
         const startOverlay = document.getElementById('start-overlay');
         startOverlay.addEventListener('click', runSequence);
         startOverlay.addEventListener('touchstart', runSequence, { passive: true });
-
-        document.getElementById('enter-button').addEventListener('click', detectAndRedirect);
-        document.getElementById('enter-button').addEventListener('touchend', detectAndRedirect, { passive: false });
     </script>
 </body>
 </html>
