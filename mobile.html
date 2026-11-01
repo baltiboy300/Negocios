@@ -1,72 +1,451 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f7f8f5">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101812">
 <title>FoodCheck India</title>
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f7f8f5;color:#17221d;font-family:Arial,sans-serif}
-header{height:65px;background:white;border-bottom:1px solid #e5eae5;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100% - 950px)/2))}
-.brand{font-size:20px;font-weight:800}.brand span{color:#168052}
-main{max-width:850px;margin:38px auto;padding:0 18px}
-h1{font-size:42px;letter-spacing:-1.5px;margin:12px 0}
-h2{font-size:20px}
-.sub{color:#758078;font-size:14px;line-height:1.7}
-.panel{background:white;border:1px solid #e5eae5;border-radius:17px;padding:20px;margin:18px 0}
-button{border:0;border-radius:10px;padding:13px 17px;font-weight:bold;cursor:pointer}
-.primary{background:#176b4b;color:white}
-.secondary{background:#edf3ee;color:#24543d}
-input,textarea{padding:13px;border:1px solid #dfe6df;border-radius:10px;font:inherit;min-width:0}
-.row{display:flex;gap:10px}
-.row input{flex:1;width:100%}
-#barcodeRow{display:none;margin-top:12px}
-#camera{display:none;margin-top:15px;position:relative;background:#111;border-radius:12px;overflow:hidden}
-video{width:100%;max-height:300px}
-#status{font-size:13px;color:#718078;margin-top:13px}
-#result{display:none}
-.product{display:flex;gap:15px;align-items:center}
-.product img{width:85px;height:85px;object-fit:contain;border-radius:12px;background:#f5f7f4}
-.muted{color:#78847c;font-size:12px;line-height:1.6}
-.section{font-size:17px;font-weight:800;margin:25px 0 12px}
-.score{padding:15px;background:#f1f6f1;border-radius:12px;margin:16px 0}
-.flag,.country,.news,.difference{padding:14px;border:1px solid #e8ece7;border-radius:12px;margin:9px 0}
-.flagtop,.countryhead{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.flag b{font-size:13px}
-.flag p,.news p{font-size:12px;color:#69766e;line-height:1.6}
-.pill{font-size:10px;font-weight:bold;padding:5px 9px;border-radius:20px;background:#f5eee0;color:#8c6727;white-space:nowrap}
-.red{background:#fae9e7;color:#a53d32}
-.green{background:#e7f3eb;color:#26714a}
-.blue{background:#e8eff9;color:#315b90}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.nutrient{background:#f5f7f4;border-radius:10px;padding:13px}
-.nutrient span{display:block;font-size:11px;color:#77847b}
-.nutrient b{font-size:16px}
-.tabs{display:flex;gap:8px;overflow-x:auto;margin:15px 0}
-.tabs button{white-space:nowrap;padding:10px 13px}
-.active{background:#176b4b;color:white}
-.childbox{background:#f0f7f1;border:1px solid #dceade;border-radius:13px;padding:15px;margin:12px 0}
-.childbox b{font-size:14px}
-.childbox p{font-size:13px;line-height:1.7;color:#435a49;margin-bottom:0}
-.diffrow{padding:13px 0;border-bottom:1px solid #edf0eb}
-.diffrow:last-child{border:0}
-.diffrow b{font-size:13px}
-.diffrow p{font-size:12px;color:#68756d;line-height:1.6}
-.bar{height:9px;background:#e9eee9;border-radius:10px;overflow:hidden;margin-top:8px}
-.bar div{height:100%;background:#36865c;border-radius:10px}
-.news a{color:#176b4b;font-size:14px;font-weight:bold;text-decoration:none}
-.news small{font-size:11px;color:#839087}
-.foot{font-size:11px;color:#89938c;line-height:1.7}
-details summary{cursor:pointer;font-weight:bold;font-size:13px;color:#176b4b}
-textarea{width:100%;margin-top:12px;min-height:85px}
-@media(max-width:550px){
-h1{font-size:34px}
-.row{flex-direction:column}
-.grid{grid-template-columns:1fr}
-.panel{padding:16px}
+:root {
+    --bg: #101812;
+    --panel: #19251d;
+    --panel2: #202e25;
+    --green: #9be7a8;
+    --green2: #c9f5ce;
+    --text: #f2f7f2;
+    --muted: #a9b8ac;
+    --red: #ff8585;
+    --yellow: #ffd477;
+    --border: #34463a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+    padding: 22px 6%;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--green);
+}
+
+.logo span {
+    color: white;
+}
+
+.header-tag {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+main {
+    width: min(1100px, 92%);
+    margin: 35px auto;
+}
+
+.hero {
+    margin-bottom: 28px;
+}
+
+.hero h1 {
+    font-size: clamp(28px, 5vw, 46px);
+    margin: 0 0 12px;
+    line-height: 1.12;
+}
+
+.hero h1 span {
+    color: var(--green);
+}
+
+.hero p {
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 650px;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 20px;
+    margin: 0 0 16px;
+}
+
+h3 {
+    font-size: 16px;
+    margin: 0 0 12px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+input, select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    background: #101a13;
+    border: 1px solid var(--border);
+    color: white;
+    outline: none;
+    font-size: 15px;
+}
+
+input:focus, select:focus {
+    border-color: var(--green);
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 13px 18px;
+    background: var(--green);
+    color: #102015;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--green2);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.secondary {
+    background: var(--panel2);
+    color: white;
+    border: 1px solid var(--border);
+}
+
+.secondary:hover {
+    background: #2b3d30;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.input-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.status {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 12px;
+    line-height: 1.5;
+}
+
+.error {
+    color: var(--red);
+}
+
+.success {
+    color: var(--green);
+}
+
+#camera {
+    display: none;
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-top: 15px;
+    background: black;
+}
+
+.product-top {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+
+.product-top img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    background: white;
+    border-radius: 12px;
+    padding: 5px;
+}
+
+.product-top h2 {
+    margin-bottom: 6px;
+}
+
+.product-meta {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.stat {
+    background: var(--panel2);
+    padding: 16px;
+    border-radius: 12px;
+    min-width: 0;
+}
+
+.stat small {
+    color: var(--muted);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.stat strong {
+    font-size: 21px;
+}
+
+.stat p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+.pill {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #293b2e;
+    color: var(--green);
+    font-size: 12px;
+    margin: 3px 3px 3px 0;
+}
+
+.warning-pill {
+    background: #493b22;
+    color: var(--yellow);
+}
+
+.danger-pill {
+    background: #482929;
+    color: var(--red);
+}
+
+.ingredient-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.ingredient {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.difference-item {
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.5;
+}
+
+.difference-item:last-child {
+    border-bottom: 0;
+}
+
+.difference-item strong {
+    color: var(--green);
+}
+
+.summary-text {
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.good {
+    color: var(--green);
+}
+
+.bad {
+    color: var(--red);
+}
+
+.neutral {
+    color: var(--yellow);
+}
+
+.comparison-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.country-box {
+    background: var(--panel2);
+    border-radius: 12px;
+    padding: 14px;
+    min-width: 0;
+}
+
+.country-box small {
+    color: var(--muted);
+}
+
+.country-box strong {
+    display: block;
+    margin-top: 7px;
+    overflow-wrap: anywhere;
+}
+
+.nutrition-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    font-size: 13px;
+}
+
+.nutrition-row:last-child {
+    border-bottom: 0;
+}
+
+.nutrition-row span:nth-child(2),
+.nutrition-row span:nth-child(3) {
+    text-align: right;
+}
+
+.meter {
+    width: 100%;
+    height: 7px;
+    background: #34463a;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.meter div {
+    height: 100%;
+    background: var(--green);
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 30px 15px;
+    line-height: 1.7;
+}
+
+a {
+    color: var(--green);
+}
+
+.news-item {
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.news-item:last-child {
+    border-bottom: 0;
+}
+
+.news-item a {
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1.5;
+}
+
+.news-item p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media(max-width:650px) {
+    header {
+        padding: 18px 5%;
+    }
+
+    main {
+        width: 92%;
+        margin-top: 25px;
+    }
+
+    .panel {
+        padding: 17px;
+    }
+
+    .input-row {
+        flex-direction: column;
+    }
+
+    .input-row button {
+        width: 100%;
+    }
+
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .product-top {
+        align-items: flex-start;
+    }
+
+    .product-top img {
+        width: 78px;
+        height: 78px;
+    }
+
+    .nutrition-row {
+        font-size: 11px;
+    }
 }
 </style>
 </head>
@@ -74,973 +453,1273 @@ h1{font-size:34px}
 <body>
 
 <header>
-<div class="brand">FoodCheck <span>India</span></div>
-<div class="muted">Know what you eat</div>
+    <div class="logo">FoodCheck<span> India</span></div>
+    <div class="header-tag">Know what you eat.</div>
 </header>
 
 <main>
 
-<div class="muted" style="color:#168052;font-weight:bold;letter-spacing:2px">
-SCAN · COMPARE · UNDERSTAND
-</div>
+    <section class="hero">
+        <h1>What's really <span>inside your food?</span></h1>
+        <p>
+            Scan a food barcode to explore its ingredients, nutrition,
+            and how the same product compares across countries.
+        </p>
+    </section>
 
-<h1>Know what's<br>inside your food.</h1>
+    <section class="panel">
+        <h2>Scan a product</h2>
 
-<p class="sub">
-Scan any packaged food and discover its ingredients, compare Indian and European versions, and learn about food safety news.
-</p>
+        <label for="barcodeInput">Enter the product barcode</label>
 
-<section class="panel">
+        <div class="input-row">
+            <input id="barcodeInput" type="text"
+                   inputmode="numeric"
+                   placeholder="Enter barcode number">
+            <button id="searchButton" onclick="lookupBarcode()">
+                Search product
+            </button>
+        </div>
 
-<div class="row">
-<button class="primary" id="scan">▣ Scan Product</button>
-<button class="secondary" id="manual">Enter Barcode</button>
-</div>
+        <div class="actions">
+            <button onclick="startCamera()">Scan with camera</button>
+            <button class="secondary" onclick="stopCamera()">Close camera</button>
+        </div>
 
-<div id="camera">
-<video id="video" autoplay playsinline muted></video>
-<button id="close" style="position:absolute;top:10px;right:10px">Close</button>
-</div>
+        <video id="camera" playsinline></video>
 
-<div class="row" id="barcodeRow">
-<input id="barcode" placeholder="Enter barcode number" inputmode="numeric">
-<button class="primary" id="search">Search</button>
-</div>
+        <div id="scanStatus" class="status">
+            Enter a barcode or use your camera to scan a product.
+        </div>
+    </section>
 
-<div id="status">Ready to scan a food product.</div>
+    <div id="results" class="hidden">
 
-</section>
+        <section class="panel">
+            <div class="product-top">
+                <img id="productImage" alt="Product image">
+                <div>
+                    <h2 id="productName">Product name</h2>
+                    <div class="product-meta" id="productMeta"></div>
+                    <div class="product-meta" id="productBarcode"></div>
+                </div>
+            </div>
+        </section>
 
-<div id="result" class="panel">
+        <section class="panel">
+            <h2>Nutrition facts</h2>
+            <p class="summary-text">
+                These values are shown per 100 grams or 100 millilitres,
+                depending on the information available.
+            </p>
+            <div class="grid" id="nutritionGrid"></div>
+        </section>
 
-<div id="productInfo"></div>
+        <section class="panel">
+            <h2>Ingredients</h2>
+            <p class="summary-text">
+                These are the ingredients listed in the product database.
+                The list may not be complete.
+            </p>
+            <div id="ingredientsList" class="ingredient-list"></div>
+        </section>
 
-<div class="score" id="overview"></div>
+        <section class="panel">
+            <h2>Ingredient check</h2>
+            <div id="ingredientWarnings"></div>
+        </section>
 
-<div class="section">1. Ingredient Safety</div>
-<div id="ingredients"></div>
+        <section class="panel">
+            <h2>Compare countries</h2>
 
-<div class="section">2. Nutrition Information</div>
-<div id="nutrition"></div>
+            <p class="summary-text">
+                Compare the scanned product with a matching product record
+                from another country. The comparison only works when the
+                database has enough information.
+            </p>
 
-<div class="section">3. India vs Europe</div>
+            <label for="countrySelect">Choose another country</label>
+            <select id="countrySelect">
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Germany">Germany</option>
+                <option value="France">France</option>
+                <option value="Italy">Italy</option>
+                <option value="Spain">Spain</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Belgium">Belgium</option>
+            </select>
 
-<div class="childbox">
-<b>🌍 What does this comparison mean?</b>
-<p>
-We look at food products sold in India and compare them with similar products sold in Europe. We check which ingredients are different and whether the amount of sugar, salt and saturated fat changes.
-</p>
-</div>
+            <div class="actions">
+                <button id="compareButton" onclick="compareCountries()">
+                    Compare products
+                </button>
+            </div>
 
-<div class="tabs" id="countryTabs"></div>
+            <div id="compareStatus" class="status"></div>
+        </section>
 
-<div id="comparisons">
-<p class="muted">Waiting for country information...</p>
-</div>
+        <div id="comparisonResults" class="hidden">
 
-<div class="section">4. Recent Negative News</div>
+            <section class="panel">
+                <h2>Products being compared</h2>
+                <div class="comparison-header">
+                    <div class="country-box">
+                        <small>Scanned product</small>
+                        <strong id="leftProductName"></strong>
+                        <div class="product-meta" id="leftProductCountry"></div>
+                    </div>
+                    <div class="country-box">
+                        <small id="rightCountryLabel">Other country</small>
+                        <strong id="rightProductName"></strong>
+                        <div class="product-meta" id="rightProductCountry"></div>
+                    </div>
+                </div>
+                <div id="matchQuality" class="status"></div>
+            </section>
 
-<div class="childbox">
-<b>📰 Why is this important?</b>
-<p>
-We search for news about product recalls, contamination, food safety warnings and other reported problems. News reports are not automatically proof that a product is unsafe.
-</p>
-</div>
+            <section class="panel">
+                <h2>Difference summary</h2>
+                <p class="summary-text">
+                    Here is a simple explanation of what is different
+                    between the two product records.
+                </p>
+                <div id="differenceSummary"></div>
+            </section>
 
-<div id="news">
-<p class="muted">Searching...</p>
-</div>
+            <section class="panel">
+                <h2>Ingredient differences</h2>
 
-<div class="section">5. Official Food Safety Resources</div>
+                <h3>Listed in the scanned product, not in the other record</h3>
+                <div id="leftOnlyIngredients" class="ingredient-list"></div>
 
-<div class="flag">
-<b>European Union — RASFF</b>
-<p>Official European food safety alerts and recalls.</p>
-<a href="https://food.ec.europa.eu/food-safety/rasff_en" target="_blank" rel="noopener">Visit RASFF ↗</a>
-</div>
+                <h3 style="margin-top:22px">
+                    Listed in the other record, not in the scanned product
+                </h3>
+                <div id="rightOnlyIngredients" class="ingredient-list"></div>
 
-<div class="flag">
-<b>India — FSSAI</b>
-<p>Indian food safety rules and notifications.</p>
-<a href="https://www.fssai.gov.in/" target="_blank" rel="noopener">Visit FSSAI ↗</a>
-</div>
+                <p class="summary-text" style="margin-top:16px">
+                    These are differences between database ingredient lists.
+                    They do not prove that an ingredient is legally banned,
+                    unsafe, or absent from every version sold in that country.
+                </p>
+            </section>
 
-</div>
+            <section class="panel">
+                <h2>Nutrition comparison</h2>
+                <p class="summary-text">
+                    All values below are per 100 g or 100 ml, as recorded.
+                </p>
+                <div id="nutritionComparison"></div>
+            </section>
 
-<section class="panel">
-<details>
-<summary>Manually analyse an ingredient label</summary>
-<textarea id="manualIngredients" placeholder="Paste ingredients from the package..."></textarea>
-<button class="secondary" id="analyse">Analyse Ingredients</button>
-<div id="manualResult"></div>
-</details>
-</section>
+        </div>
 
-<p class="foot">
-FoodCheck uses Open Food Facts, a community-maintained database. Product records may be incomplete or outdated. Country comparisons are based on matching database records, not guaranteed manufacturer-confirmed formulations. Health flags are educational screening information, not medical diagnoses. Always verify the physical package and current FSSAI or European regulations.
-</p>
+        <section class="panel">
+            <h2>Recent product news</h2>
+            <p class="summary-text">
+                News search results may mention similar products or brands.
+                Always open the source and check whether it refers to this
+                exact product.
+            </p>
+            <div id="newsResults" class="summary-text">
+                News has not been searched yet.
+            </div>
+            <div class="actions">
+                <button class="secondary" onclick="loadNews()">
+                    Search recent news
+                </button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Official food safety sources</h2>
+            <div class="difference-item">
+                <strong>India – FSSAI</strong>
+                <p class="summary-text">
+                    Food safety alerts, standards and regulations.
+                </p>
+                <a href="https://www.fssai.gov.in/" target="_blank" rel="noopener">
+                    Visit FSSAI
+                </a>
+            </div>
+            <div class="difference-item">
+                <strong>Europe – RASFF</strong>
+                <p class="summary-text">
+                    European food and feed safety alerts.
+                </p>
+                <a href="https://webgate.ec.europa.eu/rasff-window/screen/search"
+                   target="_blank" rel="noopener">
+                    Visit RASFF
+                </a>
+            </div>
+        </section>
+
+    </div>
 
 </main>
 
+<footer>
+    FoodCheck India uses publicly available product information.
+    Database entries can be incomplete or incorrect.
+    Ingredient presence alone does not establish health risk.
+</footer>
+
 <script type="module">
-
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getAuth,
+    signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
-getFirestore,
-collection,
-addDoc,
-serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import {
-getAuth,
-signInAnonymously
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-
-const firebaseConfig={
-apiKey:"AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
-authDomain:"negocios-8e8a4.firebaseapp.com",
-databaseURL:"https://negocios-8e8a4-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"negocios-8e8a4",
-storageBucket:"negocios-8e8a4.firebasestorage.app",
-messagingSenderId:"298423907311",
-appId:"1:298423907311:web:92b79b23776a4f56557c1a"
+const firebaseConfig = {
+    apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
+    authDomain: "negocios-8e8a4.firebaseapp.com",
+    databaseURL: "https://negocios-8e8a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "negocios-8e8a4",
+    storageBucket: "negocios-8e8a4.firebasestorage.app",
+    messagingSenderId: "298423907311",
+    appId: "1:298423907311:web:92b79b23776a4f56557c1a"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-const auth=getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-let user=null;
-let stream=null;
-let productData=null;
-let countryCache={};
-let selectedCountry="germany";
-let lookupGeneration=0;
+let currentProduct = null;
+let comparisonProduct = null;
+let cameraStream = null;
+let scanTimer = null;
 
-const $=id=>document.getElementById(id);
+const countryInfo = {
+    "United Kingdom": {
+        tag: "united-kingdom",
+        subdomain: "gb"
+    },
+    "Germany": {
+        tag: "germany",
+        subdomain: "de"
+    },
+    "France": {
+        tag: "france",
+        subdomain: "fr"
+    },
+    "Italy": {
+        tag: "italy",
+        subdomain: "it"
+    },
+    "Spain": {
+        tag: "spain",
+        subdomain: "es"
+    },
+    "Netherlands": {
+        tag: "netherlands",
+        subdomain: "nl"
+    },
+    "Belgium": {
+        tag: "belgium",
+        subdomain: "be"
+    }
+};
 
-const countries=[
-{key:"united-kingdom",name:"United Kingdom"},
-{key:"germany",name:"Germany"},
-{key:"france",name:"France"},
-{key:"italy",name:"Italy"},
-{key:"spain",name:"Spain"},
-{key:"netherlands",name:"Netherlands"},
-{key:"belgium",name:"Belgium"}
+const fields = [
+    "code",
+    "product_name",
+    "product_name_en",
+    "brands",
+    "quantity",
+    "countries",
+    "countries_tags",
+    "ingredients_text",
+    "ingredients_text_en",
+    "ingredients",
+    "nutriments",
+    "image_url",
+    "image_front_url",
+    "categories",
+    "additives_tags",
+    "allergens",
+    "nutrition_grades",
+    "nova_group"
+].join(",");
+
+function byId(id) {
+    return document.getElementById(id);
+}
+
+function setStatus(id, message, type = "") {
+    const element = byId(id);
+    element.className = "status " + type;
+    element.textContent = message;
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[char]);
+}
+
+async function fetchJSON(url, timeout = 15000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        const response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        return await response.json();
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function getProductName(product) {
+    return product?.product_name ||
+           product?.product_name_en ||
+           "Unknown product";
+}
+
+function getIngredients(product) {
+    let text = product?.ingredients_text_en ||
+               product?.ingredients_text ||
+               "";
+
+    if (text.trim()) return text;
+
+    if (Array.isArray(product?.ingredients)) {
+        return product.ingredients
+            .map(item => item.text || item.id || "")
+            .filter(Boolean)
+            .join(", ");
+    }
+
+    return "";
+}
+
+function getNutrient(product, keys) {
+    const nutrients = product?.nutriments || {};
+
+    for (const key of keys) {
+        const value = nutrients[key];
+
+        if (value !== undefined && value !== null && value !== "") {
+            const number = Number(value);
+            if (Number.isFinite(number)) return number;
+        }
+    }
+
+    return null;
+}
+
+function formatNumber(value) {
+    if (value === null || value === undefined) return "Not available";
+    return Number(value).toFixed(2).replace(/\.?0+$/, "");
+}
+
+function nutrientData(product) {
+    return [
+        {
+            name: "Sugar",
+            keys: ["sugars_100g"],
+            unit: "g"
+        },
+        {
+            name: "Salt",
+            keys: ["salt_100g"],
+            unit: "g"
+        },
+        {
+            name: "Saturated fat",
+            keys: ["saturated-fat_100g"],
+            unit: "g"
+        },
+        {
+            name: "Total fat",
+            keys: ["fat_100g"],
+            unit: "g"
+        },
+        {
+            name: "Energy",
+            keys: ["energy-kcal_100g"],
+            unit: "kcal"
+        },
+        {
+            name: "Protein",
+            keys: ["proteins_100g"],
+            unit: "g"
+        },
+        {
+            name: "Fibre",
+            keys: ["fiber_100g"],
+            unit: "g"
+        }
+    ].map(item => ({
+        ...item,
+        value: getNutrient(product, item.keys)
+    }));
+}
+
+async function lookupBarcode() {
+    const barcode = byId("barcodeInput").value.trim();
+
+    if (!/^[0-9]{8,14}$/.test(barcode)) {
+        setStatus("scanStatus", "Please enter a valid barcode with 8 to 14 digits.", "error");
+        return;
+    }
+
+    byId("searchButton").disabled = true;
+    setStatus("scanStatus", "Searching product database...");
+
+    try {
+        const url =
+            "https://world.openfoodfacts.org/api/v2/product/" +
+            encodeURIComponent(barcode) +
+            ".json?fields=" +
+            encodeURIComponent(fields);
+
+        const data = await fetchJSON(url);
+
+        if (data.status !== 1 || !data.product) {
+            throw new Error("This barcode was not found in Open Food Facts.");
+        }
+
+        currentProduct = {
+            ...data.product,
+            code: data.code || barcode
+        };
+
+        showProduct(currentProduct);
+        await saveScan(currentProduct);
+
+        setStatus("scanStatus", "Product found successfully.", "success");
+        stopCamera();
+
+    } catch (error) {
+        setStatus(
+            "scanStatus",
+            error.name === "AbortError"
+                ? "The product search timed out. Please try again."
+                : error.message || "Could not load the product.",
+            "error"
+        );
+    } finally {
+        byId("searchButton").disabled = false;
+    }
+}
+
+function showProduct(product) {
+    byId("results").classList.remove("hidden");
+    byId("comparisonResults").classList.add("hidden");
+
+    byId("productName").textContent = getProductName(product);
+
+    byId("productMeta").textContent =
+        (product.brands || "Brand not available") +
+        (product.quantity ? " • " + product.quantity : "");
+
+    byId("productBarcode").textContent =
+        "Barcode: " + (product.code || "Not available");
+
+    byId("productImage").src =
+        product.image_front_url ||
+        product.image_url ||
+        "https://placehold.co/120x120?text=No+Image";
+
+    byId("productImage").onerror = () => {
+        byId("productImage").src =
+            "https://placehold.co/120x120?text=No+Image";
+    };
+
+    renderNutrition(product);
+    renderIngredients(product);
+    renderIngredientWarnings(product);
+    byId("newsResults").textContent = "Click the button to search recent news.";
+    byId("results").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderNutrition(product) {
+    const values = nutrientData(product);
+
+    byId("nutritionGrid").innerHTML = values.map(item => `
+        <div class="stat">
+            <small>${escapeHTML(item.name)}</small>
+            <strong>${formatNumber(item.value)}</strong>
+            <p>${item.unit} per 100 g / 100 ml</p>
+        </div>
+    `).join("");
+}
+
+function splitIngredients(text) {
+    if (!text) return [];
+
+    return text
+        .split(/[,;]+/)
+        .map(item => item
+            .replace(/\([^)]*\)/g, "")
+            .replace(/\[[^\]]*\]/g, "")
+            .trim()
+        )
+        .filter(item => item.length > 1);
+}
+
+function normalizeIngredient(value) {
+    return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\([^)]*\)/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+        .replace(/\s+/g, " ");
+}
+
+function renderIngredients(product) {
+    const ingredients = splitIngredients(getIngredients(product));
+
+    if (!ingredients.length) {
+        byId("ingredientsList").innerHTML =
+            '<span class="summary-text">Ingredient information is not available.</span>';
+        return;
+    }
+
+    byId("ingredientsList").innerHTML = ingredients.map(item =>
+        `<span class="ingredient">${escapeHTML(item)}</span>`
+    ).join("");
+}
+
+const ingredientInfo = [
+    {
+        terms: ["partially hydrogenated", "hydrogenated vegetable oil"],
+        name: "Hydrogenated oils",
+        detail: "Some hydrogenated oils can contain industrial trans fats. Check the exact ingredient and nutrition label."
+    },
+    {
+        terms: ["aspartame"],
+        name: "Aspartame",
+        detail: "A low-calorie sweetener. People with phenylketonuria (PKU) must avoid it."
+    },
+    {
+        terms: ["sodium nitrite", "sodium nitrate", "potassium nitrite", "potassium nitrate"],
+        name: "Nitrite or nitrate preservatives",
+        detail: "Used in some cured meats. Their safety depends on permitted use and exposure."
+    },
+    {
+        terms: ["sodium benzoate", "potassium sorbate"],
+        name: "Preservatives",
+        detail: "These help prevent spoilage. Their permitted use depends on food type and regulations."
+    },
+    {
+        terms: ["potassium bromate"],
+        name: "Potassium bromate",
+        detail: "A flour treatment agent restricted or prohibited in several countries. Check local rules and the exact product."
+    },
+    {
+        terms: ["monosodium glutamate", "msg"],
+        name: "MSG",
+        detail: "A flavour enhancer. Its presence alone does not mean the food is unsafe."
+    }
 ];
 
-const checks=[
-{
-terms:["partially hydrogenated","vanaspati"],
-name:"Partially hydrogenated oils",
-level:"High concern",
-tone:"red",
-explanation:"These can contain industrial trans fats, which increase heart disease risk. This is not a cancer finding."
-},
-{
-terms:["aspartame","ins 951","e951"],
-name:"Aspartame",
-level:"Evidence is nuanced",
-tone:"amber",
-explanation:"IARC classified aspartame as possibly carcinogenic (Group 2B), based on limited evidence. JECFA retained its acceptable daily intake. This does not mean one serving causes cancer."
-},
-{
-terms:["sodium nitrite","ins 250","e250"],
-name:"Sodium nitrite",
-level:"Context matters",
-tone:"amber",
-explanation:"Can participate in nitrosamine formation under certain conditions. Risk depends on food type, processing and exposure."
-},
-{
-terms:["sodium nitrate","ins 251","e251","potassium nitrate","ins 252"],
-name:"Nitrate salts",
-level:"Context matters",
-tone:"amber",
-explanation:"Health assessment depends on source, amount and dietary context."
-},
-{
-terms:["sodium benzoate","ins 211","e211"],
-name:"Sodium benzoate",
-level:"Context matters",
-tone:"amber",
-explanation:"Under certain conditions with ascorbic acid, benzene formation can be a concern. This ingredient list cannot establish that it occurred."
-},
-{
-terms:["potassium bromate","ins 924","e924"],
-name:"Potassium bromate",
-level:"Needs verification",
-tone:"red",
-explanation:"This additive has raised toxicological concerns. Verify current FSSAI rules and the exact product formulation."
-},
-{
-terms:["red 40","allura red","ins 129","e129","sunset yellow","ins 110","e110","tartrazine","ins 102","e102"],
-name:"Synthetic food colours",
-level:"Check permitted use",
-tone:"amber",
-explanation:"Permitted use depends on the specific colour, food category and national regulations."
-},
-{
-terms:["monosodium glutamate","msg","ins 621","e621"],
-name:"MSG",
-level:"Not a cancer warning",
-tone:"green",
-explanation:"MSG is a flavour enhancer. Its presence is not evidence that the product causes cancer."
-}
-];
+function renderIngredientWarnings(product) {
+    const ingredients = normalizeIngredient(getIngredients(product));
 
-function safe(v){
-return String(v??"").replace(/[&<>"']/g,c=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-}[c]));
+    const matches = ingredientInfo.filter(item =>
+        item.terms.some(term => ingredients.includes(normalizeIngredient(term)))
+    );
+
+    if (!ingredients) {
+        byId("ingredientWarnings").innerHTML =
+            '<p class="summary-text">There is not enough ingredient information to check this product.</p>';
+        return;
+    }
+
+    if (!matches.length) {
+        byId("ingredientWarnings").innerHTML =
+            '<p class="summary-text">No ingredients from this limited screening list were detected. This does not mean the product is risk-free.</p>';
+        return;
+    }
+
+    byId("ingredientWarnings").innerHTML = matches.map(item => `
+        <div class="difference-item">
+            <strong>${escapeHTML(item.name)}</strong>
+            <p class="summary-text">${escapeHTML(item.detail)}</p>
+        </div>
+    `).join("");
 }
 
-function analyse(text){
-const t=(text||"").toLowerCase();
-return checks.filter(x=>x.terms.some(term=>t.includes(term)));
+async function saveScan(product) {
+    try {
+        const credential = await signInAnonymously(auth);
+
+        await addDoc(
+            collection(db, "users", credential.user.uid, "scans"),
+            {
+                barcode: String(product.code || ""),
+                productName: getProductName(product),
+                brand: product.brands || "",
+                scannedAt: serverTimestamp()
+            }
+        );
+    } catch (error) {
+        console.warn("Scan history could not be saved:", error);
+    }
 }
 
-function flagsHTML(items,empty){
-if(!items.length)return `<p class="muted">${safe(empty)}</p>`;
-
-return items.map(x=>`
-<div class="flag">
-<div class="flagtop">
-<b>${safe(x.name)}</b>
-<span class="pill ${x.tone==="red"?"red":x.tone==="green"?"green":""}">${safe(x.level)}</span>
-</div>
-<p>${safe(x.explanation)}</p>
-</div>
-`).join("");
+function normalizeName(value) {
+    return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+        .replace(/\s+/g, " ");
 }
 
-function nutrientsHTML(p){
-const n=p.nutriments||{};
+function similarityScore(original, candidate) {
+    const a = normalizeName(original);
+    const b = normalizeName(candidate);
 
-const values=[
-["Energy",n["energy-kcal_100g"],"kcal"],
-["Sugar",n.sugars_100g,"g"],
-["Salt",n.salt_100g,"g"],
-["Saturated fat",n["saturated-fat_100g"],"g"],
-["Protein",n.proteins_100g,"g"],
-["Fibre",n.fiber_100g,"g"]
-].filter(x=>x[1]!==undefined&&x[1]!==null&&x[1]!=="");
+    if (!a || !b) return 0;
+    if (a === b) return 10;
+    if (a.includes(b) || b.includes(a)) return 6;
 
-if(!values.length)return `<p class="muted">Nutrition information unavailable.</p>`;
+    const aWords = new Set(a.split(" ").filter(word => word.length > 2));
+    const bWords = new Set(b.split(" ").filter(word => word.length > 2));
 
-return `<div class="grid">${values.map(x=>`
-<div class="nutrient">
-<span>${x[0]} per 100 g</span>
-<b>${safe(x[1])} ${x[2]}</b>
-</div>`).join("")}</div>`;
+    let shared = 0;
+
+    for (const word of aWords) {
+        if (bWords.has(word)) shared++;
+    }
+
+    const total = Math.max(aWords.size, bWords.size, 1);
+
+    return 6 * shared / total;
 }
 
-function nutritionWarnings(p){
-const n=p.nutriments||{};
-const result=[];
+function productMatchScore(original, candidate) {
+    const nameScore = similarityScore(
+        getProductName(original),
+        getProductName(candidate)
+    );
 
-if(Number.isFinite(Number(n.sugars_100g))&&Number(n.sugars_100g)>=22.5){
-result.push({
-name:"High sugar",
-level:"High per 100 g",
-tone:"amber",
-explanation:`${n.sugars_100g} g per 100 g. This is a screening threshold, not an Indian legal verdict.`
-});
+    const originalBrand = normalizeName(original.brands);
+    const candidateBrand = normalizeName(candidate.brands);
+
+    let brandScore = 0;
+
+    if (originalBrand && candidateBrand) {
+        if (originalBrand === candidateBrand) brandScore = 5;
+        else if (
+            originalBrand.includes(candidateBrand) ||
+            candidateBrand.includes(originalBrand)
+        ) {
+            brandScore = 3;
+        }
+    }
+
+    return nameScore + brandScore;
 }
 
-if(Number.isFinite(Number(n.salt_100g))&&Number(n.salt_100g)>=1.5){
-result.push({
-name:"High salt",
-level:"High per 100 g",
-tone:"amber",
-explanation:`${n.salt_100g} g per 100 g. Frequent high salt intake can increase blood pressure.`
-});
+async function searchCountryProduct(product, country) {
+    const info = countryInfo[country];
+
+    if (!info) {
+        throw new Error("This country is not supported.");
+    }
+
+    const name = getProductName(product);
+    const brand = product.brands || "";
+
+    if (!name || name === "Unknown product") {
+        throw new Error("The scanned product does not have a product name.");
+    }
+
+    const searchTerms = (name + " " + brand).trim();
+
+    const params = new URLSearchParams({
+        search_terms: searchTerms,
+        search_simple: "1",
+        action: "process",
+        json: "1",
+        page: "1",
+        page_size: "50",
+        fields: fields,
+        tagtype_0: "countries",
+        tag_contains_0: "contains",
+        tag_0: info.tag
+    });
+
+    const urls = [
+        "https://world.openfoodfacts.org/cgi/search.pl?" + params.toString()
+    ];
+
+    const countryParams = new URLSearchParams({
+        search_terms: searchTerms,
+        search_simple: "1",
+        action: "process",
+        json: "1",
+        page: "1",
+        page_size: "50",
+        fields: fields
+    });
+
+    urls.push(
+        "https://" + info.subdomain +
+        ".openfoodfacts.org/cgi/search.pl?" +
+        countryParams.toString()
+    );
+
+    let lastError = null;
+    let allProducts = [];
+
+    for (const url of urls) {
+        try {
+            const data = await fetchJSON(url);
+
+            if (Array.isArray(data.products)) {
+                allProducts = allProducts.concat(data.products);
+            }
+        } catch (error) {
+            lastError = error;
+        }
+
+        if (allProducts.length) break;
+    }
+
+    const unique = new Map();
+
+    for (const item of allProducts) {
+        if (item.code) unique.set(String(item.code), item);
+    }
+
+    const candidates = [...unique.values()]
+        .map(item => ({
+            ...item,
+            matchScore: productMatchScore(product, item)
+        }))
+        .sort((a, b) => b.matchScore - a.matchScore);
+
+    if (!candidates.length) {
+        if (lastError) {
+            throw new Error(
+                "The Open Food Facts country search could not be reached. " +
+                "Please try again in a moment."
+            );
+        }
+
+        return null;
+    }
+
+    const best = candidates[0];
+
+    if (best.matchScore < 6) {
+        return {
+            unverified: true,
+            candidate: best,
+            score: best.matchScore
+        };
+    }
+
+    return {
+        ...best,
+        score: best.matchScore
+    };
 }
 
-if(Number.isFinite(Number(n["saturated-fat_100g"]))&&Number(n["saturated-fat_100g"])>=5){
-result.push({
-name:"High saturated fat",
-level:"High per 100 g",
-tone:"amber",
-explanation:`${n["saturated-fat_100g"]} g per 100 g. Consider portion size and overall diet.`
-});
+function getIngredientSet(product) {
+    return new Map(
+        splitIngredients(getIngredients(product))
+            .map(item => [normalizeIngredient(item), item])
+            .filter(([key]) => key.length > 1)
+    );
 }
 
-return result;
+function getDifference(left, right) {
+    const leftSet = getIngredientSet(left);
+    const rightSet = getIngredientSet(right);
+
+    const leftOnly = [];
+    const rightOnly = [];
+
+    for (const [key, value] of leftSet) {
+        if (!rightSet.has(key)) leftOnly.push(value);
+    }
+
+    for (const [key, value] of rightSet) {
+        if (!leftSet.has(key)) rightOnly.push(value);
+    }
+
+    return { leftOnly, rightOnly };
 }
 
-// Fetch actual product information
+function getNutritionDifference(left, right) {
+    const leftNutrition = nutrientData(left);
+    const rightNutrition = nutrientData(right);
 
-async function getProduct(barcode){
+    return leftNutrition.map(item => {
+        const other = rightNutrition.find(x => x.name === item.name);
 
-const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json?fields=code,product_name,product_name_en,brands,countries,ingredients_text,ingredients_text_en,ingredients,nutriments,image_front_small_url,image_url,quantity,packaging`;
-
-const response=await fetch(url);
-
-if(!response.ok)throw Error("Product database unavailable.");
-
-const data=await response.json();
-
-if(data.status!==1||!data.product)return null;
-
-return data.product;
+        return {
+            name: item.name,
+            unit: item.unit,
+            left: item.value,
+            right: other?.value ?? null,
+            difference:
+                item.value !== null && other?.value !== null
+                    ? other.value - item.value
+                    : null
+        };
+    });
 }
 
-// Ingredient names from product records
+function renderTags(elementId, items, emptyMessage) {
+    const element = byId(elementId);
 
-function ingredientList(p){
+    if (!items.length) {
+        element.innerHTML =
+            `<span class="summary-text">${escapeHTML(emptyMessage)}</span>`;
+        return;
+    }
 
-if(Array.isArray(p.ingredients)&&p.ingredients.length){
-
-return p.ingredients
-.map(x=>x.text||x.id||"")
-.filter(Boolean)
-.map(normalizeIngredient)
-.filter(Boolean);
-
+    element.innerHTML = items.map(item =>
+        `<span class="ingredient">${escapeHTML(item)}</span>`
+    ).join("");
 }
 
-const raw=p.ingredients_text||p.ingredients_text_en||"";
+function makeNutritionComparison(left, right) {
+    const values = getNutritionDifference(left, right);
 
-return raw.split(/[,;]+/)
-.map(normalizeIngredient)
-.filter(x=>x.length>1);
+    byId("nutritionComparison").innerHTML = values.map(item => {
+        let differenceText = "Difference unavailable";
 
+        if (item.difference !== null) {
+            const amount = Math.abs(item.difference).toFixed(2);
+
+            if (item.difference > 0) {
+                differenceText =
+                    "Other country has " + amount + " more " + item.unit;
+            } else if (item.difference < 0) {
+                differenceText =
+                    "Other country has " + amount + " less " + item.unit;
+            } else {
+                differenceText = "Same recorded amount";
+            }
+        }
+
+        return `
+            <div class="nutrition-row">
+                <span>${escapeHTML(item.name)}</span>
+                <span>${formatNumber(item.left)} ${item.unit}</span>
+                <span>${formatNumber(item.right)} ${item.unit}</span>
+            </div>
+            <div class="summary-text" style="margin-bottom:12px">
+                ${escapeHTML(differenceText)} per 100 g / 100 ml.
+            </div>
+        `;
+    }).join("");
 }
 
-function normalizeIngredient(text){
+function makeDifferenceSummary(left, right, country, ingredientDiff, nutritionDiff) {
+    const summary = [];
 
-return String(text||"")
-.toLowerCase()
-.replace(/\([^)]*\)/g," ")
-.replace(/\d+(?:[.,]\d+)?\s*%/g," ")
-.replace(/[^a-z0-9\s-]/g," ")
-.replace(/\s+/g," ")
-.trim();
+    const leftName = getProductName(left);
+    const rightName = getProductName(right);
 
+    summary.push(
+        `<div class="difference-item">
+            <strong>Product match</strong>
+            <p class="summary-text">
+                The database found a product record that looks similar to
+                ${escapeHTML(leftName)}. Check the brand, package size and
+                barcode before treating the records as the exact same product.
+            </p>
+        </div>`
+    );
+
+    if (ingredientDiff.leftOnly.length) {
+        summary.push(
+            `<div class="difference-item">
+                <strong>${ingredientDiff.leftOnly.length} ingredient name(s) appear only in the scanned record</strong>
+                <p class="summary-text">
+                    These ingredient names were found in the scanned product
+                    record but not in the ${escapeHTML(country)} record.
+                </p>
+            </div>`
+        );
+    } else {
+        summary.push(
+            `<div class="difference-item">
+                <strong>No extra ingredient names found in the scanned record</strong>
+                <p class="summary-text">
+                    The database ingredient lists did not show any names
+                    unique to the scanned record.
+                </p>
+            </div>`
+        );
+    }
+
+    if (ingredientDiff.rightOnly.length) {
+        summary.push(
+            `<div class="difference-item">
+                <strong>${ingredientDiff.rightOnly.length} ingredient name(s) appear only in the ${escapeHTML(country)} record</strong>
+                <p class="summary-text">
+                    These names were found in the ${escapeHTML(country)} record
+                    but not in the scanned product record.
+                </p>
+            </div>`
+        );
+    } else {
+        summary.push(
+            `<div class="difference-item">
+                <strong>No extra ingredient names found in the ${escapeHTML(country)} record</strong>
+                <p class="summary-text">
+                    The database ingredient lists did not show any names
+                    unique to the other record.
+                </p>
+            </div>`
+        );
+    }
+
+    const keyNutrients = nutritionDiff.filter(item =>
+        ["Sugar", "Salt", "Saturated fat"].includes(item.name)
+    );
+
+    for (const item of keyNutrients) {
+        if (item.left === null || item.right === null) {
+            summary.push(
+                `<div class="difference-item">
+                    <strong>${escapeHTML(item.name)}</strong>
+                    <p class="summary-text">
+                        There is not enough recorded information to compare
+                        ${escapeHTML(item.name.toLowerCase())}.
+                    </p>
+                </div>`
+            );
+            continue;
+        }
+
+        const difference = item.right - item.left;
+        let explanation;
+
+        if (Math.abs(difference) < 0.005) {
+            explanation = "Both records show almost the same amount.";
+        } else if (difference > 0) {
+            explanation =
+                "The " + escapeHTML(country) + " record has " +
+                Math.abs(difference).toFixed(2) + " g more.";
+        } else {
+            explanation =
+                "The " + escapeHTML(country) + " record has " +
+                Math.abs(difference).toFixed(2) + " g less.";
+        }
+
+        summary.push(
+            `<div class="difference-item">
+                <strong>${escapeHTML(item.name)}</strong>
+                <p class="summary-text">
+                    Scanned product: ${formatNumber(item.left)} g.
+                    ${escapeHTML(country)} product: ${formatNumber(item.right)} g.
+                    ${explanation}
+                    These numbers are per 100 g / 100 ml.
+                </p>
+            </div>`
+        );
+    }
+
+    summary.push(
+        `<div class="difference-item">
+            <strong>What does this mean?</strong>
+            <p class="summary-text">
+                Think of these as two food labels being compared side by side.
+                A different ingredient list or nutrition number does not
+                automatically mean one product is dangerous. The recipe,
+                serving size, product variant and local food rules can all
+                be different.
+            </p>
+        </div>`
+    );
+
+    byId("differenceSummary").innerHTML = summary.join("");
 }
 
-// Find country-specific actual records
+async function compareCountries() {
+    if (!currentProduct) {
+        setStatus("compareStatus", "Scan a product first.", "error");
+        return;
+    }
 
-async function searchCountry(country){
+    const country = byId("countrySelect").value;
 
-const key=country.key;
+    byId("compareButton").disabled = true;
+    byId("comparisonResults").classList.add("hidden");
 
-if(countryCache[key])return countryCache[key];
+    setStatus(
+        "compareStatus",
+        "Searching for a matching product in " + country + "..."
+    );
 
-const brand=productData.brands||"";
-const name=productData.product_name||productData.product_name_en||"";
+    try {
+        const result = await searchCountryProduct(currentProduct, country);
 
-const terms=[brand,name].filter(Boolean).join(" ");
+        if (!result) {
+            throw new Error(
+                "No matching product record was found in " + country +
+                ". Try another country or check the product name."
+            );
+        }
 
-if(!terms)return [];
+        if (result.unverified) {
+            throw new Error(
+                "Some possible products were found, but none matched closely " +
+                "enough to compare reliably. No comparison was made."
+            );
+        }
 
-const params=new URLSearchParams({
-search_terms:terms,
-search_simple:"1",
-action:"process",
-tagtype_0:"countries",
-tag_0:country.name,
-json:"1",
-page_size:"20",
-fields:"code,product_name,brands,countries,ingredients_text,ingredients_text_en,ingredients,nutriments,image_front_small_url,quantity"
-});
+        comparisonProduct = result;
 
-const url="https://world.openfoodfacts.org/cgi/search.pl?"+params.toString();
+        byId("leftProductName").textContent = getProductName(currentProduct);
+        byId("rightProductName").textContent = getProductName(result);
+        byId("rightCountryLabel").textContent = country;
 
-const response=await fetch(url);
+        byId("leftProductCountry").textContent =
+            currentProduct.brands || "Brand not available";
 
-if(!response.ok)throw Error("Could not search "+country.name);
+        byId("rightProductCountry").textContent =
+            (result.brands || "Brand not available") +
+            (result.quantity ? " • " + result.quantity : "");
 
-const data=await response.json();
+        byId("matchQuality").textContent =
+            "Match score: " + result.score.toFixed(1) +
+            " / 15. This is an approximate name and brand match, not proof " +
+            "that the products are identical.";
 
-const products=(data.products||[]).filter(p=>
-p.product_name&&
-p.ingredients_text&&
-(!brand||(p.brands||"").toLowerCase().includes(brand.toLowerCase()))
-);
+        const ingredientDiff = getDifference(currentProduct, result);
+        const nutritionDiff = getNutritionDifference(currentProduct, result);
 
-countryCache[key]=products;
+        renderTags(
+            "leftOnlyIngredients",
+            ingredientDiff.leftOnly,
+            "No unique ingredient names found, or ingredient information is missing."
+        );
 
-return products;
+        renderTags(
+            "rightOnlyIngredients",
+            ingredientDiff.rightOnly,
+            "No unique ingredient names found, or ingredient information is missing."
+        );
+
+        makeNutritionComparison(currentProduct, result);
+
+        makeDifferenceSummary(
+            currentProduct,
+            result,
+            country,
+            ingredientDiff,
+            nutritionDiff
+        );
+
+        byId("comparisonResults").classList.remove("hidden");
+
+        setStatus(
+            "compareStatus",
+            "Comparison loaded. Check the product names and match details.",
+            "success"
+        );
+
+        byId("comparisonResults").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    } catch (error) {
+        setStatus(
+            "compareStatus",
+            error.message || "The country comparison could not be loaded.",
+            "error"
+        );
+    } finally {
+        byId("compareButton").disabled = false;
+    }
 }
 
-// Compare Indian and European ingredients
+async function loadNews() {
+    if (!currentProduct) return;
 
-function compareIngredients(india,europe){
+    const name = getProductName(currentProduct);
+    const brand = currentProduct.brands || "";
+    const query = (name + " " + brand + " food recall OR contamination OR warning").trim();
 
-const a=ingredientList(india);
-const b=ingredientList(europe);
+    byId("newsResults").textContent = "Searching recent news...";
 
-const onlyIndia=a.filter(x=>!b.includes(x));
-const onlyEurope=b.filter(x=>!a.includes(x));
+    try {
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 6);
 
-return {onlyIndia,onlyEurope};
+        const dateString = startDate.toISOString()
+            .replace(/[-:T]/g, "")
+            .slice(0, 14);
+
+        const params = new URLSearchParams({
+            query: query,
+            mode: "ArtList",
+            format: "json",
+            sort: "HybridRel",
+            startdatetime: dateString,
+            maxrecords: "10",
+            sourcelang: "eng"
+        });
+
+        const url = "https://api.gdeltproject.org/api/v2/doc/doc?" +
+            params.toString();
+
+        const data = await fetchJSON(url, 20000);
+        const articles = data.articles || [];
+
+        if (!articles.length) {
+            byId("newsResults").textContent =
+                "No recent matching articles were found. This does not prove that no safety alerts exist.";
+            return;
+        }
+
+        byId("newsResults").innerHTML = articles.map(article => `
+            <div class="news-item">
+                <a href="${escapeHTML(article.url)}"
+                   target="_blank"
+                   rel="noopener">
+                    ${escapeHTML(article.title || "Open news article")}
+                </a>
+                <p>
+                    ${escapeHTML(article.domain || "")}
+                    ${article.seendate ? " • " + escapeHTML(article.seendate) : ""}
+                </p>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        byId("newsResults").textContent =
+            "News search is temporarily unavailable. Please try again later.";
+    }
 }
 
-// Compare nutrition values per 100g
+async function startCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus(
+            "scanStatus",
+            "Camera access is not supported by this browser. Please enter the barcode manually.",
+            "error"
+        );
+        return;
+    }
 
-function compareNutrients(india,europe){
+    if (!("BarcodeDetector" in window)) {
+        setStatus(
+            "scanStatus",
+            "This browser does not support built-in barcode scanning. Please enter the barcode manually.",
+            "error"
+        );
+        return;
+    }
 
-const n1=india.nutriments||{};
-const n2=europe.nutriments||{};
+    try {
+        stopCamera();
 
-const fields=[
-{name:"Sugar",key:"sugars_100g",unit:"g"},
-{name:"Salt",key:"salt_100g",unit:"g"},
-{name:"Saturated fat",key:"saturated-fat_100g",unit:"g"}
-];
+        const detector = new BarcodeDetector({
+            formats: ["ean_13", "ean_8", "upc_a", "upc_e"]
+        });
 
-return fields.map(field=>{
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "environment"
+            },
+            audio: false
+        });
 
-const a=Number(n1[field.key]);
-const b=Number(n2[field.key]);
+        const video = byId("camera");
+        video.srcObject = cameraStream;
+        video.style.display = "block";
 
-const valid=n1[field.key]!==undefined&&
-n1[field.key]!==null&&
-n1[field.key]!==""&&
-n2[field.key]!==undefined&&
-n2[field.key]!==null&&
-n2[field.key]!=="";
+        await video.play();
 
-if(!valid||!Number.isFinite(a)||!Number.isFinite(b)){
-return {...field,available:false};
+        setStatus("scanStatus", "Camera active. Point it at the barcode.");
+
+        const scan = async () => {
+            if (!cameraStream || video.readyState < 2) return;
+
+            try {
+                const codes = await detector.detect(video);
+
+                if (codes.length && codes[0].rawValue) {
+                    byId("barcodeInput").value = codes[0].rawValue;
+                    stopCamera();
+                    lookupBarcode();
+                    return;
+                }
+            } catch (error) {
+                console.warn("Barcode detection error:", error);
+            }
+
+            if (cameraStream) {
+                scanTimer = setTimeout(scan, 300);
+            }
+        };
+
+        scan();
+
+    } catch (error) {
+        stopCamera();
+        setStatus(
+            "scanStatus",
+            "Could not open the camera. Check browser camera permissions or enter the barcode manually.",
+            "error"
+        );
+    }
 }
 
-const difference=Math.round(Math.abs(a-b)*100)/100;
+function stopCamera() {
+    if (scanTimer) {
+        clearTimeout(scanTimer);
+        scanTimer = null;
+    }
 
-let explanation="Both versions have the same recorded amount.";
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
 
-if(a>b){
-explanation=`The Indian version has ${difference} g more ${field.name.toLowerCase()} per 100 g.`;
-}else if(b>a){
-explanation=`The European version has ${difference} g more ${field.name.toLowerCase()} per 100 g.`;
+    const video = byId("camera");
+    video.pause();
+    video.srcObject = null;
+    video.style.display = "none";
 }
 
-return {
-...field,
-available:true,
-india:a,
-europe:b,
-difference,
-explanation,
-indiaMore:a>b
-};
-
-});
-
-}
-
-function ingredientDifferenceHTML(title,items,empty,description){
-
-return `
-<div class="difference">
-<b>${title}</b>
-<p class="muted">${description}</p>
-${items.length?
-items.map(x=>`<div class="diffrow"><b>• ${safe(x)}</b></div>`).join("")
-:`<p class="muted">${empty}</p>`}
-</div>
-`;
-
-}
-
-function nutrientComparisonHTML(values){
-
-return values.map(x=>{
-
-if(!x.available){
-
-return `
-<div class="diffrow">
-<b>${x.name}</b>
-<p>We do not have enough information to compare these two versions.</p>
-</div>
-`;
-
-}
-
-const max=Math.max(x.india,x.europe,0.01);
-
-const a=(x.india/max)*100;
-const b=(x.europe/max)*100;
-
-const more=x.indiaMore?"India":"Europe";
-
-return `
-<div class="diffrow">
-
-<b>${x.name} per 100 g</b>
-
-<div class="grid" style="margin-top:10px">
-
-<div>
-<span class="muted">🇮🇳 India</span>
-<br><b>${x.india} g</b>
-<div class="bar"><div style="width:${a}%"></div></div>
-</div>
-
-<div>
-<span class="muted">🇪🇺 Europe</span>
-<br><b>${x.europe} g</b>
-<div class="bar"><div style="width:${b}%"></div></div>
-</div>
-
-</div>
-
-<p>${safe(x.explanation)}</p>
-
-<div class="childbox">
-<b>👧 Easy explanation</b>
-<p>${safe(x.difference===0
-?"Both versions have the same recorded amount."
-:`Imagine we compare two 100 g portions. ${more} has ${x.difference} g more ${x.name.toLowerCase()}.`)}</p>
-</div>
-
-</div>
-`;
-
-}).join("");
-
-}
-
-function renderTabs(){
-
-$("countryTabs").innerHTML=countries.map(c=>`
-<button class="${selectedCountry===c.key?"active":"secondary"}"
-data-country="${c.key}">${safe(c.name)}</button>
-`).join("");
-
-$("countryTabs").querySelectorAll("button").forEach(btn=>{
-
-btn.onclick=()=>{
-selectedCountry=btn.dataset.country;
-renderTabs();
-renderComparison();
-};
-
-});
-
-}
-
-async function renderComparison(){
-
-const country=countries.find(x=>x.key===selectedCountry);
-
-$("comparisons").innerHTML=`<p class="muted">Searching for a matching product in ${safe(country.name)}...</p>`;
-
-try{
-
-const products=await searchCountry(country);
-
-if(!products.length){
-
-$("comparisons").innerHTML=`
-<div class="country">
-<h3>${safe(country.name)}</h3>
-<div class="childbox">
-<b>We couldn't find a matching product.</b>
-<p>This does not mean the product is unavailable or different in this country. We simply don't have a reliable matching database record.</p>
-</div>
-</div>`;
-
-return;
-
-}
-
-// Show the best available candidate, not multiple possibly unrelated products.
-
-const candidate=products[0];
-
-const ingredients=compareIngredients(productData,candidate);
-const nutrition=compareNutrients(productData,candidate);
-
-const name=candidate.product_name||"Product name unavailable";
-
-$("comparisons").innerHTML=`
-
-<div class="country">
-
-<div class="countryhead">
-<h3>🇮🇳 India vs 🇪🇺 ${safe(country.name)}</h3>
-<span class="pill blue">Database match</span>
-</div>
-
-<p class="muted">${safe(name)}</p>
-
-<p class="muted">India barcode: ${safe(productData.code||"Unavailable")}<br>
-Comparison barcode: ${safe(candidate.code||"Unavailable")}</p>
-
-${candidate.image_front_small_url?
-`<img src="${safe(candidate.image_front_small_url)}" alt="European product" style="width:75px;height:75px;object-fit:contain">`:""}
-
-<div class="section">Ingredients in India but not Europe</div>
-
-${ingredientDifferenceHTML(
-"🇮🇳 India only",
-ingredients.onlyIndia,
-"No additional ingredients found in the Indian list.",
-"These words appear in the Indian ingredient record but not in the selected European record."
-)}
-
-<div class="section">Ingredients in Europe but not India</div>
-
-${ingredientDifferenceHTML(
-"🇪🇺 Europe only",
-ingredients.onlyEurope,
-"No additional ingredients found in the European list.",
-"These words appear in the European ingredient record but not in the Indian record."
-)}
-
-<div class="section">Sugar, salt and saturated fat</div>
-
-${nutrientComparisonHTML(nutrition)}
-
-<div class="childbox">
-<b>🧒 What should I understand?</b>
-<p>
-Food companies can make different versions of the same product for different countries. The ingredients and nutrition numbers above show differences in the records we found. A difference does not automatically mean one version is dangerous.
-</p>
-</div>
-
-<div class="foot">
-Ingredient matching uses normalised database text. Different spellings, language translations, ingredient grouping and incomplete labels can affect the comparison. The matching product has not been independently verified as the identical formulation.
-</div>
-
-<p>
-<a href="https://world.openfoodfacts.org/product/${encodeURIComponent(candidate.code||"")}" target="_blank" rel="noopener">View European product record ↗</a>
-</p>
-
-</div>
-
-`;
-
-}catch(error){
-
-$("comparisons").innerHTML=`<p class="muted">${safe(error.message)}</p>`;
-
-}
-
-}
-
-// Recent news search
-
-async function loadNews(){
-
-const name=productData.product_name||productData.product_name_en||"";
-const brand=productData.brands||"";
-
-const identity=`"${name}" ${brand}`.trim();
-
-const search=`${identity} (recall OR contamination OR unsafe OR warning OR banned OR salmonella OR food safety)`;
-
-const url=new URL("https://api.gdeltproject.org/api/v2/doc/doc");
-
-url.searchParams.set("query",search);
-url.searchParams.set("mode","ArtList");
-url.searchParams.set("format","json");
-url.searchParams.set("maxrecords","10");
-url.searchParams.set("sort","HybridRel");
-url.searchParams.set("timespan","6m");
-
-$("news").innerHTML="<p class='muted'>Looking for recent reports...</p>";
-
-try{
-
-const response=await fetch(url);
-
-if(!response.ok)throw Error("News search unavailable.");
-
-const data=await response.json();
-
-const articles=data.articles||[];
-
-if(!articles.length){
-
-$("news").innerHTML=`
-<p class="muted">No matching reports were returned. This does not prove that no incidents have occurred.</p>
-<a href="https://news.google.com/search?q=${encodeURIComponent(identity+" food recall warning")}" target="_blank" rel="noopener">Search Google News ↗</a>`;
-
-return;
-
-}
-
-$("news").innerHTML=articles.map(a=>`
-
-<div class="news">
-<a href="${safe(a.url)}" target="_blank" rel="noopener">${safe(a.title||"Read report")} ↗</a>
-<p>${safe(a.domain||"News source")}</p>
-<small>${safe(a.seendate||"Date unavailable")}</small>
-</div>
-
-`).join("");
-
-}catch(error){
-
-$("news").innerHTML=`
-<p class="muted">Automatic news search is unavailable right now.</p>
-<a href="https://news.google.com/search?q=${encodeURIComponent(identity+" food recall warning")}" target="_blank" rel="noopener">Search Google News ↗</a>`;
-
-}
-
-}
-
-// Firebase scan history
-
-async function saveScan(p,barcode,count){
-
-if(!user)return;
-
-try{
-
-await addDoc(collection(db,"users",user.uid,"scans"),{
-barcode,
-productName:p.product_name||"Unknown product",
-findingCount:count,
-createdAt:serverTimestamp()
-});
-
-}catch(e){
-
-console.error("History save failed:",e);
-
-}
-
-}
-
-// Display product
-
-async function displayProduct(p,barcode,generation){
-
-if(generation!==lookupGeneration)return;
-
-productData=p;
-countryCache={};
-selectedCountry="germany";
-
-$("result").style.display="block";
-
-const image=p.image_front_small_url||p.image_url||"";
-
-$("productInfo").innerHTML=`
-<div class="product">
-${image?`<img src="${safe(image)}" alt="Product image">`:""}
-<div>
-<h2>${safe(p.product_name||p.product_name_en||"Unknown product")}</h2>
-<div class="muted">${safe(p.brands||"Brand unavailable")}</div>
-<div class="muted">Barcode: ${safe(barcode)}</div>
-<div class="muted">Recorded markets: ${safe(p.countries||"Not specified")}</div>
-</div>
-</div>
-`;
-
-const text=p.ingredients_text||p.ingredients_text_en||"";
-const ingredientFlags=analyse(text);
-const nutritionFlags=nutritionWarnings(p);
-const all=[...ingredientFlags,...nutritionFlags];
-
-$("overview").innerHTML=`
-<b>${all.length} screening findings</b>
-<p class="muted">These are ingredients and nutrition points worth understanding. They are not a medical diagnosis or a cancer score.</p>
-`;
-
-$("ingredients").innerHTML=`
-${flagsHTML(ingredientFlags,text
-?"No markers from our limited screening list were found. This does not mean every ingredient is risk-free."
-:"Ingredient information is missing from the database.")}
-<div class="muted">Recorded ingredient list:</div>
-<p class="muted">${text?safe(text):"Unavailable"}</p>
-`;
-
-$("nutrition").innerHTML=`
-${flagsHTML(nutritionFlags,"No nutrition thresholds flagged from the available data.")}
-${nutrientsHTML(p)}
-`;
-
-renderTabs();
-
-$("comparisons").innerHTML="<p class='muted'>Loading country comparisons...</p>";
-
-renderComparison();
-loadNews();
-
-saveScan(p,barcode,all.length);
-
-}
-
-async function lookup(barcode){
-
-if(!/^\d{8,14}$/.test(barcode)){
-$("status").textContent="Please enter a valid barcode.";
-return;
-}
-
-const generation=++lookupGeneration;
-
-$("status").textContent="Looking up real product information...";
-$("result").style.display="none";
-
-try{
-
-const p=await getProduct(barcode);
-
-if(generation!==lookupGeneration)return;
-
-if(!p){
-
-$("status").textContent="Product not found. Try another barcode or paste the ingredient label.";
-return;
-
-}
-
-$("status").textContent="Product found. Preparing your comparison...";
-
-displayProduct(p,barcode,generation);
-
-}catch(error){
-
-if(generation===lookupGeneration){
-$("status").textContent=error.message;
-}
-
-}
-
-}
-
-// Barcode scanner
-
-async function startCamera(){
-
-try{
-
-if(!navigator.mediaDevices?.getUserMedia){
-throw Error("Camera unavailable. Enter the barcode manually.");
-}
-
-stream=await navigator.mediaDevices.getUserMedia({
-video:{facingMode:{ideal:"environment"}},
-audio:false
+byId("barcodeInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") lookupBarcode();
 });
 
-$("camera").style.display="block";
-$("video").srcObject=stream;
-
-await $("video").play();
-
-if(!("BarcodeDetector" in window)){
-$("status").textContent="Barcode scanning unsupported in this browser. Enter the barcode manually.";
-$("barcodeRow").style.display="flex";
-return;
-}
-
-const detector=new BarcodeDetector({
-formats:["ean_13","ean_8","upc_a","upc_e"]
-});
-
-let running=true;
-
-const scan=async()=>{
-
-if(!running)return;
-
-try{
-
-const codes=await detector.detect($("video"));
-
-if(codes.length){
-
-running=false;
-stopCamera();
-
-$("barcode").value=codes[0].rawValue;
-
-lookup(codes[0].rawValue);
-
-return;
-
-}
-
-}catch(e){}
-
-requestAnimationFrame(scan);
-
-};
-
-$("close").onclick=()=>{
-running=false;
-stopCamera();
-};
-
-requestAnimationFrame(scan);
-
-}catch(error){
-
-$("status").textContent=error.message||"Camera permission unavailable.";
-$("barcodeRow").style.display="flex";
-
-}
-
-}
-
-function stopCamera(){
-
-if(stream){
-
-stream.getTracks().forEach(t=>t.stop());
-stream=null;
-
-}
-
-$("camera").style.display="none";
-
-}
-
-$("scan").onclick=startCamera;
-
-$("manual").onclick=()=>{
-$("barcodeRow").style.display="flex";
-};
-
-$("search").onclick=()=>{
-lookup($("barcode").value.trim());
-};
-
-$("barcode").addEventListener("keydown",e=>{
-if(e.key==="Enter")lookup($("barcode").value.trim());
-});
-
-$("analyse").onclick=()=>{
-
-const text=$("manualIngredients").value.trim();
-
-if(!text)return;
-
-const results=analyse(text);
-
-$("manualResult").innerHTML=`
-<div class="section">Ingredient screening</div>
-${flagsHTML(results,"No markers from our limited screening list were found. This does not mean the product is risk-free.")}
-<p class="muted">Text-only analysis. Product identity and ingredient quantities are not verified.</p>
-`;
-
-};
-
-// Firebase login
-
-try{
-
-const credential=await signInAnonymously(auth);
-
-user=credential.user;
-
-}catch(error){
-
-console.error("Firebase authentication unavailable:",error);
-
-$("status").textContent="Scanning works, but Firebase history is unavailable. Enable Anonymous Authentication.";
-
-}
+window.lookupBarcode = lookupBarcode;
+window.startCamera = startCamera;
+window.stopCamera = stopCamera;
+window.compareCountries = compareCountries;
+window.loadNews = loadNews;
 
 </script>
 
