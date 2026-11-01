@@ -3,116 +3,183 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f7f8f5">
 <title>FoodCheck India</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f7f8f5;color:#17221d;font-family:Arial, sans-serif}
-header{height:68px;border-bottom:1px solid #e7eae4;display:flex;align-items:center;justify-content:space-between;padding:0 7%;background:white}
-.brand{font-weight:800;font-size:20px}
-.brand span{color:#19734e}
-.tag{font-size:12px;color:#718078;background:#eef2ed;padding:8px 12px;border-radius:20px}
-main{width:min(680px,calc(100% - 32px));margin:45px auto}
-.eyebrow{color:#19734e;font-size:12px;font-weight:bold;letter-spacing:1.5px}
-h1{font-size:clamp(32px,6vw,44px);letter-spacing:-1.5px;line-height:1.1;margin:12px 0}
-.sub{color:#66736b;line-height:1.6;font-size:15px;margin-bottom:28px}
-.panel{background:white;border:1px solid #e7ebe5;border-radius:18px;padding:22px;box-shadow:0 10px 30px #20382a08}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-button{cursor:pointer;border:0;border-radius:11px;padding:14px;font-weight:bold;font-size:14px}
+body{margin:0;background:#f7f8f5;color:#17221d;font-family:Arial,sans-serif}
+header{height:65px;background:white;border-bottom:1px solid #e5eae5;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100% - 950px)/2))}
+.brand{font-size:20px;font-weight:800}.brand span{color:#168052}
+main{max-width:850px;margin:38px auto;padding:0 18px}
+h1{font-size:42px;letter-spacing:-1.5px;margin:12px 0}
+h2{font-size:20px}
+.sub{color:#758078;font-size:14px;line-height:1.7}
+.panel{background:white;border:1px solid #e5eae5;border-radius:17px;padding:20px;margin:18px 0}
+button{border:0;border-radius:10px;padding:13px 17px;font-weight:bold;cursor:pointer}
 .primary{background:#176b4b;color:white}
-.secondary{background:#edf3ee;color:#1c4e38}
-.inputrow{display:flex;gap:8px;margin-top:14px}
-input,textarea{width:100%;min-width:0;padding:13px;border:1px solid #dfe6df;border-radius:10px;background:#fbfcfa;font:inherit}
-#barcodeRow{display:none}
-#camera{display:none;margin-top:16px;position:relative;background:#111;border-radius:12px;overflow:hidden}
-video{width:100%;max-height:320px;object-fit:cover;display:block}
-#stopCamera{position:absolute;right:10px;top:10px;background:white}
-#status{font-size:13px;color:#65736a;margin-top:15px;line-height:1.5}
-#result{display:none;margin-top:20px}
-.product{display:flex;gap:15px;align-items:center;padding-bottom:17px;border-bottom:1px solid #eee}
-.product img{width:75px;height:75px;object-fit:contain;background:#f4f6f2;border-radius:10px}
-.product h2{font-size:19px;margin:0 0 6px}
-.muted{font-size:12px;color:#758078;line-height:1.6}
-.score{margin:17px 0;padding:15px;background:#f2f6f1;border-radius:12px;display:flex;justify-content:space-between;gap:10px}
-.score span{font-size:12px;color:#68766e}
-.sectiontitle{font-size:14px;font-weight:bold;margin:20px 0 10px}
-.flag{padding:13px;border:1px solid #e8ece7;border-radius:11px;margin:8px 0}
-.flagtop{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.secondary{background:#edf3ee;color:#24543d}
+input,textarea{padding:13px;border:1px solid #dfe6df;border-radius:10px;font:inherit;min-width:0}
+.row{display:flex;gap:10px}
+.row input{flex:1;width:100%}
+#barcodeRow{display:none;margin-top:12px}
+#camera{display:none;margin-top:15px;position:relative;background:#111;border-radius:12px;overflow:hidden}
+video{width:100%;max-height:300px}
+#status{font-size:13px;color:#718078;margin-top:13px}
+#result{display:none}
+.product{display:flex;gap:15px;align-items:center}
+.product img{width:85px;height:85px;object-fit:contain;border-radius:12px;background:#f5f7f4}
+.muted{color:#78847c;font-size:12px;line-height:1.6}
+.section{font-size:17px;font-weight:800;margin:25px 0 12px}
+.score{padding:15px;background:#f1f6f1;border-radius:12px;margin:16px 0}
+.flag,.country,.news,.difference{padding:14px;border:1px solid #e8ece7;border-radius:12px;margin:9px 0}
+.flagtop,.countryhead{display:flex;justify-content:space-between;gap:10px;align-items:center}
 .flag b{font-size:13px}
-.flag p{font-size:12px;color:#68756d;line-height:1.5;margin:7px 0 0}
-.pill{font-size:10px;font-weight:bold;padding:5px 8px;border-radius:20px;background:#f4f0e5;color:#8a6524;white-space:nowrap}
-.red{background:#f9e9e6;color:#a43c2f}
-.green{background:#e8f3eb;color:#27714b}
-.nutrients{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.nut{background:#f7f9f6;padding:12px;border-radius:9px}
-.nut span{display:block;color:#7a867e;font-size:11px}
-.nut b{font-size:15px}
-.manual{margin-top:20px}
-.manual summary{cursor:pointer;font-size:13px;font-weight:bold;color:#315e46}
-textarea{margin-top:12px;min-height:90px;resize:vertical}
-.foot{font-size:11px;color:#859087;line-height:1.7;margin-top:18px}
-#history{display:none;margin-top:20px}
-.historyitem{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee;font-size:13px;gap:10px}
-@media(max-width:500px){
-header{padding:0 17px}
-main{margin:30px auto}
-.panel{padding:17px}
-.actions{grid-template-columns:1fr}
-.inputrow{flex-direction:column}
+.flag p,.news p{font-size:12px;color:#69766e;line-height:1.6}
+.pill{font-size:10px;font-weight:bold;padding:5px 9px;border-radius:20px;background:#f5eee0;color:#8c6727;white-space:nowrap}
+.red{background:#fae9e7;color:#a53d32}
+.green{background:#e7f3eb;color:#26714a}
+.blue{background:#e8eff9;color:#315b90}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.nutrient{background:#f5f7f4;border-radius:10px;padding:13px}
+.nutrient span{display:block;font-size:11px;color:#77847b}
+.nutrient b{font-size:16px}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin:15px 0}
+.tabs button{white-space:nowrap;padding:10px 13px}
+.active{background:#176b4b;color:white}
+.childbox{background:#f0f7f1;border:1px solid #dceade;border-radius:13px;padding:15px;margin:12px 0}
+.childbox b{font-size:14px}
+.childbox p{font-size:13px;line-height:1.7;color:#435a49;margin-bottom:0}
+.diffrow{padding:13px 0;border-bottom:1px solid #edf0eb}
+.diffrow:last-child{border:0}
+.diffrow b{font-size:13px}
+.diffrow p{font-size:12px;color:#68756d;line-height:1.6}
+.bar{height:9px;background:#e9eee9;border-radius:10px;overflow:hidden;margin-top:8px}
+.bar div{height:100%;background:#36865c;border-radius:10px}
+.news a{color:#176b4b;font-size:14px;font-weight:bold;text-decoration:none}
+.news small{font-size:11px;color:#839087}
+.foot{font-size:11px;color:#89938c;line-height:1.7}
+details summary{cursor:pointer;font-weight:bold;font-size:13px;color:#176b4b}
+textarea{width:100%;margin-top:12px;min-height:85px}
+@media(max-width:550px){
+h1{font-size:34px}
+.row{flex-direction:column}
+.grid{grid-template-columns:1fr}
+.panel{padding:16px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
 <div class="brand">FoodCheck <span>India</span></div>
-<div class="tag">Know what you eat</div>
+<div class="muted">Know what you eat</div>
 </header>
 
 <main>
-<div class="eyebrow">FOOD TRANSPARENCY</div>
-<h1>Scan the label.<br>Understand the ingredients.</h1>
-<p class="sub">Discover what's inside your packaged food. Check ingredients, additives and nutritional information using real product records.</p>
+
+<div class="muted" style="color:#168052;font-weight:bold;letter-spacing:2px">
+SCAN · COMPARE · UNDERSTAND
+</div>
+
+<h1>Know what's<br>inside your food.</h1>
+
+<p class="sub">
+Scan any packaged food and discover its ingredients, compare Indian and European versions, and learn about food safety news.
+</p>
 
 <section class="panel">
 
-<div class="actions">
-<button class="primary" id="scanBtn">▣ Scan Product</button>
-<button class="secondary" id="manualBtn">Enter Barcode</button>
+<div class="row">
+<button class="primary" id="scan">▣ Scan Product</button>
+<button class="secondary" id="manual">Enter Barcode</button>
 </div>
 
 <div id="camera">
-<video id="video" playsinline muted></video>
-<button id="stopCamera">Close</button>
+<video id="video" autoplay playsinline muted></video>
+<button id="close" style="position:absolute;top:10px;right:10px">Close</button>
 </div>
 
-<div class="inputrow" id="barcodeRow">
-<input id="barcodeInput" placeholder="Enter product barcode" inputmode="numeric">
-<button class="secondary" id="lookupBtn">Check</button>
+<div class="row" id="barcodeRow">
+<input id="barcode" placeholder="Enter barcode number" inputmode="numeric">
+<button class="primary" id="search">Search</button>
 </div>
 
-<div id="status">Ready to scan. Point your camera at a product barcode.</div>
-
-<details class="manual">
-<summary>Manually analyse an ingredient label</summary>
-<textarea id="ingredientInput" placeholder="Paste ingredients printed on the package..."></textarea>
-<button class="secondary" id="analyseText" style="width:100%;margin-top:10px">Analyse Ingredients</button>
-<p class="muted">Manual analysis only checks the text supplied. It cannot verify the product or ingredient quantities.</p>
-</details>
-
-<div id="result"></div>
+<div id="status">Ready to scan a food product.</div>
 
 </section>
 
-<section class="panel" id="history">
-<div class="sectiontitle">Recent Scans</div>
-<div id="historyList"></div>
+<div id="result" class="panel">
+
+<div id="productInfo"></div>
+
+<div class="score" id="overview"></div>
+
+<div class="section">1. Ingredient Safety</div>
+<div id="ingredients"></div>
+
+<div class="section">2. Nutrition Information</div>
+<div id="nutrition"></div>
+
+<div class="section">3. India vs Europe</div>
+
+<div class="childbox">
+<b>🌍 What does this comparison mean?</b>
+<p>
+We look at food products sold in India and compare them with similar products sold in Europe. We check which ingredients are different and whether the amount of sugar, salt and saturated fat changes.
+</p>
+</div>
+
+<div class="tabs" id="countryTabs"></div>
+
+<div id="comparisons">
+<p class="muted">Waiting for country information...</p>
+</div>
+
+<div class="section">4. Recent Negative News</div>
+
+<div class="childbox">
+<b>📰 Why is this important?</b>
+<p>
+We search for news about product recalls, contamination, food safety warnings and other reported problems. News reports are not automatically proof that a product is unsafe.
+</p>
+</div>
+
+<div id="news">
+<p class="muted">Searching...</p>
+</div>
+
+<div class="section">5. Official Food Safety Resources</div>
+
+<div class="flag">
+<b>European Union — RASFF</b>
+<p>Official European food safety alerts and recalls.</p>
+<a href="https://food.ec.europa.eu/food-safety/rasff_en" target="_blank" rel="noopener">Visit RASFF ↗</a>
+</div>
+
+<div class="flag">
+<b>India — FSSAI</b>
+<p>Indian food safety rules and notifications.</p>
+<a href="https://www.fssai.gov.in/" target="_blank" rel="noopener">Visit FSSAI ↗</a>
+</div>
+
+</div>
+
+<section class="panel">
+<details>
+<summary>Manually analyse an ingredient label</summary>
+<textarea id="manualIngredients" placeholder="Paste ingredients from the package..."></textarea>
+<button class="secondary" id="analyse">Analyse Ingredients</button>
+<div id="manualResult"></div>
+</details>
 </section>
 
 <p class="foot">
-Product information is retrieved from Open Food Facts, a community-maintained database. Product records may be incomplete or outdated. This tool is an educational screening aid, not a laboratory test, medical diagnosis or FSSAI certification. Ingredient presence alone does not establish that a food causes cancer. Always verify the physical package and current official regulations.
+FoodCheck uses Open Food Facts, a community-maintained database. Product records may be incomplete or outdated. Country comparisons are based on matching database records, not guaranteed manufacturer-confirmed formulations. Health flags are educational screening information, not medical diagnoses. Always verify the physical package and current FSSAI or European regulations.
 </p>
+
 </main>
 
 <script type="module">
@@ -123,10 +190,6 @@ import {
 getFirestore,
 collection,
 addDoc,
-query,
-orderBy,
-limit,
-getDocs,
 serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
@@ -135,489 +198,751 @@ getAuth,
 signInAnonymously
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-const firebaseConfig = {
-apiKey: "AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
-authDomain: "negocios-8e8a4.firebaseapp.com",
-databaseURL: "https://negocios-8e8a4-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "negocios-8e8a4",
-storageBucket: "negocios-8e8a4.firebasestorage.app",
-messagingSenderId: "298423907311",
-appId: "1:298423907311:web:92b79b23776a4f56557c1a"
+const firebaseConfig={
+apiKey:"AIzaSyCfVmrY2rJIGkMVocdarjbQ30rEh78MwmY",
+authDomain:"negocios-8e8a4.firebaseapp.com",
+databaseURL:"https://negocios-8e8a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"negocios-8e8a4",
+storageBucket:"negocios-8e8a4.firebasestorage.app",
+messagingSenderId:"298423907311",
+appId:"1:298423907311:web:92b79b23776a4f56557c1a"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const auth=getAuth(app);
 
-let currentUser = null;
-let stream = null;
-let scanLoop = false;
+let user=null;
+let stream=null;
+let productData=null;
+let countryCache={};
+let selectedCountry="germany";
+let lookupGeneration=0;
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-const ingredientChecks = [
-
-{
-terms:["partially hydrogenated","vanaspati"],
-name:"Partially Hydrogenated Oils",
-level:"High Concern",
-tone:"red",
-detail:"These can contain industrial trans fats, which increase cardiovascular risk. This is not a cancer finding."
-},
-
-{
-terms:["sodium nitrite","ins 250","e250"],
-name:"Sodium Nitrite (INS 250)",
-level:"Context Matters",
-tone:"amber",
-detail:"Used in some cured meats. Nitrite can participate in nitrosamine formation under certain conditions. Actual risk depends on food type, processing and exposure."
-},
-
-{
-terms:["sodium nitrate","ins 251","e251","potassium nitrate","ins 252"],
-name:"Nitrate Salts",
-level:"Context Matters",
-tone:"amber",
-detail:"Health assessment depends on source, quantity and dietary context. Ingredient presence alone cannot establish exposure."
-},
-
-{
-terms:["aspartame","ins 951","e951"],
-name:"Aspartame (INS 951)",
-level:"Evidence Is Nuanced",
-tone:"amber",
-detail:"IARC classified aspartame as possibly carcinogenic (Group 2B), based on limited evidence. JECFA retained its acceptable daily intake. Hazard classification does not measure the risk from one serving."
-},
-
-{
-terms:["monosodium glutamate","msg","ins 621","e621"],
-name:"MSG (INS 621)",
-level:"Not a Cancer Warning",
-tone:"green",
-detail:"MSG is a flavour enhancer. Its presence is not evidence that the product causes cancer."
-},
-
-{
-terms:["sodium benzoate","ins 211","e211"],
-name:"Sodium Benzoate (INS 211)",
-level:"Context Matters",
-tone:"amber",
-detail:"A preservative permitted in specified categories and limits. Under certain conditions with ascorbic acid, benzene formation can be a concern. This label cannot establish that it occurred."
-},
-
-{
-terms:["potassium bromate","ins 924","e924"],
-name:"Potassium Bromate",
-level:"Needs Verification",
-tone:"red",
-detail:"This additive has raised toxicological concerns. Verify the product against current FSSAI rules. This scan cannot establish its actual concentration or regulatory compliance."
-},
-
-{
-terms:["red 40","allura red","ins 129","e129","sunset yellow","ins 110","e110","tartrazine","ins 102","e102"],
-name:"Synthetic Food Colours",
-level:"Check Permitted Use",
-tone:"amber",
-detail:"Some synthetic colours have category-specific permitted uses and limits. This is not a cancer diagnosis."
-}
-
+const countries=[
+{key:"united-kingdom",name:"United Kingdom"},
+{key:"germany",name:"Germany"},
+{key:"france",name:"France"},
+{key:"italy",name:"Italy"},
+{key:"spain",name:"Spain"},
+{key:"netherlands",name:"Netherlands"},
+{key:"belgium",name:"Belgium"}
 ];
 
-function analyseIngredients(text){
-
-const normalized = (text || "").toLowerCase().replace(/[()[\],;]/g," ");
-
-return ingredientChecks.filter(item =>
-item.terms.some(term => normalized.includes(term))
-);
-
+const checks=[
+{
+terms:["partially hydrogenated","vanaspati"],
+name:"Partially hydrogenated oils",
+level:"High concern",
+tone:"red",
+explanation:"These can contain industrial trans fats, which increase heart disease risk. This is not a cancer finding."
+},
+{
+terms:["aspartame","ins 951","e951"],
+name:"Aspartame",
+level:"Evidence is nuanced",
+tone:"amber",
+explanation:"IARC classified aspartame as possibly carcinogenic (Group 2B), based on limited evidence. JECFA retained its acceptable daily intake. This does not mean one serving causes cancer."
+},
+{
+terms:["sodium nitrite","ins 250","e250"],
+name:"Sodium nitrite",
+level:"Context matters",
+tone:"amber",
+explanation:"Can participate in nitrosamine formation under certain conditions. Risk depends on food type, processing and exposure."
+},
+{
+terms:["sodium nitrate","ins 251","e251","potassium nitrate","ins 252"],
+name:"Nitrate salts",
+level:"Context matters",
+tone:"amber",
+explanation:"Health assessment depends on source, amount and dietary context."
+},
+{
+terms:["sodium benzoate","ins 211","e211"],
+name:"Sodium benzoate",
+level:"Context matters",
+tone:"amber",
+explanation:"Under certain conditions with ascorbic acid, benzene formation can be a concern. This ingredient list cannot establish that it occurred."
+},
+{
+terms:["potassium bromate","ins 924","e924"],
+name:"Potassium bromate",
+level:"Needs verification",
+tone:"red",
+explanation:"This additive has raised toxicological concerns. Verify current FSSAI rules and the exact product formulation."
+},
+{
+terms:["red 40","allura red","ins 129","e129","sunset yellow","ins 110","e110","tartrazine","ins 102","e102"],
+name:"Synthetic food colours",
+level:"Check permitted use",
+tone:"amber",
+explanation:"Permitted use depends on the specific colour, food category and national regulations."
+},
+{
+terms:["monosodium glutamate","msg","ins 621","e621"],
+name:"MSG",
+level:"Not a cancer warning",
+tone:"green",
+explanation:"MSG is a flavour enhancer. Its presence is not evidence that the product causes cancer."
 }
+];
 
-function safe(value){
-
-return String(value ?? "").replace(/[&<>"']/g,c=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#39;"
+function safe(v){
+return String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[c]));
-
 }
 
-function nutrientFlags(p){
-
-const n = p.nutriments || {};
-const flags = [];
-
-const sugar = Number(n.sugars_100g);
-const salt = Number(n.salt_100g);
-const fat = Number(n["saturated-fat_100g"]);
-
-if(Number.isFinite(sugar) && sugar >= 22.5){
-
-flags.push({
-name:"High Sugars",
-level:"High per 100 g",
-tone:"amber",
-detail:`${sugar} g sugar per 100 g. This is a screening threshold, not an Indian legal verdict.`
-});
-
+function analyse(text){
+const t=(text||"").toLowerCase();
+return checks.filter(x=>x.terms.some(term=>t.includes(term)));
 }
 
-if(Number.isFinite(salt) && salt >= 1.5){
+function flagsHTML(items,empty){
+if(!items.length)return `<p class="muted">${safe(empty)}</p>`;
 
-flags.push({
-name:"High Salt",
-level:"High per 100 g",
-tone:"amber",
-detail:`${salt} g salt per 100 g. Frequent high salt intake can increase blood pressure.`
-});
-
-}
-
-if(Number.isFinite(fat) && fat >= 5){
-
-flags.push({
-name:"High Saturated Fat",
-level:"High per 100 g",
-tone:"amber",
-detail:`${fat} g saturated fat per 100 g. Consider serving size and overall diet.`
-});
-
-}
-
-return flags;
-
-}
-
-function renderFlags(flags,empty){
-
-if(!flags.length){
-
-return `<p class="muted">${safe(empty)}</p>`;
-
-}
-
-return flags.map(f=>`
-
+return items.map(x=>`
 <div class="flag">
-
 <div class="flagtop">
-<b>${safe(f.name)}</b>
-<span class="pill ${f.tone==="red"?"red":f.tone==="green"?"green":""}">
-${safe(f.level)}
-</span>
+<b>${safe(x.name)}</b>
+<span class="pill ${x.tone==="red"?"red":x.tone==="green"?"green":""}">${safe(x.level)}</span>
 </div>
-
-<p>${safe(f.detail)}</p>
-
+<p>${safe(x.explanation)}</p>
 </div>
-
 `).join("");
-
 }
 
-function renderNutrition(p){
-
+function nutrientsHTML(p){
 const n=p.nutriments||{};
 
-const rows=[
+const values=[
 ["Energy",n["energy-kcal_100g"],"kcal"],
 ["Sugar",n.sugars_100g,"g"],
 ["Salt",n.salt_100g,"g"],
-["Saturated Fat",n["saturated-fat_100g"],"g"],
+["Saturated fat",n["saturated-fat_100g"],"g"],
 ["Protein",n.proteins_100g,"g"],
 ["Fibre",n.fiber_100g,"g"]
-];
+].filter(x=>x[1]!==undefined&&x[1]!==null&&x[1]!=="");
 
-const valid=rows.filter(r=>r[1]!==undefined&&r[1]!==null&&r[1]!=="");
+if(!values.length)return `<p class="muted">Nutrition information unavailable.</p>`;
 
-if(!valid.length){
-
-return `<p class="muted">Nutrition data unavailable.</p>`;
-
+return `<div class="grid">${values.map(x=>`
+<div class="nutrient">
+<span>${x[0]} per 100 g</span>
+<b>${safe(x[1])} ${x[2]}</b>
+</div>`).join("")}</div>`;
 }
 
-return `<div class="nutrients">`+
-valid.map(r=>`
-<div class="nut">
-<span>${r[0]} per 100 g</span>
-<b>${safe(r[1])} ${r[2]}</b>
-</div>
-`).join("")+
-`</div>`;
+function nutritionWarnings(p){
+const n=p.nutriments||{};
+const result=[];
 
-}
-
-function showProduct(p,barcode){
-
-const ingredients=p.ingredients_text||p.ingredients_text_en||"";
-
-const flags=analyseIngredients(ingredients);
-const nflags=nutrientFlags(p);
-const all=[...flags,...nflags];
-
-const image=p.image_front_small_url||p.image_url||"";
-
-const score=all.some(x=>x.tone==="red")
-?"Review Carefully"
-:all.length
-?"Some Points to Check"
-:"No Listed Flags Found";
-
-$("result").style.display="block";
-
-$("result").innerHTML=`
-
-<div class="product">
-
-${image?`<img src="${safe(image)}" alt="Product image" loading="lazy">`:""}
-
-<div>
-<h2>${safe(p.product_name||p.product_name_en||"Unnamed Product")}</h2>
-<div class="muted">${safe(p.brands||"Brand unavailable")}</div>
-<div class="muted">Barcode: ${safe(barcode)}</div>
-<div class="muted">Source: Open Food Facts</div>
-</div>
-
-</div>
-
-<div class="score">
-<div>
-<strong>${score}</strong>
-<br>
-<span>Ingredient and nutrition screening</span>
-</div>
-<span>${all.length} findings</span>
-</div>
-
-<div class="sectiontitle">Ingredient Review</div>
-
-${renderFlags(flags,ingredients
-?"No markers from this screening list were found. This does not mean every ingredient is risk-free."
-:"Ingredient information is missing from the database.")}
-
-<div class="sectiontitle">Nutrition Review</div>
-
-${renderFlags(nflags,"No high sugar, salt or saturated-fat threshold flags from available data.")}
-
-${renderNutrition(p)}
-
-<div class="sectiontitle">Recorded Ingredients</div>
-
-<p class="muted">${ingredients?safe(ingredients):"Ingredient data unavailable."}</p>
-
-<p class="foot">
-Database records may be incomplete or intended for another market or pack size. Verify the ingredients on your Indian package. This is not a laboratory test or product-specific safety certification.
-</p>
-
-`;
-
-saveScan({
-
-barcode,
-productName:p.product_name||p.product_name_en||"Unnamed Product",
-findingCount:all.length,
-source:"Open Food Facts"
-
+if(Number.isFinite(Number(n.sugars_100g))&&Number(n.sugars_100g)>=22.5){
+result.push({
+name:"High sugar",
+level:"High per 100 g",
+tone:"amber",
+explanation:`${n.sugars_100g} g per 100 g. This is a screening threshold, not an Indian legal verdict.`
 });
-
 }
 
-function showManual(text){
-
-const flags=analyseIngredients(text);
-
-$("result").style.display="block";
-
-$("result").innerHTML=`
-
-<div class="sectiontitle">Ingredient Analysis</div>
-
-<div class="score">
-<strong>${flags.length} markers found</strong>
-<span>Text screening only</span>
-</div>
-
-${renderFlags(flags,"No markers from this limited screening list were found. This does not mean the food is risk-free.")}
-
-<p class="foot">
-This is not a verified product result. Product identity, quantities and regulatory compliance have not been checked.
-</p>
-
-`;
-
+if(Number.isFinite(Number(n.salt_100g))&&Number(n.salt_100g)>=1.5){
+result.push({
+name:"High salt",
+level:"High per 100 g",
+tone:"amber",
+explanation:`${n.salt_100g} g per 100 g. Frequent high salt intake can increase blood pressure.`
+});
 }
 
-async function lookup(barcode){
-
-const code=barcode.trim();
-
-if(!/^\d{8,14}$/.test(code)){
-
-$("status").textContent="Enter a valid 8–14 digit barcode.";
-return;
-
+if(Number.isFinite(Number(n["saturated-fat_100g"]))&&Number(n["saturated-fat_100g"])>=5){
+result.push({
+name:"High saturated fat",
+level:"High per 100 g",
+tone:"amber",
+explanation:`${n["saturated-fat_100g"]} g per 100 g. Consider portion size and overall diet.`
+});
 }
 
-$("status").textContent="Searching actual product database...";
+return result;
+}
 
-$("result").style.display="none";
+// Fetch actual product information
 
-try{
+async function getProduct(barcode){
 
-const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=code,product_name,product_name_en,brands,countries,ingredients_text,ingredients_text_en,nutriments,image_front_small_url,image_url`;
+const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json?fields=code,product_name,product_name_en,brands,countries,ingredients_text,ingredients_text_en,ingredients,nutriments,image_front_small_url,image_url,quantity,packaging`;
 
 const response=await fetch(url);
 
-if(!response.ok){
-
-throw new Error("Product database unavailable. Try again.");
-
-}
+if(!response.ok)throw Error("Product database unavailable.");
 
 const data=await response.json();
 
-if(data.status!==1||!data.product){
+if(data.status!==1||!data.product)return null;
 
-$("status").textContent="Product not found. Try another barcode or paste the ingredients manually.";
-return;
+return data.product;
+}
+
+// Ingredient names from product records
+
+function ingredientList(p){
+
+if(Array.isArray(p.ingredients)&&p.ingredients.length){
+
+return p.ingredients
+.map(x=>x.text||x.id||"")
+.filter(Boolean)
+.map(normalizeIngredient)
+.filter(Boolean);
 
 }
 
-$("status").textContent="Real product record retrieved.";
+const raw=p.ingredients_text||p.ingredients_text_en||"";
 
-showProduct(data.product,code);
-
-}catch(error){
-
-$("status").textContent=error.message||"Unable to retrieve product data.";
+return raw.split(/[,;]+/)
+.map(normalizeIngredient)
+.filter(x=>x.length>1);
 
 }
 
+function normalizeIngredient(text){
+
+return String(text||"")
+.toLowerCase()
+.replace(/\([^)]*\)/g," ")
+.replace(/\d+(?:[.,]\d+)?\s*%/g," ")
+.replace(/[^a-z0-9\s-]/g," ")
+.replace(/\s+/g," ")
+.trim();
+
 }
 
-async function saveScan(item){
+// Find country-specific actual records
 
-if(!currentUser)return;
+async function searchCountry(country){
 
-try{
+const key=country.key;
 
-await addDoc(collection(db,"users",currentUser.uid,"scans"),{
+if(countryCache[key])return countryCache[key];
 
-...item,
-createdAt:serverTimestamp()
+const brand=productData.brands||"";
+const name=productData.product_name||productData.product_name_en||"";
+
+const terms=[brand,name].filter(Boolean).join(" ");
+
+if(!terms)return [];
+
+const params=new URLSearchParams({
+search_terms:terms,
+search_simple:"1",
+action:"process",
+tagtype_0:"countries",
+tag_0:country.name,
+json:"1",
+page_size:"20",
+fields:"code,product_name,brands,countries,ingredients_text,ingredients_text_en,ingredients,nutriments,image_front_small_url,quantity"
+});
+
+const url="https://world.openfoodfacts.org/cgi/search.pl?"+params.toString();
+
+const response=await fetch(url);
+
+if(!response.ok)throw Error("Could not search "+country.name);
+
+const data=await response.json();
+
+const products=(data.products||[]).filter(p=>
+p.product_name&&
+p.ingredients_text&&
+(!brand||(p.brands||"").toLowerCase().includes(brand.toLowerCase()))
+);
+
+countryCache[key]=products;
+
+return products;
+}
+
+// Compare Indian and European ingredients
+
+function compareIngredients(india,europe){
+
+const a=ingredientList(india);
+const b=ingredientList(europe);
+
+const onlyIndia=a.filter(x=>!b.includes(x));
+const onlyEurope=b.filter(x=>!a.includes(x));
+
+return {onlyIndia,onlyEurope};
+}
+
+// Compare nutrition values per 100g
+
+function compareNutrients(india,europe){
+
+const n1=india.nutriments||{};
+const n2=europe.nutriments||{};
+
+const fields=[
+{name:"Sugar",key:"sugars_100g",unit:"g"},
+{name:"Salt",key:"salt_100g",unit:"g"},
+{name:"Saturated fat",key:"saturated-fat_100g",unit:"g"}
+];
+
+return fields.map(field=>{
+
+const a=Number(n1[field.key]);
+const b=Number(n2[field.key]);
+
+const valid=n1[field.key]!==undefined&&
+n1[field.key]!==null&&
+n1[field.key]!==""&&
+n2[field.key]!==undefined&&
+n2[field.key]!==null&&
+n2[field.key]!=="";
+
+if(!valid||!Number.isFinite(a)||!Number.isFinite(b)){
+return {...field,available:false};
+}
+
+const difference=Math.round(Math.abs(a-b)*100)/100;
+
+let explanation="Both versions have the same recorded amount.";
+
+if(a>b){
+explanation=`The Indian version has ${difference} g more ${field.name.toLowerCase()} per 100 g.`;
+}else if(b>a){
+explanation=`The European version has ${difference} g more ${field.name.toLowerCase()} per 100 g.`;
+}
+
+return {
+...field,
+available:true,
+india:a,
+europe:b,
+difference,
+explanation,
+indiaMore:a>b
+};
 
 });
 
-loadHistory();
-
-}catch(error){
-
-console.error("Unable to save scan:",error);
-
 }
 
-}
-
-async function loadHistory(){
-
-if(!currentUser)return;
-
-try{
-
-const q=query(
-collection(db,"users",currentUser.uid,"scans"),
-orderBy("createdAt","desc"),
-limit(5)
-);
-
-const snapshot=await getDocs(q);
-
-if(snapshot.empty)return;
-
-$("history").style.display="block";
-
-$("historyList").innerHTML=snapshot.docs.map(doc=>{
-
-const x=doc.data();
+function ingredientDifferenceHTML(title,items,empty,description){
 
 return `
-<div class="historyitem">
-<b>${safe(x.productName)}</b>
-<span>${safe(x.barcode)}</span>
+<div class="difference">
+<b>${title}</b>
+<p class="muted">${description}</p>
+${items.length?
+items.map(x=>`<div class="diffrow"><b>• ${safe(x)}</b></div>`).join("")
+:`<p class="muted">${empty}</p>`}
+</div>
+`;
+
+}
+
+function nutrientComparisonHTML(values){
+
+return values.map(x=>{
+
+if(!x.available){
+
+return `
+<div class="diffrow">
+<b>${x.name}</b>
+<p>We do not have enough information to compare these two versions.</p>
+</div>
+`;
+
+}
+
+const max=Math.max(x.india,x.europe,0.01);
+
+const a=(x.india/max)*100;
+const b=(x.europe/max)*100;
+
+const more=x.indiaMore?"India":"Europe";
+
+return `
+<div class="diffrow">
+
+<b>${x.name} per 100 g</b>
+
+<div class="grid" style="margin-top:10px">
+
+<div>
+<span class="muted">🇮🇳 India</span>
+<br><b>${x.india} g</b>
+<div class="bar"><div style="width:${a}%"></div></div>
+</div>
+
+<div>
+<span class="muted">🇪🇺 Europe</span>
+<br><b>${x.europe} g</b>
+<div class="bar"><div style="width:${b}%"></div></div>
+</div>
+
+</div>
+
+<p>${safe(x.explanation)}</p>
+
+<div class="childbox">
+<b>👧 Easy explanation</b>
+<p>${safe(x.difference===0
+?"Both versions have the same recorded amount."
+:`Imagine we compare two 100 g portions. ${more} has ${x.difference} g more ${x.name.toLowerCase()}.`)}</p>
+</div>
+
 </div>
 `;
 
 }).join("");
 
-}catch(error){
+}
 
-console.warn("History unavailable",error);
+function renderTabs(){
+
+$("countryTabs").innerHTML=countries.map(c=>`
+<button class="${selectedCountry===c.key?"active":"secondary"}"
+data-country="${c.key}">${safe(c.name)}</button>
+`).join("");
+
+$("countryTabs").querySelectorAll("button").forEach(btn=>{
+
+btn.onclick=()=>{
+selectedCountry=btn.dataset.country;
+renderTabs();
+renderComparison();
+};
+
+});
 
 }
 
-}
+async function renderComparison(){
 
-async function startCamera(){
+const country=countries.find(x=>x.key===selectedCountry);
 
-if(!navigator.mediaDevices?.getUserMedia){
+$("comparisons").innerHTML=`<p class="muted">Searching for a matching product in ${safe(country.name)}...</p>`;
 
-$("status").textContent="Camera unavailable. Enter barcode manually.";
-$("barcodeRow").style.display="flex";
+try{
+
+const products=await searchCountry(country);
+
+if(!products.length){
+
+$("comparisons").innerHTML=`
+<div class="country">
+<h3>${safe(country.name)}</h3>
+<div class="childbox">
+<b>We couldn't find a matching product.</b>
+<p>This does not mean the product is unavailable or different in this country. We simply don't have a reliable matching database record.</p>
+</div>
+</div>`;
+
 return;
 
 }
 
+// Show the best available candidate, not multiple possibly unrelated products.
+
+const candidate=products[0];
+
+const ingredients=compareIngredients(productData,candidate);
+const nutrition=compareNutrients(productData,candidate);
+
+const name=candidate.product_name||"Product name unavailable";
+
+$("comparisons").innerHTML=`
+
+<div class="country">
+
+<div class="countryhead">
+<h3>🇮🇳 India vs 🇪🇺 ${safe(country.name)}</h3>
+<span class="pill blue">Database match</span>
+</div>
+
+<p class="muted">${safe(name)}</p>
+
+<p class="muted">India barcode: ${safe(productData.code||"Unavailable")}<br>
+Comparison barcode: ${safe(candidate.code||"Unavailable")}</p>
+
+${candidate.image_front_small_url?
+`<img src="${safe(candidate.image_front_small_url)}" alt="European product" style="width:75px;height:75px;object-fit:contain">`:""}
+
+<div class="section">Ingredients in India but not Europe</div>
+
+${ingredientDifferenceHTML(
+"🇮🇳 India only",
+ingredients.onlyIndia,
+"No additional ingredients found in the Indian list.",
+"These words appear in the Indian ingredient record but not in the selected European record."
+)}
+
+<div class="section">Ingredients in Europe but not India</div>
+
+${ingredientDifferenceHTML(
+"🇪🇺 Europe only",
+ingredients.onlyEurope,
+"No additional ingredients found in the European list.",
+"These words appear in the European ingredient record but not in the Indian record."
+)}
+
+<div class="section">Sugar, salt and saturated fat</div>
+
+${nutrientComparisonHTML(nutrition)}
+
+<div class="childbox">
+<b>🧒 What should I understand?</b>
+<p>
+Food companies can make different versions of the same product for different countries. The ingredients and nutrition numbers above show differences in the records we found. A difference does not automatically mean one version is dangerous.
+</p>
+</div>
+
+<div class="foot">
+Ingredient matching uses normalised database text. Different spellings, language translations, ingredient grouping and incomplete labels can affect the comparison. The matching product has not been independently verified as the identical formulation.
+</div>
+
+<p>
+<a href="https://world.openfoodfacts.org/product/${encodeURIComponent(candidate.code||"")}" target="_blank" rel="noopener">View European product record ↗</a>
+</p>
+
+</div>
+
+`;
+
+}catch(error){
+
+$("comparisons").innerHTML=`<p class="muted">${safe(error.message)}</p>`;
+
+}
+
+}
+
+// Recent news search
+
+async function loadNews(){
+
+const name=productData.product_name||productData.product_name_en||"";
+const brand=productData.brands||"";
+
+const identity=`"${name}" ${brand}`.trim();
+
+const search=`${identity} (recall OR contamination OR unsafe OR warning OR banned OR salmonella OR food safety)`;
+
+const url=new URL("https://api.gdeltproject.org/api/v2/doc/doc");
+
+url.searchParams.set("query",search);
+url.searchParams.set("mode","ArtList");
+url.searchParams.set("format","json");
+url.searchParams.set("maxrecords","10");
+url.searchParams.set("sort","HybridRel");
+url.searchParams.set("timespan","6m");
+
+$("news").innerHTML="<p class='muted'>Looking for recent reports...</p>";
+
 try{
 
-stream=await navigator.mediaDevices.getUserMedia({
+const response=await fetch(url);
 
-video:{facingMode:{ideal:"environment"}},
-audio:false
+if(!response.ok)throw Error("News search unavailable.");
 
+const data=await response.json();
+
+const articles=data.articles||[];
+
+if(!articles.length){
+
+$("news").innerHTML=`
+<p class="muted">No matching reports were returned. This does not prove that no incidents have occurred.</p>
+<a href="https://news.google.com/search?q=${encodeURIComponent(identity+" food recall warning")}" target="_blank" rel="noopener">Search Google News ↗</a>`;
+
+return;
+
+}
+
+$("news").innerHTML=articles.map(a=>`
+
+<div class="news">
+<a href="${safe(a.url)}" target="_blank" rel="noopener">${safe(a.title||"Read report")} ↗</a>
+<p>${safe(a.domain||"News source")}</p>
+<small>${safe(a.seendate||"Date unavailable")}</small>
+</div>
+
+`).join("");
+
+}catch(error){
+
+$("news").innerHTML=`
+<p class="muted">Automatic news search is unavailable right now.</p>
+<a href="https://news.google.com/search?q=${encodeURIComponent(identity+" food recall warning")}" target="_blank" rel="noopener">Search Google News ↗</a>`;
+
+}
+
+}
+
+// Firebase scan history
+
+async function saveScan(p,barcode,count){
+
+if(!user)return;
+
+try{
+
+await addDoc(collection(db,"users",user.uid,"scans"),{
+barcode,
+productName:p.product_name||"Unknown product",
+findingCount:count,
+createdAt:serverTimestamp()
 });
 
-$("video").srcObject=stream;
+}catch(e){
+
+console.error("History save failed:",e);
+
+}
+
+}
+
+// Display product
+
+async function displayProduct(p,barcode,generation){
+
+if(generation!==lookupGeneration)return;
+
+productData=p;
+countryCache={};
+selectedCountry="germany";
+
+$("result").style.display="block";
+
+const image=p.image_front_small_url||p.image_url||"";
+
+$("productInfo").innerHTML=`
+<div class="product">
+${image?`<img src="${safe(image)}" alt="Product image">`:""}
+<div>
+<h2>${safe(p.product_name||p.product_name_en||"Unknown product")}</h2>
+<div class="muted">${safe(p.brands||"Brand unavailable")}</div>
+<div class="muted">Barcode: ${safe(barcode)}</div>
+<div class="muted">Recorded markets: ${safe(p.countries||"Not specified")}</div>
+</div>
+</div>
+`;
+
+const text=p.ingredients_text||p.ingredients_text_en||"";
+const ingredientFlags=analyse(text);
+const nutritionFlags=nutritionWarnings(p);
+const all=[...ingredientFlags,...nutritionFlags];
+
+$("overview").innerHTML=`
+<b>${all.length} screening findings</b>
+<p class="muted">These are ingredients and nutrition points worth understanding. They are not a medical diagnosis or a cancer score.</p>
+`;
+
+$("ingredients").innerHTML=`
+${flagsHTML(ingredientFlags,text
+?"No markers from our limited screening list were found. This does not mean every ingredient is risk-free."
+:"Ingredient information is missing from the database.")}
+<div class="muted">Recorded ingredient list:</div>
+<p class="muted">${text?safe(text):"Unavailable"}</p>
+`;
+
+$("nutrition").innerHTML=`
+${flagsHTML(nutritionFlags,"No nutrition thresholds flagged from the available data.")}
+${nutrientsHTML(p)}
+`;
+
+renderTabs();
+
+$("comparisons").innerHTML="<p class='muted'>Loading country comparisons...</p>";
+
+renderComparison();
+loadNews();
+
+saveScan(p,barcode,all.length);
+
+}
+
+async function lookup(barcode){
+
+if(!/^\d{8,14}$/.test(barcode)){
+$("status").textContent="Please enter a valid barcode.";
+return;
+}
+
+const generation=++lookupGeneration;
+
+$("status").textContent="Looking up real product information...";
+$("result").style.display="none";
+
+try{
+
+const p=await getProduct(barcode);
+
+if(generation!==lookupGeneration)return;
+
+if(!p){
+
+$("status").textContent="Product not found. Try another barcode or paste the ingredient label.";
+return;
+
+}
+
+$("status").textContent="Product found. Preparing your comparison...";
+
+displayProduct(p,barcode,generation);
+
+}catch(error){
+
+if(generation===lookupGeneration){
+$("status").textContent=error.message;
+}
+
+}
+
+}
+
+// Barcode scanner
+
+async function startCamera(){
+
+try{
+
+if(!navigator.mediaDevices?.getUserMedia){
+throw Error("Camera unavailable. Enter the barcode manually.");
+}
+
+stream=await navigator.mediaDevices.getUserMedia({
+video:{facingMode:{ideal:"environment"}},
+audio:false
+});
 
 $("camera").style.display="block";
+$("video").srcObject=stream;
 
 await $("video").play();
 
 if(!("BarcodeDetector" in window)){
-
-$("status").textContent="Barcode scanning is unsupported in this browser. Enter the barcode manually.";
-
+$("status").textContent="Barcode scanning unsupported in this browser. Enter the barcode manually.";
 $("barcodeRow").style.display="flex";
-
 return;
-
 }
 
-let detector;
-
-try{
-
-detector=new BarcodeDetector({
-
+const detector=new BarcodeDetector({
 formats:["ean_13","ean_8","upc_a","upc_e"]
-
 });
 
-}catch{
-
-detector=new BarcodeDetector();
-
-}
-
-scanLoop=true;
-
-$("status").textContent="Point the camera at the barcode.";
+let running=true;
 
 const scan=async()=>{
 
-if(!scanLoop)return;
+if(!running)return;
 
 try{
 
@@ -625,9 +950,10 @@ const codes=await detector.detect($("video"));
 
 if(codes.length){
 
+running=false;
 stopCamera();
 
-$("barcodeInput").value=codes[0].rawValue;
+$("barcode").value=codes[0].rawValue;
 
 lookup(codes[0].rawValue);
 
@@ -635,22 +961,22 @@ return;
 
 }
 
-}catch(error){
-
-console.warn(error);
-
-}
+}catch(e){}
 
 requestAnimationFrame(scan);
 
+};
+
+$("close").onclick=()=>{
+running=false;
+stopCamera();
 };
 
 requestAnimationFrame(scan);
 
 }catch(error){
 
-$("status").textContent="Camera permission denied or unavailable. Enter the barcode manually.";
-
+$("status").textContent=error.message||"Camera permission unavailable.";
 $("barcodeRow").style.display="flex";
 
 }
@@ -659,12 +985,9 @@ $("barcodeRow").style.display="flex";
 
 function stopCamera(){
 
-scanLoop=false;
-
 if(stream){
 
-stream.getTracks().forEach(track=>track.stop());
-
+stream.getTracks().forEach(t=>t.stop());
 stream=null;
 
 }
@@ -673,59 +996,53 @@ $("camera").style.display="none";
 
 }
 
-$("scanBtn").onclick=startCamera;
+$("scan").onclick=startCamera;
 
-$("stopCamera").onclick=stopCamera;
-
-$("manualBtn").onclick=()=>{
-
-$("barcodeRow").style.display=
-
-$("barcodeRow").style.display==="flex"?"none":"flex";
-
+$("manual").onclick=()=>{
+$("barcodeRow").style.display="flex";
 };
 
-$("lookupBtn").onclick=()=>lookup($("barcodeInput").value);
+$("search").onclick=()=>{
+lookup($("barcode").value.trim());
+};
 
-$("barcodeInput").addEventListener("keydown",e=>{
-
-if(e.key==="Enter")lookup($("barcodeInput").value);
-
+$("barcode").addEventListener("keydown",e=>{
+if(e.key==="Enter")lookup($("barcode").value.trim());
 });
 
-$("analyseText").onclick=()=>{
+$("analyse").onclick=()=>{
 
-const text=$("ingredientInput").value.trim();
+const text=$("manualIngredients").value.trim();
 
-if(!text){
+if(!text)return;
 
-$("status").textContent="Paste an ingredient list first.";
-return;
+const results=analyse(text);
 
-}
-
-showManual(text);
-
-$("status").textContent="Text analysis complete. Not a verified product result.";
+$("manualResult").innerHTML=`
+<div class="section">Ingredient screening</div>
+${flagsHTML(results,"No markers from our limited screening list were found. This does not mean the product is risk-free.")}
+<p class="muted">Text-only analysis. Product identity and ingredient quantities are not verified.</p>
+`;
 
 };
+
+// Firebase login
 
 try{
 
 const credential=await signInAnonymously(auth);
 
-currentUser=credential.user;
-
-loadHistory();
+user=credential.user;
 
 }catch(error){
 
 console.error("Firebase authentication unavailable:",error);
 
-$("status").textContent="Product scanning works. Enable Firebase Anonymous Authentication to save scan history.";
+$("status").textContent="Scanning works, but Firebase history is unavailable. Enable Anonymous Authentication.";
 
 }
 
 </script>
+
 </body>
 </html>
