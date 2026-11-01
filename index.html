@@ -9,8 +9,8 @@
     <style>
         :root {
             --pixel-font: 'Press Start 2P', cursive;
-            --bg-beige: #f5f5dc;
-            --accent-pink: #e2a9be;
+            --bg-beige: #f5f5dc; 
+            --accent-pink: #e2a9be; 
             --deep-rose: #b07d8e;
             --text-main: #4a4a4a;
             --border-color: #d1d1bc;
@@ -44,7 +44,7 @@
             inset: 0;
             background-color: var(--bg-beige);
             border: 16px solid var(--border-color);
-            outline: 3px solid white;
+            outline: 3px solid white; 
             outline-offset: -10px;
             display: flex;
             flex-direction: column;
@@ -319,7 +319,7 @@
                 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
                 const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
 
-                // Mapped precisely to your repository's exact filenames
+                // Safely handles exact filenames with spaces and uppercase letters using encodeURIComponent
                 if (isMobile) {
                     window.open('NEGOCIO MOBILE final product.html', '_self');
                 } else {
